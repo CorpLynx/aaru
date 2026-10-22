@@ -25,3 +25,5 @@ __pycache__/
 # Build artifacts
 dist/
 build/
+# Open WebUI fork: standalone clone while untracked (was a submodule)
+forks/
