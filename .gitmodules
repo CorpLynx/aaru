@@ -1,0 +1,3 @@
+[submodule "forks/open-webui"]
+	path = forks/open-webui
+	url = https://github.com/CorpLynx/open-webui.git
