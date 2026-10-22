@@ -1,0 +1,36 @@
+# LiteLLM Proxy Configuration
+# See: https://docs.litellm.ai/docs/proxy/configs
+#
+# Model aliases are stable names exposed to clients.
+# Map subscription entitlements to allowed aliases and quotas via LiteLLM virtual keys.
+
+model_list:
+  # Safety classifier — optional, evaluate before enabling in production
+  # - model_name: guardrail
+  #   litellm_params:
+  #     model: openai/llama-guard-3
+  #     api_base: http://guardrail-container:8082/v1
+
+  - model_name: fast
+    litellm_params:
+      model: openai/nemotron-3.5-lightning
+      api_base: http://llamacpp:8080/v1
+      # api_key: not needed for local llama.cpp
+
+  # - model_name: reasoning
+  #   litellm_params:
+  #     model: openai/llama-3.3-70b
+  #     api_base: http://vllm:8081/v1
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+
+litellm_settings:
+  # Drop unsupported parameters for local models
+  drop_params: true
+  # Do not log prompts or completions
+  set_verbose: false
+
+router_settings:
+  routing_strategy: simple-shuffle

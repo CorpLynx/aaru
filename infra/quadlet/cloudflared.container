@@ -1,0 +1,21 @@
+[Unit]
+Description=Cloudflare Tunnel
+After=network-online.target openwebui.service litellm.service
+Wants=network-online.target
+
+[Container]
+Image=docker.io/cloudflare/cloudflared:latest
+ContainerName=cloudflared
+Network=aaru-internal.network
+Exec=tunnel run
+Secret=cloudflared-token,type=env,target=TUNNEL_TOKEN
+Environment=TUNNEL_TOKEN={env:TUNNEL_TOKEN}
+NoNewPrivileges=true
+Memory=256m
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

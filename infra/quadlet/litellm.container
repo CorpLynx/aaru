@@ -1,0 +1,30 @@
+[Unit]
+Description=LiteLLM API Gateway
+After=network-online.target postgres.service
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/berriai/litellm:main-stable
+ContainerName=litellm
+Network=aaru-internal.network
+PublishPort=127.0.0.1:4000:4000
+Volume=%h/aaru/infra/config/litellm_config.yaml:/app/config.yaml:ro,z
+Environment=LITELLM_MASTER_KEY={env:LITELLM_MASTER_KEY}
+Environment=DATABASE_URL={env:DATABASE_URL}
+Secret=litellm-master-key,type=env,target=LITELLM_MASTER_KEY
+Secret=database-url,type=env,target=DATABASE_URL
+HealthCmd=python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health')"
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
+NoNewPrivileges=true
+ReadOnly=true
+Tmpfs=/tmp:size=100m
+Memory=2g
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target

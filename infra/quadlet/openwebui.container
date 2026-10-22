@@ -1,0 +1,27 @@
+[Unit]
+Description=Open WebUI
+After=network-online.target postgres.service litellm.service
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/open-webui/open-webui:main
+ContainerName=openwebui
+Network=aaru-internal.network
+PublishPort=127.0.0.1:3000:8080
+Volume=openwebui-data.volume:/app/backend/data:Z
+Environment=OPENAI_API_BASE_URL=http://litellm:4000/v1
+Environment=OPENAI_API_KEY={env:OPENAI_API_KEY}
+Environment=DATABASE_URL={env:DATABASE_URL}
+Secret=openai-api-key,type=env,target=OPENAI_API_KEY
+Secret=database-url,type=env,target=DATABASE_URL
+Environment=WEBUI_AUTH=true
+Environment=ENABLE_SIGNUP=false
+NoNewPrivileges=true
+Memory=2g
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target

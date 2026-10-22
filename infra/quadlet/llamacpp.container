@@ -1,0 +1,28 @@
+[Unit]
+Description=llama.cpp Inference Server (Vulkan)
+After=network-online.target aaru-internal-network.service
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/ggml-org/llama.cpp:server
+ContainerName=llamacpp
+Network=aaru-internal.network
+# No host port published — internal only
+AddDevice=/dev/dri
+SecurityLabelType=container_t
+NoNewPrivileges=true
+ReadOnly=true
+Tmpfs=/tmp:size=200m
+Memory=100g
+Environment=LLAMA_ARG_MODEL=/models/model.gguf
+Environment=LLAMA_ARG_HOST=0.0.0.0
+Environment=LLAMA_ARG_PORT=8080
+Volume=%h/aaru/models:/models:ro,z
+Volume=%h/aaru/infra/config:/config:ro,z
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target
