@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+html,body{margin:0;background:#050607;color:#EDEFF2;font-family:"Geist",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
+*{box-sizing:border-box}
+@keyframes aaruReed{0%{transform:scale(1);opacity:1}17%{transform:scale(0);opacity:0}34%,100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:48px;display:flex;flex-direction:column;gap:32px;font-family:'Geist',system-ui,sans-serif">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:720px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">BRAND · LOGO MOTION</div>
+    <div style="font-size:28px;line-height:36px;font-weight:600;letter-spacing:-0.015em">Reed wave</div>
+    <div style="font-size:15px;line-height:24px;color:#A6ADB8">Each reed retracts into the core until it disappears, then extends back out, one after another clockwise. The next reed starts retracting as the previous one returns, so the gap travels around the ring.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+    <div style="height:420px;border-radius:16px;border:1px solid #1E232A;background:#000;display:flex;align-items:center;justify-content:center;color:#EDEFF2">{{ hero }}</div>
+    <div style="height:420px;border-radius:16px;border:1px solid #1E232A;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;color:#EDEFF2">
+      {{ splash }}
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">UNLOCKING VAULT…</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#474E59;position:absolute;margin-top:340px">Open WebUI splash replacement</span>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+    <div style="border-radius:12px;border:1px solid #1E232A;background:#0A0C0F;padding:20px;display:flex;align-items:center;gap:20px;color:#EDEFF2">{{ s48 }}{{ s32 }}{{ s24 }}<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682">48 · 32 · 24</span></div>
+    <div style="border-radius:12px;border:1px solid #1E232A;background:#EDEFF2;padding:20px;display:flex;align-items:center;gap:14px;color:#050607">{{ light }}<span style="font-weight:600;font-size:30px;letter-spacing:-0.03em;line-height:1">aaru</span></div>
+    <div style="border-radius:12px;border:1px solid #1E232A;background:#0A0C0F;padding:20px;display:flex;align-items:center;gap:10px;font-size:13px;color:#A6ADB8">{{ s16 }}Connecting to server…</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;font-size:13px;line-height:20px;color:#A6ADB8">
+    <div><span style="color:#EDEFF2">Motion</span> — scale to 0 toward the center (50,50) at 17% and back to 1 at 34%, symmetric ease-in-out, no hold or overshoot. Stagger = cycle ÷ 6, so two reeds are always moving and the wave never stops; default cycle 3.2s.</div>
+    <div><span style="color:#EDEFF2">Where</span> — splash, unlock, "connecting", and empty states while a model loads. Never in persistent chrome (sidebar, header). Reduced motion shows the static mark.</div>
+    <div><span style="color:#EDEFF2">Files</span> — <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#EDEFF2">assets/aaru-mark-animated.svg</span> (self-contained, works in an &lt;img&gt;) and <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#EDEFF2">&lt;Logo animated /&gt;</span>.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;duration&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:1.2,&quot;max&quot;:5,&quot;step&quot;:0.1,&quot;unit&quot;:&quot;s&quot;,&quot;default&quot;:2.4,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  mark(size, color, sw) {
+    const dur = this.props.duration ?? 3.2;
+    const step = dur / 6;
+    const ease = 'cubic-bezier(.45,0,.55,1)';
+    return React.createElement('svg', { width: size, height: size, viewBox: '-6 -6 112 112', fill: 'none', stroke: color, strokeWidth: sw, style: { display: 'block', overflow: 'visible' } },
+      [0, 60, 120, 180, 240, 300].map((a, i) => React.createElement('g', { key: a, transform: 'rotate(' + a + ' 50 50)' },
+        React.createElement('rect', { x: 47, y: 10, width: 13, height: 46, rx: 6.5, style: { transformOrigin: '50px 50px', animation: 'aaruReed ' + dur + 's ' + ease + ' ' + (i * step).toFixed(2) + 's infinite' } }))));
+  }
+  renderVals() {
+    return {
+      hero: this.mark(240, 'currentColor', 5),
+      splash: this.mark(96, 'currentColor', 5.5),
+      s48: this.mark(48, 'currentColor', 5.5), s32: this.mark(32, 'currentColor', 5.5), s24: this.mark(24, 'currentColor', 6.5), s16: this.mark(16, 'currentColor', 8),
+      light: this.mark(36, 'currentColor', 5.5),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+:root {
+  /* Base — OLED-first neutral ramp (cool, near-zero chroma) */
+  --aaru-void: #000000;      /* true OLED black: mobile bg, code wells */
+  --aaru-ink-950: #050607;   /* app background */
+  --aaru-ink-900: #0A0C0F;   /* sidebar / chrome */
+  --aaru-ink-850: #101318;   /* cards, panels */
+  --aaru-ink-800: #161A20;   /* inputs, raised */
+  --aaru-ink-700: #1F242C;   /* hover, overlays */
+  --aaru-line-1: #1E232A;    /* hairline */
+  --aaru-line-2: #2A3039;    /* default border */
+  --aaru-line-3: #3A414C;    /* strong border / focus base */
+  --aaru-fg-1: #EDEFF2;      /* primary text */
+  --aaru-fg-2: #A6ADB8;      /* secondary text */
+  --aaru-fg-3: #6E7682;      /* tertiary, metadata */
+  --aaru-fg-4: #474E59;      /* disabled */
+
+  /* Functional accents */
+  --aaru-ember: #FF7A33;     /* active / generating / compute heat */
+  --aaru-ember-tint: rgba(255,122,51,0.12);
+  --aaru-cipher: #3DDC97;    /* secure / encrypted / local */
+  --aaru-cipher-tint: rgba(61,220,151,0.10);
+  --aaru-signal: #6FA8FF;    /* info, links, citations */
+  --aaru-caution: #F2C14E;   /* warnings, context near limit */
+  --aaru-fault: #FF5468;     /* errors, destructive */
+
+  /* Tiers — hierarchy Graphite < Quartz < Arc < Aurum */
+  --aaru-tier-casual: #8A93A0;
+  --aaru-tier-casual-tint: rgba(138,147,160,0.06);
+  --aaru-tier-chat: #B4BCC8;
+  --aaru-tier-chat-tint: rgba(180,188,200,0.08);
+  --aaru-tier-dev: #A08BFF;
+  --aaru-tier-dev-tint: rgba(160,139,255,0.12);
+  --aaru-tier-sponsor: #E6C27A;
+  --aaru-tier-sponsor-tint: rgba(230,194,122,0.12);
+
+  /* Semantic aliases */
+  --bg-app: var(--aaru-ink-950);
+  --bg-chrome: var(--aaru-ink-900);
+  --surface-card: var(--aaru-ink-850);
+  --surface-input: var(--aaru-ink-800);
+  --surface-hover: var(--aaru-ink-700);
+  --border-subtle: var(--aaru-line-1);
+  --border-default: var(--aaru-line-2);
+  --border-strong: var(--aaru-line-3);
+  --text-primary: var(--aaru-fg-1);
+  --text-secondary: var(--aaru-fg-2);
+  --text-muted: var(--aaru-fg-3);
+  --text-disabled: var(--aaru-fg-4);
+  --state-generating: var(--aaru-ember);
+  --state-secure: var(--aaru-cipher);
+  --link: var(--aaru-signal);
+}

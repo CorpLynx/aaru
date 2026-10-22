@@ -1,0 +1,56 @@
+<!-- @dsCard group="Mobile app" viewport="420x880" name="Mobile chat & account" -->
+<!-- @startingPoint section="Screens" subtitle="Mobile chat + account (OLED)" viewport="420x880" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Aaru — Mobile</title><link rel="stylesheet" href="../../styles.css">
+<style>html,body{margin:0;height:100%;background:var(--bg-app);color:var(--text-primary);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}*{box-sizing:border-box}#root{height:100%}::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--aaru-line-2);border-radius:4px}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="../../ds-loader.js"></script>
+<script type="text/babel" src="../web/stream.js"></script>
+<script type="text/babel" src="ChatScreen.jsx"></script>
+<script type="text/babel" src="HistoryDrawer.jsx"></script>
+<script type="text/babel" src="AccountScreen.jsx"></script>
+<script type="text/babel" src="SealSheet.jsx"></script>
+</head><body><div id="root"></div>
+<script type="text/babel">
+
+function App() {
+  const [tab, setTab] = React.useState("chat");
+  const [drawer, setDrawer] = React.useState(false);
+  const [sheet, setSheet] = React.useState(false);
+  const tabs = [["chat", "message-square", "Chat"], ["vault", "library", "Vault"], ["account", "user-round", "Account"]];
+  return (
+    <div style={{ minHeight: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ width: 390, height: 844, borderRadius: 48, border: "1px solid var(--aaru-line-2)", background: "var(--aaru-void)", overflow: "hidden", display: "flex", flexDirection: "column", position: "relative" }}>
+        <div style={{ height: 48, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", fontSize: 14, fontWeight: 600 }}><span>9:41</span><span style={{ display: "flex", gap: 6 }}><i className="icon-signal" style={{ fontSize: 14 }} /><i className="icon-wifi" style={{ fontSize: 14 }} /><i className="icon-battery-full" style={{ fontSize: 16 }} /></span></div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          {tab === "chat" && <ChatScreen onMenu={() => setDrawer(true)} onSeal={() => setSheet(true)} />}
+          {tab === "account" && <AccountScreen />}
+          {tab === "vault" && <VaultMobile />}
+        </div>
+        <div style={{ height: 76, flexShrink: 0, borderTop: "1px solid var(--border-subtle)", display: "flex", paddingBottom: 20 }}>
+          {tabs.map(([k, ic, l]) => <button key={k} onClick={() => setTab(k)} style={{ flex: 1, border: 0, background: "transparent", color: tab === k ? "var(--text-primary)" : "var(--text-muted)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, fontFamily: "var(--font-sans)", fontSize: 11, cursor: "pointer" }}><i className={"icon-" + ic} style={{ fontSize: 20 }} />{l}</button>)}
+        </div>
+        {drawer && <HistoryDrawer onClose={() => setDrawer(false)} />}
+        {sheet && <SealSheet onClose={() => setSheet(false)} />}
+      </div>
+    </div>
+  );
+}
+function VaultMobile() {
+  const { VaultFileRow, ContextBar } = window.DS;
+  return (
+    <div style={{ height: "100%", overflow: "auto", padding: "0 16px" }}>
+      <div style={{ padding: "8px 4px 16px", fontSize: 28, fontWeight: 600, letterSpacing: "-0.02em" }}>Vault</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <VaultFileRow name="q3-board-memo.pdf" status="encrypting" progress={0.4} />
+        <VaultFileRow name="contracts.docx" meta="2.4 MB · 312 chunks" inContext />
+        <VaultFileRow name="msa-meridian.pdf" meta="1.1 MB · 140 chunks" inContext />
+        <VaultFileRow name="pricing_model.py" kind="code" meta="18 KB · 22 chunks" />
+      </div>
+      <div style={{ marginTop: 24 }}><ContextBar system={1.2} documents={6.8} chat={2} total={16} /></div>
+    </div>
+  );
+}
+loadAaruDS("../../").then(NS => { window.DS = NS; ReactDOM.createRoot(document.getElementById("root")).render(<App />); });
+</script></body></html>

@@ -1,0 +1,16 @@
+export interface AmbientStatusProps {
+  /** @default true */
+  generating?: boolean;
+  /** tok/s → Steady (<15), Fast (15–40), Instant (>40). */
+  speed?: number;
+  /** igpu → "Onboard engine", egpu → "Boost engine". @default "egpu" */
+  engine?: "igpu" | "egpu" | null;
+  /** @default "Writing" */
+  verb?: string;
+  /** Show the raw number instead of the word. */
+  showSpeed?: boolean;
+  /** px. @default 13 */
+  size?: number;
+  style?: React.CSSProperties;
+}
+export declare function AmbientStatus(props: AmbientStatusProps): JSX.Element;

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
+<style>
+html,body{margin:0;background:#050607;color:#EDEFF2;font-family:"Geist",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
+*{box-sizing:border-box}
+</style>
+</helmet>
+<section style="padding:48px;display:flex;flex-direction:column;gap:40px">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">AARU MOBILE · OPENCODE MOBILE FORK · STATIC HI-FI</div>
+    <div style="font-size:32px;line-height:40px;font-weight:600;letter-spacing:-0.02em">Six core screens, iOS and Android</div>
+    <div style="font-size:15px;line-height:24px;color:#A6ADB8">Same content and design system on both platforms. Platform differences: status bar, centered vs left-aligned titles, iOS tab bar vs Material navigation bar with pill indicator, Keychain/Face ID vs Keystore/fingerprint, rounded-rect vs pill buttons.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:2px 6px;border-radius:4px;background:#1F242C">iOS</span><span style="font-size:13px;color:#6E7682">390 × 844</span></div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <sc-for list="{{ screens }}" as="s" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span style="font-size:14px;font-weight:500">{{ s.label }}</span>
+          <dc-import name="Aaru Mobile Screen" screen="{{ s.key }}" platform="ios" hint-size="392px,846px"></dc-import>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:2px 6px;border-radius:4px;background:#1F242C">Android</span><span style="font-size:13px;color:#6E7682">Material 3 navigation</span></div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <sc-for list="{{ screens }}" as="s" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span style="font-size:14px;font-weight:500">{{ s.label }}</span>
+          <dc-import name="Aaru Mobile Screen" screen="{{ s.key }}" platform="android" hint-size="392px,846px"></dc-import>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      screens: [
+        { key: 'onboarding', label: 'Onboarding · key setup' },
+        { key: 'chat', label: 'Chat' },
+        { key: 'sessions', label: 'Coding session · agent run' },
+        { key: 'vault', label: 'Vault' },
+        { key: 'account', label: 'Account & tier' },
+        { key: 'status', label: 'Server status' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!-- @dsCard group="Web app" viewport="1280x800" name="chat.aaru.ai" -->
+<!-- @startingPoint section="Screens" subtitle="Web chat with RAG vault" viewport="1280x800" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Aaru — Web</title><link rel="stylesheet" href="../../styles.css">
+<style>html,body{margin:0;height:100%;background:var(--bg-app);color:var(--text-primary);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}*{box-sizing:border-box}#root{height:100%}::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--aaru-line-2);border-radius:4px}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="../../ds-loader.js"></script>
+<script type="text/babel" src="stream.js"></script>
+<script type="text/babel" src="UnlockScreen.jsx"></script>
+<script type="text/babel" src="Sidebar.jsx"></script>
+<script type="text/babel" src="Thread.jsx"></script>
+<script type="text/babel" src="VaultPanel.jsx"></script>
+<script type="text/babel" src="PlansScreen.jsx"></script>
+<script type="text/babel" src="BillingScreen.jsx"></script>
+</head><body><div id="root"></div>
+<script type="text/babel">
+
+const ANSWER = "Two of the four contracts allow termination without cause:\n\n1. Halvorsen Logistics — 60 days written notice [contracts.docx §4.2]\n2. Meridian Parts — 90 days, plus a wind-down fee [msa-meridian.pdf §11]\n\nThe other two require a material breach first.";
+const SEED = [
+  { id: 1, title: "Supplier contract review", time: "2m", group: "today", messages: [
+    { role: "user", text: "Which supplier contracts allow termination without cause, and with how much notice?", time: "14:02" },
+    { role: "assistant", text: ANSWER, tps: 47.6 } ] },
+  { id: 2, title: "Q3 board memo draft", time: "1h", group: "today", messages: [] },
+  { id: 3, title: "Rust borrow checker notes", time: "2d", group: "week", messages: [] },
+  { id: 4, title: "Postgres index tuning", time: "4d", group: "week", messages: [] },
+];
+const DOCS = [
+  { name: "contracts.docx", kind: "doc", status: "sealed", inContext: true },
+  { name: "msa-meridian.pdf", kind: "doc", status: "sealed", inContext: true },
+  { name: "halvorsen-sow.pdf", kind: "doc", status: "sealed", inContext: true },
+  { name: "q3-board-memo.pdf", kind: "doc", status: "sealed" },
+  { name: "pricing_model.py", kind: "code", status: "sealed" },
+];
+function App() {
+  const { Toast } = window.DS;
+  const [unlocked, setUnlocked] = React.useState(true);
+  const [view, setView] = React.useState("chat");
+  const [tier, setTier] = React.useState("dev");
+  const [chats, setChats] = React.useState(SEED);
+  const [active, setActive] = React.useState(1);
+  const [model, setModelRaw] = React.useState("moe");
+  const [vault, setVault] = React.useState(window.innerWidth >= 1100);
+  const [docs, setDocs] = React.useState(DOCS);
+  const [gen, setGen] = React.useState(false);
+  const [toast, setToast] = React.useState(null);
+  const stopRef = React.useRef(null);
+  const chat = chats.find(c => c.id === active);
+  const patch = (id, fn) => setChats(cs => cs.map(c => c.id === id ? fn(c) : c));
+  const setModel = m => { if (m === model) return; setModelRaw(m); if (chat.messages.length) patch(active, c => ({ ...c, messages: [...c.messages, { role: "divider", text: m === "moe" ? "SWITCHED TO QUICK · SPARSE MoE" : "SWITCHED TO DEEP · HEAVY DENSE 70B" }] })); };
+  const send = text => {
+    const id = active;
+    patch(id, c => ({ ...c, title: c.messages.length ? c.title : text.slice(0, 32), messages: [...c.messages, { role: "user", text, time: "14:06" }, { role: "assistant", text: "", live: true }] }));
+    setGen(true);
+    const reply = docs.some(d => d.inContext) ? "Based on the documents in context: Halvorsen requires 60 days written notice [contracts.docx §4.2]. Meridian requires 90 days and charges a wind-down fee equal to one month of minimum volume [msa-meridian.pdf §11]." : "Sure. Add documents from the Vault and I'll answer with citations.";
+    stopRef.current = fakeStream(reply, t => patch(id, c => { const m = [...c.messages]; m[m.length - 1] = { ...m[m.length - 1], text: t }; return { ...c, messages: m }; }),
+      () => { setGen(false); patch(id, c => { const m = [...c.messages]; m[m.length - 1] = { ...m[m.length - 1], live: false, tps: model === "moe" ? 48.2 : 11.8 }; return { ...c, messages: m }; }); }, model === "moe" ? 40 : 110);
+  };
+  const upload = () => {
+    const name = "board-minutes-sept.pdf";
+    if (docs.find(d => d.name === name)) return;
+    setDocs(d => [{ name, kind: "doc", status: "encrypting", progress: 0 }, ...d]);
+    let p = 0; const t = setInterval(() => { p += 0.12; if (p >= 1) { clearInterval(t); setDocs(d => d.map(x => x.name === name ? { ...x, status: "sealed", progress: 1 } : x)); setToast(1); setTimeout(() => setToast(null), 3500); } else setDocs(d => d.map(x => x.name === name ? { ...x, progress: p } : x)); }, 220);
+  };
+  const newChat = () => { const id = Date.now(); setChats(cs => [{ id, title: "New chat", time: "now", group: "today", messages: [] }, ...cs]); setActive(id); setView("chat"); };
+  if (!unlocked) return <UnlockScreen onUnlock={() => setUnlocked(true)} />;
+  const inCtx = docs.filter(d => d.inContext).length;
+  const chatK = chat ? Math.min(40, chat.messages.reduce((a, m) => a + (m.text || "").length, 0) / 400 + 1.2) : 0;
+  return (
+    <div style={{ height: "100%", display: "flex", position: "relative" }}>
+      <Sidebar chats={chats} activeId={view === "chat" ? active : null} onSelect={id => { setActive(id); setView("chat"); }} onNew={newChat} onPlans={() => setView("billing")} onLock={() => setUnlocked(false)} tier={tier} />
+      {view === "billing" ? <BillingScreen tier={tier} onChangePlan={() => setView("plans")} onBack={() => setView("chat")} /> : view === "plans" ? <PlansScreen tier={tier} setTier={t => { setTier(t); setView("billing"); }} onBack={() => setView("billing")} /> : <>
+        <Thread chat={chat} model={model} setModel={setModel} onSend={send} onStop={() => stopRef.current && stopRef.current()} generating={gen} vaultOpen={vault} toggleVault={() => setVault(v => !v)} docsInContext={inCtx} />
+        {vault && <VaultPanel docs={docs} toggleDoc={n => setDocs(d => d.map(x => x.name === n ? { ...x, inContext: !x.inContext } : x))} onClose={() => setVault(false)} onUpload={upload} context={{ system: 7.7, documents: inCtx * 7.6, chat: chatK }} />}
+      </>}
+      {toast && <div style={{ position: "absolute", right: 24, bottom: 24 }}><Toast tone="secure" title="board-minutes-sept.pdf sealed" body="Stored as ciphertext. 204 chunks indexed." /></div>}
+    </div>
+  );
+}
+loadAaruDS("../../").then(NS => { window.DS = NS; ReactDOM.createRoot(document.getElementById("root")).render(<App />); });
+</script></body></html>

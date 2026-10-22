@@ -1,0 +1,28 @@
+<!-- @dsCard group="IDE extension" viewport="900x640" name="VS Code sidebar" -->
+<!-- @startingPoint section="Screens" subtitle="300px IDE sidebar" viewport="900x640" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Aaru — IDE</title><link rel="stylesheet" href="../../styles.css">
+<style>html,body{margin:0;height:100%;background:var(--bg-app);color:var(--text-primary);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}*{box-sizing:border-box}#root{height:100%}::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--aaru-line-2);border-radius:4px}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="../../ds-loader.js"></script>
+<script type="text/babel" src="../web/stream.js"></script>
+<script type="text/babel" src="IdeSidebar.jsx"></script>
+<script type="text/babel" src="EditorMock.jsx"></script>
+</head><body><div id="root"></div>
+<script type="text/babel">
+
+function App() {
+  return (
+    <div style={{ height: "100%", display: "flex" }}>
+      <div style={{ width: 44, flexShrink: 0, background: "var(--aaru-ink-900)", borderRight: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, paddingTop: 12, color: "var(--text-muted)" }}>
+        <i className="icon-files" style={{ fontSize: 18 }} /><i className="icon-search" style={{ fontSize: 18 }} /><i className="icon-git-branch" style={{ fontSize: 18 }} />
+        <span style={{ width: 32, height: 32, borderRadius: 6, background: "var(--aaru-ink-700)", display: "flex", alignItems: "center", justifyContent: "center" }}><window.DS.Logo variant="mark" size={18} /></span>
+      </div>
+      <IdeSidebar tier="dev" />
+      <EditorMock />
+    </div>
+  );
+}
+loadAaruDS("../../").then(NS => { window.DS = NS; ReactDOM.createRoot(document.getElementById("root")).render(<App />); });
+</script></body></html>

@@ -13,6 +13,7 @@
 - Separate public ingress, applications, databases, and inference services.
 - Keep persistent user data encrypted at rest and minimize sensitive logging.
 - Reuse maintained projects rather than implementing a model server, gateway, UI, or vector database from scratch.
+- **Custom codebase language:** Infrastructure only — shell scripts, Quadlet configs, YAML, and Markdown. No custom application code. Upstream projects dictate their own languages (Python for LiteLLM/Open WebUI, C++ for llama.cpp, Go for Podman). Any future custom integrations (billing webhooks, plugins) will be evaluated per-need.
 
 ### Initial scope
 

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.454.0/font/lucide.css">
+<style>
+html,body{margin:0;background:#050607;color:#EDEFF2;font-family:"Geist",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
+*{box-sizing:border-box}
+@keyframes aaruPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+</style>
+</helmet>
+<div style="width:390px;height:844px;border-radius:44px;border:1px solid #2A3039;background:#000000;overflow:hidden;display:flex;flex-direction:column;position:relative;font-family:'Geist',system-ui,sans-serif;color:#EDEFF2">
+
+  <sc-if value="{{ isIos }}" hint-placeholder-val="{{ true }}">
+    <div style="height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:4px 32px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><i class="icon-signal" style="font-size:15px"></i><i class="icon-wifi" style="font-size:15px"></i><i class="icon-battery-full" style="font-size:18px"></i></span></div>
+  </sc-if>
+  <sc-if value="{{ isAndroid }}" hint-placeholder-val="{{ false }}">
+    <div style="height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:13px;font-weight:500"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><i class="icon-wifi" style="font-size:14px"></i><i class="icon-signal" style="font-size:14px"></i><i class="icon-battery-full" style="font-size:16px"></i></span></div>
+  </sc-if>
+
+  <div style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden">
+
+  <sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;padding:16px 24px 24px;gap:24px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-left:-12px;color:#A6ADB8"><i class="icon-chevron-left" style="font-size:22px"></i></span>
+        <div style="flex:1;display:flex;gap:6px"><span style="flex:1;height:3px;border-radius:2px;background:#EDEFF2"></span><span style="flex:1;height:3px;border-radius:2px;background:#EDEFF2"></span><span style="flex:1;height:3px;border-radius:2px;background:#1F242C"></span></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">2 / 3</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;padding-top:16px">
+        <span style="width:56px;height:56px;border-radius:16px;background:rgba(61,220,151,0.10);border:1px solid rgba(61,220,151,0.35);display:flex;align-items:center;justify-content:center"><i class="icon-key-round" style="font-size:24px;color:#3DDC97"></i></span>
+        <div style="font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.02em">Unlock your vault on this phone</div>
+        <div style="font-size:15px;line-height:23px;color:#A6ADB8">Enter your passphrase once. Aaru derives your key here and stores it in the {{ secureStore }}. It never leaves the device.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:13px;font-weight:500;color:#A6ADB8">Passphrase</span>
+        <div style="height:52px;border-radius:12px;background:#161A20;border:1px solid #3A414C;box-shadow:0 0 0 4px rgba(237,239,242,0.06);display:flex;align-items:center;padding:0 16px;gap:10px"><span style="flex:1;font-size:18px;letter-spacing:4px">••••••••••••••</span><i class="icon-eye" style="font-size:18px;color:#6E7682"></i></div>
+      </div>
+      <div style="border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;overflow:hidden">
+        <div style="min-height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="{{ bioIcon }}" style="font-size:20px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">{{ bioLabel }}</span><span style="width:44px;height:26px;border-radius:999px;background:#EDEFF2;position:relative"><span style="position:absolute;right:2px;top:2px;width:22px;height:22px;border-radius:999px;background:#050607"></span></span></div>
+        <div style="min-height:56px;display:flex;align-items:center;gap:12px;padding:0 16px"><i class="icon-file-key" style="font-size:20px;color:#A6ADB8"></i><div style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px">Recovery kit</span><span style="font-size:12px;color:#6E7682">Saved Oct 1 · aaru-recovery.pdf</span></div><i class="icon-circle-check" style="font-size:18px;color:#3DDC97"></i></div>
+      </div>
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
+        <span style="height:52px;border-radius:{{ btnRadius }};background:#EDEFF2;color:#050607;font-size:16px;font-weight:500;display:flex;align-items:center;justify-content:center">Unlock</span>
+        <span style="align-self:center;display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682"><i class="icon-lock" style="font-size:11px;color:#3DDC97"></i>KEY DERIVED ON DEVICE · ARGON2ID</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isChat }}" hint-placeholder-val="{{ true }}">
+    <div style="height:56px;flex-shrink:0;display:flex;align-items:center;padding:0 4px;border-bottom:1px solid #1E232A">
+      <span style="width:48px;height:48px;display:flex;align-items:center;justify-content:center"><i class="icon-menu" style="font-size:22px"></i></span>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:{{ titleAlign }}"><span style="font-size:16px;font-weight:500">Contract review</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#3DDC97;display:flex;align-items:center;gap:3px"><i class="icon-lock" style="font-size:9px"></i>E2EE · Quick · 3 docs</span></div>
+      <span style="width:48px;height:48px;display:flex;align-items:center;justify-content:center"><i class="icon-square-pen" style="font-size:20px"></i></span>
+    </div>
+    <div style="flex:1;overflow:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:18px">
+      <div style="align-self:flex-end;max-width:85%;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div style="padding:12px 16px;border-radius:18px 18px 4px 18px;background:#161A20;box-shadow:0 0 0 1px rgba(61,220,151,0.35);font-size:16px;line-height:24px">Which contracts allow early exit?</div><span style="display:flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#3DDC97"><i class="icon-lock" style="font-size:10px"></i>sealed · 14:02</span></div>
+      <div style="font-size:16px;line-height:26px">Two of the four. Halvorsen Logistics needs 60 days written notice. Meridian Parts needs 90 days plus a wind-down fee equal to one month of minimum volume.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:999px;background:rgba(111,168,255,0.12);color:#6FA8FF;font-family:'JetBrains Mono',monospace;font-size:11px">contracts.docx §4.2</span><span style="display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:999px;background:rgba(111,168,255,0.12);color:#6FA8FF;font-family:'JetBrains Mono',monospace;font-size:11px">msa-meridian.pdf §11</span></div>
+      <div style="align-self:flex-end;max-width:85%;padding:12px 16px;border-radius:18px 18px 4px 18px;background:#161A20;box-shadow:0 0 0 1px rgba(61,220,151,0.35);font-size:16px;line-height:24px">Draft a termination notice for Halvorsen.</div>
+      <div style="font-size:16px;line-height:26px;color:#EDEFF2">Here's a notice under §4.2, effective 60 days from delivery:</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#A6ADB8">{{ pulse }}Writing<span style="color:#474E59">·</span>Instant<span style="color:#474E59">·</span>Boost engine</div>
+    </div>
+    <div style="padding:8px 12px 12px">
+      <div style="border-radius:26px;background:#101318;border:1px solid #2A3039;padding:4px;display:flex;align-items:center;gap:4px">
+        <span style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#A6ADB8"><i class="icon-plus" style="font-size:22px"></i></span>
+        <span style="flex:1;color:#6E7682;font-size:16px">Reply while Aaru writes…</span>
+        <span style="width:44px;height:44px;border-radius:999px;border:1px solid #3A414C;display:flex;align-items:center;justify-content:center"><i class="icon-square" style="font-size:14px"></i></span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isSessions }}" hint-placeholder-val="{{ false }}">
+    <div style="height:56px;flex-shrink:0;display:flex;align-items:center;gap:4px;padding:0 4px;border-bottom:1px solid #1E232A">
+      <span style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#A6ADB8"><i class="icon-chevron-left" style="font-size:22px"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:{{ titleAlign }}"><span style="font-size:16px;font-weight:500">Fix ledger rounding</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682">aaru/billing · fix/rounding</span></div>
+      <span style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#A6ADB8"><i class="icon-ellipsis" style="font-size:20px"></i></span>
+    </div>
+    <div style="padding:10px 16px;display:flex;gap:6px;border-bottom:1px solid #1E232A;flex-wrap:wrap">
+      <span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 6px;border-radius:2px;background:rgba(255,122,51,0.12);color:#FF7A33;font-family:'JetBrains Mono',monospace;font-size:11px">{{ pulse }}Agent running</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 6px;border-radius:2px;background:#161A20;color:#A6ADB8;font-family:'JetBrains Mono',monospace;font-size:11px"><i class="icon-brain" style="font-size:11px"></i>Deep · llama-70b</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 6px;border-radius:2px;background:#161A20;color:#A6ADB8;font-family:'JetBrains Mono',monospace;font-size:11px">4 files · +38 −12</span>
+    </div>
+    <div style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;gap:12px;padding:8px 0"><span style="width:24px;display:flex;justify-content:center"><i class="icon-file-search" style="font-size:16px;color:#6E7682"></i></span><div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px">Read 3 files</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">src/ledger.rs · src/money.rs · tests/ledger.rs</span></div><i class="icon-check" style="font-size:15px;color:#6E7682"></i></div>
+      <div style="display:flex;gap:12px;padding:8px 0"><span style="width:24px;display:flex;justify-content:center"><i class="icon-file-pen" style="font-size:16px;color:#6E7682"></i></span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px"><span style="font-size:14px">Edited src/money.rs</span>
+        <div style="border-radius:8px;background:#000;border:1px solid #1E232A;padding:8px 10px;display:flex;flex-direction:column;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:18px;overflow:hidden">
+          <span style="color:#FF5468;white-space:nowrap">- (cents as f64 / 100.0).round()</span>
+          <span style="color:#3DDC97;white-space:nowrap">+ cents.div_euclid(100)</span>
+          <span style="color:#3DDC97;white-space:nowrap">+   + round_half_even(cents % 100)</span>
+        </div></div><i class="icon-check" style="font-size:15px;color:#6E7682"></i></div>
+      <div style="margin-top:12px;border-radius:16px;border:1px solid rgba(242,193,78,0.4);background:rgba(242,193,78,0.06);padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500"><i class="icon-shield-question" style="font-size:16px;color:#F2C14E"></i>Approval needed</div>
+        <div style="font-size:14px;line-height:21px;color:#A6ADB8">The agent wants to run a command in your workspace container:</div>
+        <div style="border-radius:8px;background:#000;border:1px solid #1E232A;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#EDEFF2">cargo test --package ledger</div>
+        <div style="display:flex;gap:8px">
+          <span style="flex:1;height:44px;border-radius:{{ btnRadius }};border:1px solid #2A3039;background:#101318;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center">Deny</span>
+          <span style="flex:1;height:44px;border-radius:{{ btnRadius }};background:#EDEFF2;color:#050607;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center">Approve</span>
+        </div>
+      </div>
+    </div>
+    <div style="padding:8px 12px 12px">
+      <div style="border-radius:26px;background:#101318;border:1px solid #2A3039;padding:4px 4px 4px 16px;display:flex;align-items:center;gap:4px">
+        <span style="flex:1;color:#6E7682;font-size:16px">Steer the agent…</span>
+        <span style="width:44px;height:44px;border-radius:999px;background:#EDEFF2;color:#000;display:flex;align-items:center;justify-content:center"><i class="icon-arrow-up" style="font-size:20px"></i></span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isVault }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;gap:12px">
+      <span style="font-size:{{ titleSize }};font-weight:600;letter-spacing:-0.02em;flex:1">Vault</span>
+      <span style="width:44px;height:44px;border-radius:999px;background:#EDEFF2;color:#000;display:flex;align-items:center;justify-content:center"><i class="icon-upload" style="font-size:20px"></i></span>
+    </div>
+    <div style="padding:0 16px 12px;display:flex;flex-direction:column;gap:12px">
+      <div style="height:44px;border-radius:12px;background:#101318;border:1px solid #1E232A;display:flex;align-items:center;gap:10px;padding:0 14px;color:#6E7682;font-size:15px"><i class="icon-search" style="font-size:17px"></i>Search sealed documents</div>
+      <div style="display:flex;gap:8px"><span style="height:32px;padding:0 14px;border-radius:999px;background:#1F242C;font-size:13px;display:flex;align-items:center">All · 6</span><span style="height:32px;padding:0 14px;border-radius:999px;border:1px solid #2A3039;color:#A6ADB8;font-size:13px;display:flex;align-items:center">In this chat · 3</span><span style="height:32px;padding:0 14px;border-radius:999px;border:1px solid #2A3039;color:#A6ADB8;font-size:13px;display:flex;align-items:center">Code</span></div>
+    </div>
+    <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;background:#0A0C0F;border:1px solid #1E232A">
+        <i class="icon-file-text" style="font-size:20px;color:#A6ADB8"></i>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px"><span style="font-size:15px">board-minutes-sept.pdf</span><div style="height:2px;border-radius:1px;background:#1F242C;overflow:hidden"><div style="width:58%;height:2px;background:#EDEFF2"></div></div></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8">Encrypting</span>
+      </div>
+      <sc-for list="{{ vaultDocs }}" as="d" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;background:#0A0C0F;border:1px solid {{ d.border }}">
+          <i class="{{ d.icon }}" style="font-size:20px;color:{{ d.iconColor }}"></i>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ d.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">{{ d.meta }}</span></div>
+          <i class="icon-lock" style="font-size:14px;color:#3DDC97"></i>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:12px 20px;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682"><span>6 DOCS · 18.4 MB SEALED</span><span>BLUE = IN CURRENT CHAT</span></div>
+  </sc-if>
+
+  <sc-if value="{{ isAccount }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+      <div style="padding:8px 20px 16px;font-size:{{ titleSize }};font-weight:600;letter-spacing:-0.02em">Account</div>
+      <div style="margin:0 16px;padding:16px;border-radius:18px;background:#0A0C0F;border:1px solid rgba(230,194,122,0.45);box-shadow:0 0 0 3px #000,0 0 0 4px rgba(230,194,122,0.25);display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="width:44px;height:44px;border-radius:999px;background:#1F242C;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">MK</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font-size:16px;font-weight:500">Mara K.</span><span style="align-self:flex-start;display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 7px;border:1px solid rgba(230,194,122,0.6);background:rgba(230,194,122,0.12);border-radius:4px;color:#E6C27A;font-size:11px;font-weight:500"><i class="icon-gem" style="font-size:11px"></i>Founders</span></div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:14px">$150/mo</span>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;margin-bottom:6px"><span>FIRST-YEAR PAYMENTS</span><span style="color:#E6C27A">4 / 12</span></div>
+          <div style="height:6px;border-radius:1px;background:#1F242C;overflow:hidden"><div style="width:33%;height:6px;background:#E6C27A"></div></div>
+          <div style="font-size:12px;color:#6E7682;margin-top:6px">Drops to $15/mo after June 2027 · Vote #8 open</div>
+        </div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682;padding:24px 20px 8px">SECURITY</div>
+      <div style="margin:0 16px;border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;overflow:hidden">
+        <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-key-round" style="font-size:18px;color:#3DDC97"></i><span style="flex:1;font-size:15px">Encryption key</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">7F3A·C219</span></div>
+        <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-smartphone" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">Devices</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E7682">3</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
+        <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px"><i class="{{ bioIcon }}" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">{{ bioLabel }}</span><span style="width:44px;height:26px;border-radius:999px;background:#EDEFF2;position:relative"><span style="position:absolute;right:2px;top:2px;width:22px;height:22px;border-radius:999px;background:#050607"></span></span></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682;padding:24px 20px 8px">MEMBERSHIP</div>
+      <div style="margin:0 16px;border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;overflow:hidden">
+        <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-credit-card" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">Billing</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E7682">Nov 1</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
+        <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-activity" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">Server status</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F2C14E">Degraded</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
+        <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px"><i class="icon-key-square" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">API keys</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E7682">2 active</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isStatus }}" hint-placeholder-val="{{ false }}">
+    <div style="height:56px;flex-shrink:0;display:flex;align-items:center;padding:0 4px">
+      <span style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#A6ADB8"><i class="icon-chevron-left" style="font-size:22px"></i></span>
+      <span style="flex:1;text-align:{{ titleText }};font-size:17px;font-weight:500;margin-right:{{ titlePad }}">Server status</span>
+    </div>
+    <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px">
+      <div style="padding:14px 16px;border-radius:14px;background:rgba(242,193,78,0.06);border:1px solid rgba(242,193,78,0.35);display:flex;gap:12px">
+        <i class="icon-triangle-alert" style="font-size:18px;color:#F2C14E;margin-top:1px"></i>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:500">Llama 70B slowed</span><span style="font-size:13px;line-height:19px;color:#A6ADB8">eGPU A hit its thermal limit. Deep replies are slower but completing. Updated 13:10.</span></div>
+      </div>
+      <div style="border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;overflow:hidden">
+        <div style="min-height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-zap" style="font-size:18px;color:#A6ADB8"></i><div style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px">Nemotron 3.5</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">Quick · 47.8 tok/s</span></div><span style="display:flex;align-items:center;gap:6px;font-size:13px;color:#3DDC97"><span style="width:7px;height:7px;border-radius:999px;background:#3DDC97"></span>Up</span></div>
+        <div style="min-height:56px;display:flex;align-items:center;gap:12px;padding:0 16px"><i class="icon-brain" style="font-size:18px;color:#A6ADB8"></i><div style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px">Llama 70B</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">Deep · 9.1 tok/s</span></div><span style="display:flex;align-items:center;gap:6px;font-size:13px;color:#F2C14E"><span style="width:7px;height:7px;border-radius:999px;background:#F2C14E"></span>Slow</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1E232A;border-radius:16px;overflow:hidden;border:1px solid #1E232A">
+        <div style="background:#000;padding:14px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">YOUR QUEUE</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;margin-top:4px">0.1<span style="font-size:12px;color:#6E7682"> s</span></div><div style="font-size:11px;color:#E6C27A;margin-top:2px">Founders priority</div></div>
+        <div style="background:#000;padding:14px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">GPU MEMORY</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;margin-top:4px">82<span style="font-size:12px;color:#6E7682">%</span></div><div style="font-size:11px;color:#6E7682;margin-top:2px">16 GB reserved for you</div></div>
+      </div>
+      <sc-for list="{{ statusNodes }}" as="n" hint-placeholder-count="2">
+        <div style="border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><i class="{{ n.icon }}" style="font-size:16px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">{{ n.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:{{ n.color }}">{{ n.load }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">{{ n.temp }}</span></div>
+          <svg viewBox="0 0 240 40" preserveAspectRatio="none" style="width:100%;height:36px;display:block;background:#000;border-radius:4px"><polyline points="{{ n.points }}" fill="none" stroke="#A6ADB8" stroke-width="1.2" vector-effect="non-scaling-stroke"></polyline></svg>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  </div>
+
+  <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
+    <sc-if value="{{ isIos }}" hint-placeholder-val="{{ true }}">
+      <div style="height:84px;flex-shrink:0;border-top:1px solid #1E232A;background:rgba(10,12,15,0.92);display:flex;padding:8px 8px 28px">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <span style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:500;color:{{ t.color }}"><i class="{{ t.icon }}" style="font-size:22px"></i>{{ t.label }}</span>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isAndroid }}" hint-placeholder-val="{{ false }}">
+      <div style="height:92px;flex-shrink:0;background:#0A0C0F;display:flex;padding:12px 8px 20px">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:{{ t.color }}"><span style="width:64px;height:32px;border-radius:16px;background:{{ t.pill }};display:flex;align-items:center;justify-content:center"><i class="{{ t.icon }}" style="font-size:20px"></i></span>{{ t.label }}</span>
+        </sc-for>
+      </div>
+    </sc-if>
+  </sc-if>
+  <sc-if value="{{ isAndroid }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:2px;background:#A6ADB8"></div>
+  </sc-if>
+  <sc-if value="{{ isIos }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#EDEFF2"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:392,&quot;height&quot;:846},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;onboarding&quot;,&quot;chat&quot;,&quot;sessions&quot;,&quot;vault&quot;,&quot;account&quot;,&quot;status&quot;],&quot;default&quot;:&quot;chat&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const screen = this.props.screen || 'chat';
+    const platform = this.props.platform || 'ios';
+    const ios = platform === 'ios';
+    const tabDef = [['chat', 'icon-message-square', 'Chat'], ['sessions', 'icon-terminal', 'Sessions'], ['vault', 'icon-library', 'Vault'], ['account', 'icon-user-round', 'Account']];
+    const activeTab = screen === 'status' ? 'account' : screen;
+    return {
+      isIos: ios, isAndroid: !ios,
+      isOnboarding: screen === 'onboarding', isChat: screen === 'chat', isSessions: screen === 'sessions', isVault: screen === 'vault', isAccount: screen === 'account', isStatus: screen === 'status',
+      showTabs: screen !== 'onboarding',
+      tabs: tabDef.map(([k, icon, label]) => ({ icon, label, color: k === activeTab ? '#EDEFF2' : '#6E7682', pill: k === activeTab && !ios ? '#1F242C' : 'transparent' })),
+      titleAlign: ios ? 'center' : 'flex-start',
+      titleSize: ios ? '32px' : '26px',
+      titleText: ios ? 'center' : 'left',
+      titlePad: ios ? '48px' : '0px',
+      statusNodes: [['Node 01 · iGPU', 'icon-server', 1, 48, 22, '58°C', false], ['eGPU A', 'icon-microchip', 2.4, 78, 14, '83°C', true]].map(([name, icon, seed, base, amp, temp, hot]) => {
+        const pts = Array.from({ length: 48 }, (_, i) => { const v = Math.max(3, Math.min(97, base + amp * Math.sin(i / 4 + seed) + amp * 0.5 * Math.sin(i / 1.7 + seed * 3))); return (i * 240 / 47).toFixed(1) + ',' + (38 - v * 0.36).toFixed(1); });
+        return { name, icon, temp, load: base + '%', color: hot ? '#F2C14E' : '#EDEFF2', points: pts.join(' ') };
+      }),
+      vaultDocs: [
+        ['contracts.docx', '2.4 MB · 312 chunks', true, 'doc'], ['msa-meridian.pdf', '1.1 MB · 140 chunks', true, 'doc'], ['halvorsen-sow.pdf', '0.8 MB · 96 chunks', true, 'doc'],
+        ['q3-board-memo.pdf', '0.4 MB · 51 chunks', false, 'doc'], ['pricing_model.py', '18 KB · 22 chunks', false, 'code'],
+      ].map(([name, meta, ctx, kind]) => ({ name, meta, border: ctx ? 'rgba(111,168,255,0.35)' : '#1E232A', icon: kind === 'code' ? 'icon-file-code' : 'icon-file-text', iconColor: ctx ? '#6FA8FF' : '#A6ADB8' })),
+      btnRadius: ios ? '14px' : '999px',
+      secureStore: ios ? 'iOS Keychain' : 'Android Keystore',
+      bioIcon: ios ? 'icon-scan-face' : 'icon-fingerprint',
+      bioLabel: ios ? 'Unlock with Face ID' : 'Unlock with fingerprint',
+      pulse: React.createElement('span', { style: { width: 6, height: 6, borderRadius: 999, background: '#FF7A33', display: 'inline-block', flexShrink: 0, animation: 'aaruPulse 1.2s ease-in-out infinite' } }),
+    };
+  }
+}
+</script>
+</body>
+</html>

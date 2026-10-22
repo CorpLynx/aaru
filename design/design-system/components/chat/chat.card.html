@@ -1,0 +1,30 @@
+<!-- @dsCard group="Components" viewport="700x460" name="Chat" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<style>html,body{margin:0;background:var(--bg-app);color:var(--text-primary);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}*{box-sizing:border-box}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="../../ds-loader.js"></script>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const L = ({ children }) => <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.08em", color: "var(--text-muted)" }}>{children}</div>;
+const Row = ({ children, gap = 8, style }) => <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap, ...style }}>{children}</div>;
+loadAaruDS("../../").then(NS => {
+  const App = () => { const { MessageBubble, Citation, Composer, ModelToggle } = NS;
+  const [m, setM] = React.useState("moe"); const [v, setV] = React.useState("");
+  return <div style={{ padding: 20, display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <MessageBubble time="14:02">Which contracts allow termination without cause?</MessageBubble>
+      <MessageBubble role="assistant">Halvorsen — 60 days notice <Citation label="contracts.docx §4.2" /> and Meridian — 90 days plus a wind-down fee <Citation label="§11" />.</MessageBubble>
+      <Composer value={v} onChange={setV} docsCount={3} />
+      <Composer generating speed={48} />
+    </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <L>MODEL TOGGLE</L><ModelToggle value={m} onChange={setM} />
+      <L>IDE COMPOSER</L><Composer density="ide" model="Quick" />
+      <L>MOBILE COMPOSER</L><Composer density="mobile" />
+    </div>
+  </div>; };
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+});
+</script></body></html>
