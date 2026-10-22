@@ -317,6 +317,16 @@ Re-check licenses, release status, hardware compatibility, and security advisori
   - Alert on backup failure (systemd unit status, CloudWatch alarm, or external monitor).
   - Monitor backup size trends to detect anomalies (sudden growth or shrinkage).
   - Verify KMS key rotation schedule and audit KMS key usage via CloudTrail.
+ 
+- **Security considerations:**
+  - KMS key policy restricts `kms:Decrypt` and `kms:GenerateDataKey` to the backup role only. No other principal (including AWS root) may decrypt without explicit key policy grants.
+  - S3 Object Lock (compliance mode) prevents deletion or overwrite of backup objects during the retention period, protecting against ransomware and accidental deletion.
+  - S3 bucket versioning protects against accidental deletion or overwrites.
+  - No AWS credentials are embedded in the backup script or container. Use IAM instance profiles, OIDC federation, or Podman secrets with short-lived STS tokens.
+  - Backup logs (systemd journal) never contain backup contents, credentials, or S3 presigned URLs.
+  - The backup staging directory (`/tmp/aaru-backup`) is cleaned up on exit via trap. Use a dedicated encrypted volume for staging if paranoid about residual data.
+  - Client-side encryption with `age` provides an additional layer: even if the KMS key is compromised, the archive remains encrypted with a separate key.
+  - Rotate the KMS key annually and re-encrypt older backups. Audit KMS usage via CloudTrail and alert on unexpected decrypt calls.
 - Define data retention, account deletion, document deletion across original files and vectors, log retention, and backup expiry. Deletion from the live database does not immediately remove old backup copies.
 - Treat the single host, home/office power and internet, and Cloudflare as availability dependencies. Publish maintenance expectations and an outage/support contact before offering a paid service.
 
