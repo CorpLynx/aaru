@@ -280,6 +280,43 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 - Scan images/dependencies before production updates, stage updates, and maintain a rollback path. Update Fedora/kernel/firmware deliberately because inference compatibility can change with the GPU stack.
 - Monitor host RAM/swap, GPU availability, temperature, disk capacity, request latency, queue depth, errors, and container health. Alert on disk exhaustion, failed backups, unexpected restarts, and sustained overload.
 - Back up PostgreSQL and user files on a defined schedule to encrypted off-host storage. Include configuration and key-recovery instructions, but keep secrets protected separately. Perform a restore drill before onboarding paying users.
+ 
+### Encrypted S3 backups (customer-managed KMS key)
+- **Target:** AWS S3 bucket with server-side encryption using a customer-managed KMS key (SSE-KMS). The KMS key is owned and controlled by the customer (CorpLynx), not AWS. This ensures only the customer can decrypt backup data, even if AWS is compromised or subpoenaed.
+- **What is backed up:**
+  - PostgreSQL logical dump (`pg_dump` of all databases, compressed).
+  - Open WebUI persistent data volume (user accounts, chat history, RAG documents, vector embeddings).
+  - LiteLLM database (keys, usage, budgets).
+  - Quadlet unit files and non-secret configuration.
+  - LUKS key material (if applicable) — stored separately with additional access controls.
+- **Encryption:**
+  - S3 server-side encryption: `aws:kms` with a customer-managed key (CMK) in AWS KMS.
+  - The KMS key policy must restrict `kms:Decrypt` and `kms:GenerateDataKey` to the backup IAM role only. No other principal (including AWS root) may decrypt.
+  - Enable S3 bucket key (SSE-KMS with bucket key) to reduce KMS API calls and cost while maintaining per-object encryption.
+  - Client-side encryption (additional layer) is optional but recommended for highly sensitive data: encrypt the dump with `gpg` or `age` using a key stored in a separate KMS or HSM before upload.
+- **IAM and access control:**
+  - Create a dedicated IAM role (e.g., `aaru-backup-role`) with least-privilege permissions: `s3:PutObject`, `s3:GetObject`, `s3:ListBucket` on the backup bucket only; `kms:GenerateDataKey` and `kms:Decrypt` on the CMK only.
+  - Use IAM instance profile or OIDC federation (if running on AWS) — never embed long-lived AWS credentials in the host or containers.
+  - For on-prem/non-AWS hosts: use an IAM user with access keys stored in Podman secrets or systemd credentials, rotated quarterly. Prefer STS assume-role with short-lived tokens.
+  - Enable S3 bucket versioning to protect against accidental deletion or ransomware.
+  - Enable S3 Object Lock (compliance mode) on the backup bucket to prevent deletion or overwrite for a defined retention period.
+- **Backup schedule and retention:**
+  - Daily automated backups via systemd timer or cron.
+  - Retention: 30 days daily, 12 weeks weekly, 12 months monthly (adjust based on storage cost and compliance needs).
+  - S3 lifecycle rules to transition older backups to Glacier/Deep Archive for cost optimization.
+  - Test restore quarterly: download, decrypt, and restore to a staging PostgreSQL instance.
+- **Backup script (`infra/scripts/backup.sh`):**
+  - Dumps PostgreSQL using `pg_dumpall` or per-database `pg_dump`.
+  - Archives the Open WebUI data volume and config files.
+  - Encrypts the archive client-side with `age` (optional additional layer).
+  - Uploads to S3 using `aws s3 cp` with `--sse aws:kms --sse-kms-key-id <CMK_ARN>`.
+  - Verifies upload integrity (S3 ETag / checksum).
+  - Logs backup status (success/failure, size, duration) to systemd journal — never log backup contents or credentials.
+  - Cleans up local temporary files after successful upload.
+- **Monitoring:**
+  - Alert on backup failure (systemd unit status, CloudWatch alarm, or external monitor).
+  - Monitor backup size trends to detect anomalies (sudden growth or shrinkage).
+  - Verify KMS key rotation schedule and audit KMS key usage via CloudTrail.
 - Define data retention, account deletion, document deletion across original files and vectors, log retention, and backup expiry. Deletion from the live database does not immediately remove old backup copies.
 - Treat the single host, home/office power and internet, and Cloudflare as availability dependencies. Publish maintenance expectations and an outage/support contact before offering a paid service.
 

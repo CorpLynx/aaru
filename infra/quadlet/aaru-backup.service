@@ -1,0 +1,19 @@
+[Unit]
+Description=Aaru Encrypted S3 Backup
+After=network-online.target postgres.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash %h/aaru/infra/scripts/backup.sh
+Environment=AARU_S3_BUCKET=aaru-backups-prod
+Environment=AARU_KMS_KEY_ARN=arn:aws:kms:us-east-1:ACCOUNT_ID:key/KEY_ID
+Environment=AARU_BACKUP_DIR=/tmp/aaru-backup
+Environment=POSTGRES_CONTAINER=postgres
+Environment=POSTGRES_USER=aaru
+# AWS credentials should be provided via systemd credentials or Podman secrets
+# Environment=AWS_ACCESS_KEY_ID=...
+# Environment=AWS_SECRET_ACCESS_KEY=...
+# Environment=AWS_DEFAULT_REGION=us-east-1
+TimeoutStartSec=600
+StandardOutput=journal
+StandardError=journal
