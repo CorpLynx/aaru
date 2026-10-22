@@ -6,7 +6,7 @@ Wants=network-online.target
 [Container]
 Image=docker.io/vllm/vllm-openai:latest
 ContainerName=vllm
-Network=aaru-internal.network
+Network=aaru-internal.network:ip=10.231.0.21
 # No host port published — internal only
 AddDevice=/dev/nvidia0
 AddDevice=/dev/nvidiactl

@@ -1,0 +1,8 @@
+# Admin tools (Dozzle) only. Kept off the app networks because Dozzle holds the Podman socket.
+# Not internal so its 127.0.0.1 port publish works; reach it over Tailscale or an SSH tunnel.
+# Subnet is outside 10.88/16 and 10.89.x, which Podman auto-assigns to other networks.
+[Network]
+NetworkName=aaru-admin
+Driver=bridge
+Subnet=10.231.2.0/24
+Gateway=10.231.2.1

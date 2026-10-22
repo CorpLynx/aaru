@@ -6,7 +6,7 @@ Wants=network-online.target
 [Container]
 Image=ghcr.io/ggml-org/llama.cpp:server
 ContainerName=llamacpp
-Network=aaru-internal.network
+Network=aaru-internal.network:ip=10.231.0.20
 # No host port published — internal only
 AddDevice=/dev/dri
 SecurityLabelType=container_t

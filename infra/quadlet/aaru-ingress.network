@@ -1,0 +1,9 @@
+# Ingress-facing network: cloudflared, LiteLLM, Open WebUI.
+# Not internal: cloudflared needs outbound access to Cloudflare's edge.
+# Databases and inference must never join this network.
+# Subnet is outside 10.88/16 and 10.89.x, which Podman auto-assigns to other networks.
+[Network]
+NetworkName=aaru-ingress
+Driver=bridge
+Subnet=10.231.1.0/24
+Gateway=10.231.1.1

@@ -6,12 +6,16 @@ Wants=network-online.target
 [Container]
 Image=docker.io/library/postgres:16-alpine
 ContainerName=postgres
-Network=aaru-internal.network
+Network=aaru-internal.network:ip=10.231.0.10
 Volume=postgres-data.volume:/var/lib/postgresql/data:Z
 Environment=POSTGRES_USER=aaru
-Environment=POSTGRES_PASSWORD={env:POSTGRES_PASSWORD}
 Environment=POSTGRES_DB=aaru
 Secret=postgres-password,type=env,target=POSTGRES_PASSWORD
+# Separate database and least-privilege role per service (spec §2).
+# The init script runs on first start of an empty data volume only.
+Volume=%h/aaru/infra/config/postgres-init:/docker-entrypoint-initdb.d:ro,z
+Secret=litellm-db-password,type=mount
+Secret=openwebui-db-password,type=mount
 HealthCmd=pg_isready -U aaru -d aaru
 HealthInterval=10s
 HealthRetries=5

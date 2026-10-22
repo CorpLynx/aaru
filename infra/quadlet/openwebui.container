@@ -6,14 +6,16 @@ Wants=network-online.target
 [Container]
 Image=ghcr.io/open-webui/open-webui:main
 ContainerName=openwebui
-Network=aaru-internal.network
+Network=aaru-ingress.network
+Network=aaru-internal.network:ip=10.231.0.40
+# aaru-internal has no DNS (see aaru-internal.network); litellm resolves on aaru-ingress
+AddHost=postgres:10.231.0.10
 PublishPort=127.0.0.1:3000:8080
 Volume=openwebui-data.volume:/app/backend/data:Z
 Environment=OPENAI_API_BASE_URL=http://litellm:4000/v1
-Environment=OPENAI_API_KEY={env:OPENAI_API_KEY}
-Environment=DATABASE_URL={env:DATABASE_URL}
+# openai-api-key must be a LiteLLM virtual key for Open WebUI, never the master key (spec §2).
 Secret=openai-api-key,type=env,target=OPENAI_API_KEY
-Secret=database-url,type=env,target=DATABASE_URL
+Secret=openwebui-database-url,type=env,target=DATABASE_URL
 Environment=WEBUI_AUTH=true
 Environment=ENABLE_SIGNUP=false
 NoNewPrivileges=true

@@ -1,6 +1,24 @@
+# Private network: PostgreSQL and inference, plus LiteLLM and Open WebUI as clients.
+# Internal=true: no outbound internet, so model containers have no egress (spec §5, §8).
+# cloudflared must never join this network.
+#
+# DisableDNS=true is a security control, not a convenience. With DNS on, the bridge
+# gets a gateway address in the rootless network namespace and netavark routes
+# traffic from aaru-ingress to it, so an ingress-only container (cloudflared) could
+# reach PostgreSQL and the unauthenticated inference port by IP. netavark installs
+# no isolation rules for internal networks, so Options=isolate does not help.
+# Members therefore use the static IPs below; clients resolve them via AddHost=.
+#
+#   10.231.0.10  postgres
+#   10.231.0.20  llamacpp
+#   10.231.0.21  vllm
+#   10.231.0.30  litellm
+#   10.231.0.40  openwebui
+#
+# Subnet is outside 10.88/16 and 10.89.x, which Podman auto-assigns to other networks.
 [Network]
 NetworkName=aaru-internal
 Driver=bridge
 Internal=true
-Subnet=10.89.0.0/24
-Gateway=10.89.0.1
+DisableDNS=true
+Subnet=10.231.0.0/24
