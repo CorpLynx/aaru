@@ -22,15 +22,14 @@ This repository holds the infrastructure (Podman Quadlet units, configuration, s
 specification, and the design system. It contains no model weights and no application server of its own.
 
 > [!IMPORTANT]
-> **Aaru's web app is a fork of [Open WebUI](https://github.com/open-webui/open-webui).**
-> The fork lives at [`CorpLynx/open-webui`](https://github.com/CorpLynx/open-webui) and tracks
-> upstream. Aaru's changes are a theme layer, branding and a build workflow, kept small so upstream
-> fixes stay mergeable; every patch is listed in the fork's
-> [`AARU.md`](https://github.com/CorpLynx/open-webui/blob/aaru/theme-tokens/AARU.md) and tagged
-> `AARU:` in the code. The rebrand relies on clause 4(i) of the
-> [Open WebUI License](https://docs.openwebui.com/license), which permits it for deployments with at
-> most 50 end users in any rolling 30-day period. Aaru stays under that cap; above it the original
-> branding must return. Open WebUI's copyright notice and license are retained in the fork.
+> **Aaru's web app is based on [Open WebUI](https://github.com/open-webui/open-webui).** It started
+> from Open WebUI 0.12.3, created by Timothy Jaeryang Baek and the Open WebUI contributors, and now
+> lives in its own repository, [`CorpLynx/aaru-web`](https://github.com/CorpLynx/aaru-web), where it
+> will diverge as Aaru grows. Every change from Open WebUI is listed in
+> [`AARU.md`](https://github.com/CorpLynx/aaru-web/blob/main/AARU.md). The code remains under the
+> [Open WebUI License](https://github.com/CorpLynx/aaru-web/blob/main/LICENSE); the rebrand relies on
+> its clause 4(i), which permits it for deployments with at most 50 end users in any rolling 30-day
+> period. Aaru stays under that cap; above it the original branding must return.
 
 ## Design
 
@@ -65,13 +64,13 @@ specification, and the design system. It contains no model weights and no applic
   </tr>
 </table>
 
-<sub>The fork as it runs today (<code>aaru/theme-tokens</code>): the Aaru theme, fonts and branding on Open WebUI's screens. Captured from a local test instance with a stub model, so the reply is illustrative. Phone shots are the web app at 390×844, the size it runs at when installed as a PWA.</sub>
+<sub>The web app as it runs today (<code>aaru-web</code> <code>main</code>): the Aaru theme, fonts and branding on Open WebUI's screens. Captured from a local test instance with a stub model, so the reply is illustrative. Phone shots are the web app at 390×844, the size it runs at when installed as a PWA.</sub>
 
 ## How it works
 
 ```text
 API clients ─> Cloudflare edge ─> cloudflared ─> LiteLLM ─> llama.cpp (Vulkan, Radeon 8060S)
-Browsers / PWA ─> Cloudflare edge ─> cloudflared ─> Aaru web app (Open WebUI fork) ─> LiteLLM
+Browsers / PWA ─> Cloudflare edge ─> cloudflared ─> Aaru web app (aaru-web) ─> LiteLLM
                                                          └─> PostgreSQL (encrypted volume)
 ```
 
@@ -81,7 +80,7 @@ Browsers / PWA ─> Cloudflare edge ─> cloudflared ─> Aaru web app (Open Web
 | Ingress | [cloudflared](https://github.com/cloudflare/cloudflared) | Outbound tunnel; no inbound ports open on the host |
 | Gateway | [LiteLLM](https://github.com/BerriAI/litellm) | Per-user virtual keys, model allowlists, rate limits, usage |
 | Inference | [llama.cpp](https://github.com/ggml-org/llama.cpp) | Vulkan on the iGPU in production; [vLLM](https://github.com/vllm-project/vllm) on CUDA for interim testing |
-| Web app | [Open WebUI](https://github.com/open-webui/open-webui) (forked) | Chat, history, PWA |
+| Web app | [aaru-web](https://github.com/CorpLynx/aaru-web), based on [Open WebUI](https://github.com/open-webui/open-webui) | Chat, history, PWA |
 | Database | [PostgreSQL](https://www.postgresql.org/) | Separate database and least-privilege role per service |
 | Logs | [Dozzle](https://github.com/amir20/dozzle) | Live log viewer, admin network only |
 
@@ -107,7 +106,7 @@ no route into it. `aaru-admin` holds Dozzle alone.
 | --- | --- |
 | Quadlet units, network segmentation, per-service database roles | Written; `verify.sh` passes on a local PostgreSQL + LiteLLM stack, test-box run pending |
 | Encrypted S3 backups | Script and timer written; first run and restore drill pending |
-| Web app theme and branding | Built on the fork branch `aaru/theme-tokens` |
+| Web app theme and branding | Done in [`aaru-web`](https://github.com/CorpLynx/aaru-web) |
 | Image pipeline (GitHub Actions, Trivy-gated, digest-pinned) | Written; first build pending |
 | Host hardening automation, image pinning, restore drill | Next |
 | Encrypted storage, billing and tiers from the design handoff | Waiting on open decisions 10–14 in the spec |
@@ -123,7 +122,7 @@ aaru/
 │   ├── quadlet/                            Podman Quadlet units and networks
 │   ├── config/                             LiteLLM config, PostgreSQL init script
 │   └── scripts/                            setup, backup, verify, image build
-└── forks/open-webui/                       Local clone of CorpLynx/open-webui (not tracked here for now)
+└── web/                                    Local clone of CorpLynx/aaru-web (own repository, ignored here)
 ```
 
 ## Operating it
@@ -157,11 +156,11 @@ keys reach the logs.
 
 - [Build specification](framework_ai_server_architecture-2.md): architecture, security model, delivery phases, open decisions
 - [Design handoff](design/README.md): brand, tokens, components and surface specs; §7a of the spec lists where it differs from v1 scope
-- [Fork patches](https://github.com/CorpLynx/open-webui/blob/aaru/theme-tokens/AARU.md): every change Aaru makes to Open WebUI
+- [aaru-web](https://github.com/CorpLynx/aaru-web): the web app, and [`AARU.md`](https://github.com/CorpLynx/aaru-web/blob/main/AARU.md) for every change from Open WebUI
 
 ## License
 
 This repository has no license yet. The web app is governed by the
-[Open WebUI License](https://github.com/open-webui/open-webui/blob/main/LICENSE) (BSD-3-Clause plus a
+[Open WebUI License](https://github.com/CorpLynx/aaru-web/blob/main/LICENSE) (BSD-3-Clause plus a
 branding clause). Geist and JetBrains Mono are under the SIL Open Font License 1.1. Every other
 component keeps its own license; see the table above.

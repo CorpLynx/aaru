@@ -78,22 +78,13 @@ Optional native chat app ─> Web UI (user login) or LiteLLM (individual virtual
 
 Re-check licenses, release status, hardware compatibility, and security advisories when pinning versions. A project being popular or open source does not make it a security boundary.
 
-### GUI forks and source layout
+### Web app source and layout
 
-- Keep the web UI fork independent from infrastructure and operations. The Open WebUI PWA ships with the web fork; add a separate native client only if the PWA is insufficient.
-- Proposed paths inside a future source monorepo:
- 
-  ```text
-  forks/
-    open-webui/       # our maintained fork of Open WebUI (includes PWA)
-    conduit/          # optional native mobile client; only if PWA is insufficient
-  infra/              # Podman/Quadlet deployment and shared configuration
-  docs/               # product, security, privacy, and operator docs
-  ```
-
-- **Selected layout:** Git submodules pointing at **our own fork repositories**, with each fork retaining its own Git history and a documented `upstream` remote. The parent repository pins the exact commit used for each build.
-- Keep product-specific changes small and isolated (theme tokens, logos, copy, app identifiers, endpoint defaults) so upstream security and compatibility fixes remain mergeable. Record custom patches and upstream sync dates in each fork's README.
-- The `aaru` repository is `CorpLynx/aaru`. `forks/open-webui` is a submodule of `CorpLynx/open-webui` (upstream `open-webui/open-webui`). Fork patches and upstream sync dates are recorded in that fork's `AARU.md`.
+- **Decided (2026-10-22): the web app is a standalone repository, [`CorpLynx/aaru-web`](https://github.com/CorpLynx/aaru-web), based on Open WebUI 0.12.3.** It is not a GitHub fork and is expected to diverge substantially (for example, removing cloud and frontier-model inference). The earlier fork, `CorpLynx/open-webui`, is archived.
+- The code stays under the Open WebUI License: keep `LICENSE`, `LICENSE_HISTORY`, `LICENSE_NOTICE` and the copyright notice, and credit Open WebUI in the README. Leaving the fork network does not change the branding clause; the 50-user rebrand cap (§1, below) still applies.
+- There are no automatic upstream merges. `open-webui/open-webui` is kept as the `upstream` remote, and security fixes are cherry-picked by hand. Divergence makes this harder over time, so review upstream security advisories on a schedule. Changes from upstream and sync dates are recorded in `aaru-web`'s `AARU.md`.
+- In this repository, `web/` is a local clone of `aaru-web` and is git-ignored. Production images are built by `aaru-web`'s GitHub Actions workflow (`infra/scripts/build-openwebui-image.sh`) and pinned by digest.
+- A native mobile client, if added later, would be another standalone repository; the PWA ships with the web app.
 - `design/` holds the design handoff (design system, HTML design references, surface specs). See §7a.
 
 #### Open WebUI reskin gate
@@ -250,7 +241,7 @@ The design handoff lives in `design/`. Start with `design/README.md` and `design
 - **Design system:** `design/design-system/`. Tokens (`tokens/*.css`), a Tailwind preset, 29 reference React primitives, guidelines, logo and logo motion. Dark only, Geist plus JetBrains Mono, Lucide icons, five accents that each carry one meaning (Ember generating, Cipher encrypted/local, Signal citations, Caution warnings, Fault errors).
 - **Surface specs:** `design/specs/`. `openwebui.md` (web app reskin), `website.md` (marketing site), `mobile.md`, `live-data-api.md`, `billing-stripe.md`, `encryption.md`, `logo-motion.md`.
 - **Design references:** `design/designs/*.dc.html` open in a browser. They are reference prototypes, not code to ship. They load React, Babel, Google Fonts and Lucide from public CDNs when opened.
-- **Rules carried into code:** use tokens, never hard-coded hex; keep the upstream diff small and tag edits `AARU:`; self-host fonts in production surfaces (no third-party font or icon CDNs on member-facing pages); security copy in the UI must match what the code does. Where it cannot, flag it rather than ship it.
+- **Rules carried into code:** use tokens, never hard-coded hex; tag edits to files inherited from Open WebUI with `AARU:` (the handoff's "keep the upstream diff small" rule no longer applies; see §3); self-host fonts in production surfaces (no third-party font or icon CDNs on member-facing pages); security copy in the UI must match what the code does. Where it cannot, flag it rather than ship it.
 
 ### Where the handoff and this spec disagree
 
@@ -273,7 +264,7 @@ This spec stays authoritative until each row is decided. The handoff was designe
 
 | # | Workstream | v1 status |
 | --- | --- | --- |
-| 1 | Tokens and theme layer in the Open WebUI fork | **In progress** on `CorpLynx/open-webui` branch `aaru/theme-tokens` |
+| 1 | Tokens and theme layer in the web app | **Done** on `CorpLynx/aaru-web` `main` |
 | 2 | Encrypted storage of chats, titles, files, embeddings | Blocked on decision 10 |
 | 3 | Passphrase login, key derivation, recovery kit | Blocked on decision 10 |
 | 4 | Stripe subscriptions, webhooks, tier gating | Blocked on decision 11 |

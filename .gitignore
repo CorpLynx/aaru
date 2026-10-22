@@ -25,5 +25,5 @@ __pycache__/
 # Build artifacts
 dist/
 build/
-# Open WebUI fork: standalone clone while untracked (was a submodule)
-forks/
+# Local clone of CorpLynx/aaru-web (the web app); it has its own repository
+web/
