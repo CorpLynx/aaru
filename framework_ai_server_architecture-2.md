@@ -94,11 +94,10 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 - If operating under current terms with branding retained, UI changes must not obscure, recolor, relocate, or co-brand in a way that violates the current branding policy. Make the license path a decision before implementation, not a cleanup task after the reskin.
 
 #### Mobile client decision
-
-- **Default: Open WebUI PWA.** Open WebUI officially documents installable iOS/Android PWA support. Admins can set a custom PWA manifest for app name/icon/theme color. This reuses Aaru's existing authenticated chat UI and needs no separate native client or OpenCode server.
-- **Native option: [Conduit](https://github.com/cogwheel0/conduit).** It is a maintained Flutter app for iOS/Android, supports Open WebUI's account/API and direct OpenAI-compatible endpoints, and stores credentials in Keychain/Keystore. A direct LiteLLM connection should use one end-user virtual key with the user's model/quotas—not a shared gateway key.
+ 
+- **v1: Open WebUI PWA.** Open WebUI officially documents installable iOS/Android PWA support. Admins can set a custom PWA manifest for app name/icon/theme color. This reuses Aaru's existing authenticated chat UI and needs no separate native client or OpenCode server.
+- **Future: dedicated Aaru native mobile app.** Planned for a later phase, after the PWA is validated with invited users. Candidate base: [Conduit](https://github.com/cogwheel0/conduit) (Flutter, GPL-3.0) — native iOS/Android, supports Open WebUI accounts and direct OpenAI-compatible endpoints, stores credentials in Keychain/Keystore. A direct LiteLLM connection must use one end-user virtual key with the user's model/quotas—not a shared gateway key.
 - Conduit is GPL-3.0. If Aaru distributes a modified client, preserve notices and provide corresponding source under GPL-3.0; confirm app-store/signing and distribution obligations before adopting. Do not assume its license permits a closed-source reskin.
-- Test the PWA first. Fork Conduit only if native workflows materially improve the product; record the user's current 50-user Open WebUI branding cap separately from Conduit's GPL obligations.
 - **OpenCode/OpenChamber are out of scope for Aaru v1.** They provide coding-agent runtimes/workspaces and remote tool execution. Aaru does not run an OpenCode server, and those clients are not substitutes for mobile chat over Aaru's OpenAI-compatible inference API.
 
 ### Logging and monitoring
@@ -296,12 +295,17 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 - Verify private conversations and RAG documents cannot be accessed across users. Verify deletion removes document records, source files, and vectors according to the retention policy.
 - Test uploads with oversized, malformed, and unsupported files; ensure plugins/tools and arbitrary URL fetching remain disabled unless explicitly reviewed.
 
-### Phase 2b — Mobile web/PWA validation; native client only if needed
-
+### Phase 2b — Mobile web/PWA validation
+ 
 - Test Open WebUI's PWA on iOS Safari and Android Chrome; set the product app name, icon, and theme color through its supported PWA manifest configuration.
-- Only if native interactions materially improve the product, evaluate Conduit against the pinned Open WebUI release and Aaru's LiteLLM API. Decide whether it connects through Open WebUI user accounts or directly with an individual LiteLLM virtual key.
-- Before distributing a modified Conduit build, review GPL-3.0 source-distribution requirements, app-store/signing implications, and third-party dependencies. Keep OpenCode/OpenChamber out of this Aaru deployment.
-- Acceptance: unauthenticated users cannot access chats or models; native credentials, if any, use platform secure storage; native direct API access is per-user and respects model/quota restrictions; no coding-agent shell or workspace endpoints are exposed.
+- Acceptance: PWA installs on both platforms; unauthenticated users cannot access chats or models; branding and manifest reflect Aaru identity within the 50-user license cap.
+ 
+### Phase 2c — Dedicated mobile app (future, after PWA validation)
+ 
+- Evaluate Conduit (GPL-3.0, Flutter) as the base for a dedicated Aaru native mobile app.
+- Decide whether the native app connects through Open WebUI user accounts or directly with an individual LiteLLM virtual key.
+- Before distributing a modified Conduit build, review GPL-3.0 source-distribution requirements, app-store/signing implications, and third-party dependencies.
+- Keep OpenCode/OpenChamber out of this Aaru deployment.
 
 ### Phase 3 — Invite-only launch
  
@@ -327,7 +331,7 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 5. Is RAG required for v1, and must documents be isolated per person, per team, or both?
 6. Should Cloudflare be a trusted data processor, or should public ingress use a different provider/architecture?
 7. Which identity and subscription billing systems will be authoritative for account status and entitlements?
-8. Is the Open WebUI PWA sufficient for launch, or is a native mobile client required? If native is required, is GPL-3.0 acceptable for a Conduit fork and distributed app?
+8. ~~Is the Open WebUI PWA sufficient for launch, or is a native mobile client required?~~ **Decided: PWA for v1.** A dedicated Aaru native mobile app is planned for a future phase. Conduit (GPL-3.0, Flutter) is the leading candidate for the native app base; evaluate its source-distribution and app-store obligations before forking.
 9. What GitHub user/organization namespace should own the Open WebUI fork and (if selected) Conduit fork?
 
 ## 13. References
