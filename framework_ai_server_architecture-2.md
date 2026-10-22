@@ -27,9 +27,16 @@
 ### Explicit non-goals for v1
 
 - Zero-knowledge storage, protection from a live host root administrator, high availability, or certified security compliance.
-- Running a coding-agent runtime, shell/PTY tools, or per-user code workspaces. Aaru serves model inference; it does not run OpenCode servers.
+- Running a coding-agent runtime, shell/PTY tools, or per-user code workspaces. Aaru serves model inference; it does not run OpenCode servers in v1.
 - Arbitrary model tool execution, web browsing, or user-provided plugins in the first release.
 - Guaranteed throughput or unlimited use until a capacity test and fair-use policy exist.
+
+### Future roadmap: coding agents (post-v1)
+- A separate coding-agent tier (likely $150+ or add-on) running isolated OpenCode servers per user or team.
+- Each coding-agent host requires: per-user workspace isolation, authentication, shell/PTY permission controls, and least-privilege OpenCode policies.
+- Coding-agent traffic must be routed through a separate authenticated endpoint, not the public inference API (`api.<domain>`).
+- OpenCode's built-in web UI (password-protected, localhost-bound) or a self-hosted OpenChamber instance provides the coding-agent interface.
+- This is a distinct product line with its own security model, capacity planning, and billing — not a feature toggle on the inference platform.
 
 ## 2. Proposed architecture
 
@@ -219,6 +226,9 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 - Use stable internal model aliases (for example, `fast` and `reasoning`) rather than hard-coding marketing names in clients. Map subscription entitlements to allowed aliases and quotas in one provisioning source of truth.
 - LiteLLM quotas and usage tracking are not a complete recurring subscription/payment system. A billing integration must provision, downgrade, suspend, and revoke keys when a subscription changes. It must also define refunds, cancellation timing, fair use, and usage disputes. A manual invite/key flow is acceptable for a private pilot; automate billing before general sale.
 - Flat monthly tiers need tested fair-use limits: one GPU is a shared queue, and API token quotas alone do not guarantee latency. Define maximum parallel requests, queue behavior, token/context caps, and overload responses.
+- **$25 tier:** Inference-only access (fast model, strict TPM/RPM limits).
+- **$70 tier:** Inference + agentic tool use within Open WebUI (web search, code interpreter, custom functions, MCP tools). Still no coding-agent server access.
+- **$150 (Sponsor) tier:** All of the above with higher quotas and priority. Future: potential access to a separate coding-agent service (post-v1, distinct product line).
 - **Web UI identity is a separate integration risk:** verify how each authenticated UI user maps to an individual LiteLLM key or entitlement. A single shared UI-to-LiteLLM key defeats per-user gateway limits and usage attribution. Do not solve this by exposing an admin/master key. If user-key propagation is unsupported, use an authenticated provisioning/proxy integration or defer per-user UI quotas.
 - Do not duplicate prompts, completions, uploaded contents, bearer tokens, or API keys in application/telemetry logs by default. If the UI stores chat history as a product feature, disclose that storage, protect it as user data, and define retention/deletion separately from operational logs. Keep gateway usage metadata to the minimum needed and verify behavior in pinned versions.
 
