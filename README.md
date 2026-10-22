@@ -31,4 +31,4 @@ aaru/
 
 ## Status
 
-Phase 0 — Hardware and model proof. No services deployed yet.
+Phase 0 — Hardware and model proof. Interim testing on RTX 4070 Ti Super (16GB VRAM, CUDA) while Framework Desktop is being acquired.

@@ -11,11 +11,18 @@ model_list:
   #     model: openai/llama-guard-3
   #     api_base: http://guardrail-container:8082/v1
 
+  # Test hardware (RTX 4070 Ti Super): use vLLM/CUDA
   - model_name: fast
     litellm_params:
-      model: openai/nemotron-3.5-lightning
-      api_base: http://llamacpp:8080/v1
-      # api_key: not needed for local llama.cpp
+      model: openai/Qwen/Qwen2.5-7B-Instruct
+      api_base: http://vllm:8000/v1
+      # api_key: not needed for local vLLM
+
+  # Production hardware (Framework Desktop): use llama.cpp/Vulkan
+  # - model_name: fast
+  #   litellm_params:
+  #     model: openai/nemotron-3.5-lightning
+  #     api_base: http://llamacpp:8080/v1
 
   # - model_name: reasoning
   #   litellm_params:

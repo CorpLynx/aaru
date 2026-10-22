@@ -16,7 +16,8 @@
 
 ### Initial scope
 
-- **Hardware not yet acquired.** Target: Framework Desktop with AMD Ryzen AI Max+ 395 (Strix Halo, gfx1151), 128GB LPDDR5X-8000, Radeon 8060S iGPU (40 CUs), 2× M.2 2280 NVMe slots. Available pre-built with Fedora or as DIY. Framework confirms 128GB runs DeepSeek V4 Flash 0731 (UD-IQ2_XXS, ~90.9GB) with headroom for context. All Phase 0 hardware/model validation is blocked until the hardware arrives.
+- **Target hardware not yet acquired:** Framework Desktop with AMD Ryzen AI Max+ 395 (Strix Halo, gfx1151), 128GB LPDDR5X-8000, Radeon 8060S iGPU (40 CUs), 2× M.2 2280 NVMe slots. Available pre-built with Fedora or as DIY. Framework confirms 128GB runs DeepSeek V4 Flash 0731 (UD-IQ2_XXS, ~90.9GB) with headroom for context.
+- **Interim test hardware available:** NVIDIA RTX 4070 Ti Super (16GB VRAM), Ryzen 7/9, 64GB RAM. Useful for validating container infrastructure, Quadlet deployment, LiteLLM gateway, Open WebUI integration, and security hardening. Inference will use CUDA/vLLM instead of Vulkan/llama.cpp on the iGPU. AMD-specific validation (TTM tuning, Vulkan backend, unified memory) remains blocked until the Framework Desktop arrives.
 - One inference backend and one or more pinned model artifacts for the first release.
 - OpenAI-compatible chat/completions API; streaming support must be verified end to end.
 - Open WebUI is the primary chat UI and its installable PWA is the default mobile experience. A separate native mobile app is optional; RAG is not required for the first API proof of concept.
@@ -267,13 +268,13 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 
 ## 11. Delivery phases and acceptance criteria
 
-### Phase 0 — Hardware and model proof (blocked: hardware not yet acquired)
+### Phase 0 — Hardware and model proof (interim: NVIDIA test hardware)
  
-- Confirm exact CPU/APU, RAM, BIOS settings, Fedora release, kernel, and GPU devices.
-- Run llama.cpp Vulkan with one candidate model on the host, then in the intended rootless container.
-- Measure cold start, prompt/generation throughput, peak host/GPU memory, context size, and one/multiple concurrent requests. Test memory pressure and recovery after a failed inference.
-- Only then select the TTM limit, model artifact, and initial tier limits.
-- **In the meantime:** finalize the spec, create the Open WebUI fork and begin the reskin, and prepare all deployment configs so the server can be stood up quickly once hardware arrives.
+- **Interim test hardware:** RTX 4070 Ti Super (16GB VRAM), Ryzen 7/9, 64GB RAM. Use this to validate the full stack (containers, gateway, UI, security) before the Framework Desktop arrives.
+- On the test machine, use vLLM with CUDA backend instead of llama.cpp/Vulkan. Select a model that fits in 16GB VRAM (e.g., Qwen 2.5 7B or Llama 3.1 8B at Q4).
+- Validate: container deployment, Quadlet lifecycle, LiteLLM key enforcement, Open WebUI integration, Cloudflare Tunnel routing, security hardening (Lynis, firewalld, SELinux).
+- **Blocked until Framework Desktop arrives:** AMD-specific validation (TTM tuning, Vulkan backend, unified memory behavior, model selection for 128GB). The test machine validates architecture and operations, not final performance.
+- Only then select the TTM limit, model artifact, and initial tier limits on the production hardware.
 
 ### Phase 1 — Private API pilot
 

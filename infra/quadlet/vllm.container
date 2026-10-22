@@ -1,0 +1,29 @@
+[Unit]
+Description=vLLM Inference Server (CUDA) — Interim Test Hardware
+After=network-online.target aaru-internal-network.service
+Wants=network-online.target
+
+[Container]
+Image=docker.io/vllm/vllm-openai:latest
+ContainerName=vllm
+Network=aaru-internal.network
+# No host port published — internal only
+AddDevice=/dev/nvidia0
+AddDevice=/dev/nvidiactl
+AddDevice=/dev/nvidia-uvm
+AddDevice=/dev/nvidia-uvm-tools
+SecurityLabelType=container_t
+NoNewPrivileges=true
+Tmpfs=/tmp:size=200m
+Memory=20g
+Environment=VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
+Environment=VLLM_HOST=0.0.0.0
+Environment=VLLM_PORT=8000
+Volume=%h/aaru/models:/models:ro,z
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target
