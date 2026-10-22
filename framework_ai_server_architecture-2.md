@@ -16,7 +16,7 @@
 
 ### Initial scope
 
-- One host: Framework Desktop with AMD Ryzen AI Max+ 395 (Strix Halo, gfx1151), 128GB LPDDR5X-8000, Radeon 8060S iGPU (40 CUs), 2× M.2 2280 NVMe slots. Available pre-built with Fedora or as DIY. Framework confirms 128GB runs DeepSeek V4 Flash 0731 (UD-IQ2_XXS, ~90.9GB) with headroom for context.
+- **Hardware not yet acquired.** Target: Framework Desktop with AMD Ryzen AI Max+ 395 (Strix Halo, gfx1151), 128GB LPDDR5X-8000, Radeon 8060S iGPU (40 CUs), 2× M.2 2280 NVMe slots. Available pre-built with Fedora or as DIY. Framework confirms 128GB runs DeepSeek V4 Flash 0731 (UD-IQ2_XXS, ~90.9GB) with headroom for context. All Phase 0 hardware/model validation is blocked until the hardware arrives.
 - One inference backend and one or more pinned model artifacts for the first release.
 - OpenAI-compatible chat/completions API; streaming support must be verified end to end.
 - Open WebUI is the primary chat UI and its installable PWA is the default mobile experience. A separate native mobile app is optional; RAG is not required for the first API proof of concept.
@@ -267,12 +267,13 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 
 ## 11. Delivery phases and acceptance criteria
 
-### Phase 0 — Hardware and model proof
-
+### Phase 0 — Hardware and model proof (blocked: hardware not yet acquired)
+ 
 - Confirm exact CPU/APU, RAM, BIOS settings, Fedora release, kernel, and GPU devices.
 - Run llama.cpp Vulkan with one candidate model on the host, then in the intended rootless container.
 - Measure cold start, prompt/generation throughput, peak host/GPU memory, context size, and one/multiple concurrent requests. Test memory pressure and recovery after a failed inference.
 - Only then select the TTM limit, model artifact, and initial tier limits.
+- **In the meantime:** finalize the spec, create the Open WebUI fork and begin the reskin, and prepare all deployment configs so the server can be stood up quickly once hardware arrives.
 
 ### Phase 1 — Private API pilot
 
