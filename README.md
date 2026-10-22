@@ -13,6 +13,7 @@ through an OpenAI-compatible API, with a web chat/RAG interface.
 ## Documentation
 
 - [Build Specification](framework_ai_server_architecture-2.md) — full architecture, security model, phases, and open decisions
+- [Design handoff](design/README.md) — design system, surface specs, and HTML design references (see spec §7a for where it differs from the build spec)
 
 ## Project Structure
 
@@ -24,11 +25,14 @@ aaru/
 │   ├── quadlet/                            # Podman Quadlet systemd units
 │   ├── config/                             # Service configuration files
 │   └── scripts/                            # Setup and maintenance scripts
-├── forks/                                  # (planned) Git submodules for UI forks
-│   └── open-webui/                         # Maintained fork of Open WebUI
+├── design/                                 # Design handoff: design system, specs, HTML references
+├── forks/                                  # Git submodules for UI forks
+│   └── open-webui/                         # CorpLynx/open-webui (patches listed in AARU.md)
 └── docs/                                   # Product, security, privacy, operator docs
 ```
 
 ## Status
 
 Phase 0 — Hardware and model proof. Interim testing on RTX 4070 Ti Super (16GB VRAM, CUDA) while Framework Desktop is being acquired.
+
+Web UI: Aaru theme layer (tokens, fonts, branding) in progress on `forks/open-webui` branch `aaru/theme-tokens`. Encryption, billing and tier work from the design handoff wait on open decisions 10–14 in the spec.

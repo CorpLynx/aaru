@@ -1,6 +1,6 @@
 # Framework AI Inference Platform — Build Specification
 
-**Status:** Draft for iteration (v0.7) — server scaffold started 
+**Status:** Draft for iteration (v0.8) — server scaffold started; design handoff imported; web UI theme layer in progress
 **Last reviewed:** 2026-10-22  
 **Target:** Single-host Fedora deployment serving local models through an OpenAI-compatible API, with a web chat/RAG front end.
 
@@ -93,7 +93,8 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 
 - **Selected layout:** Git submodules pointing at **our own fork repositories**, with each fork retaining its own Git history and a documented `upstream` remote. The parent repository pins the exact commit used for each build.
 - Keep product-specific changes small and isolated (theme tokens, logos, copy, app identifiers, endpoint defaults) so upstream security and compatibility fixes remain mergeable. Record custom patches and upstream sync dates in each fork's README.
-- The current `aaru` workspace is not a Git repository and contains only this spec. The monorepo layout is selected, but the parent repository/submodules are not initialized until the GitHub namespace and fork URLs are known.
+- The `aaru` repository is `CorpLynx/aaru`. `forks/open-webui` is a submodule of `CorpLynx/open-webui` (upstream `open-webui/open-webui`). Fork patches and upstream sync dates are recorded in that fork's `AARU.md`.
+- `design/` holds the design handoff (design system, HTML design references, surface specs). See §7a.
 
 #### Open WebUI reskin gate
 
@@ -240,6 +241,45 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 - RAG is a phase-two feature. Enforce per-user or per-tenant authorization on both document metadata and vector retrieval; filtering only in the UI is insufficient. Test that one user's query cannot retrieve another user's chunk.
 - Treat uploaded files and retrieved passages as untrusted input. Apply file size/type limits, malware scanning where appropriate, parser isolation, and deletion/retention rules. Do not enable web fetch, arbitrary URL ingestion, tool execution, or community plugins by default.
 - If using vector search, prefer pgvector for a small deployment when supported and operationally simpler; evaluate Qdrant when scale or UI support justifies another service. Choose and test the tenant-isolation model before storing customer documents.
+
+## 7a. Product design and surfaces
+
+The design handoff lives in `design/`. Start with `design/README.md` and `design/CLAUDE.md`.
+
+- **Design system:** `design/design-system/`. Tokens (`tokens/*.css`), a Tailwind preset, 29 reference React primitives, guidelines, logo and logo motion. Dark only, Geist plus JetBrains Mono, Lucide icons, five accents that each carry one meaning (Ember generating, Cipher encrypted/local, Signal citations, Caution warnings, Fault errors).
+- **Surface specs:** `design/specs/`. `openwebui.md` (web app reskin), `website.md` (marketing site), `mobile.md`, `live-data-api.md`, `billing-stripe.md`, `encryption.md`, `logo-motion.md`.
+- **Design references:** `design/designs/*.dc.html` open in a browser. They are reference prototypes, not code to ship. They load React, Babel, Google Fonts and Lucide from public CDNs when opened.
+- **Rules carried into code:** use tokens, never hard-coded hex; keep the upstream diff small and tag edits `AARU:`; self-host fonts in production surfaces (no third-party font or icon CDNs on member-facing pages); security copy in the UI must match what the code does. Where it cannot, flag it rather than ship it.
+
+### Where the handoff and this spec disagree
+
+This spec stays authoritative until each row is decided. The handoff was designed against a broader product than v1 defines; the rows below are open decisions, not accepted changes.
+
+| Topic | This spec (v1) | Design handoff | Consequence until decided |
+| --- | --- | --- | --- |
+| Encryption claim | Zero-knowledge is a non-goal; release gate forbids the claim (§1, §8, §11) | Zero-knowledge storage of chats, titles, files and embeddings; passphrase-derived keys (Argon2id, XChaCha20-Poly1305); "the admin can't read this" (`specs/encryption.md`) | No zero-knowledge, E2EE, "sealed" or "admin can't read" copy ships. The login passphrase, Encryption settings tab, Seal badges and Vault sealing states are not built. |
+| Tiers and price | Invite-only; $25 / $70 / $150 proposed, billing deferred (§1, §6) | Casual $10, Chat $25, Dev $70, Founders $150 for 12 months then $15 for life; Stripe Checkout, webhooks and portal now (`specs/billing-stripe.md`) | No billing or tier gating is built. Tier badges are not shown. |
+| Tier entitlements | $70 adds Open WebUI tools; $150 adds quotas and priority; no shell access | Dev adds dense 70B models and RAG; Founders adds VRAM reservations, voting, and rootless Podman container access | Podman access for members conflicts with the v1 non-goal of shell/PTY and per-user workspaces. Needs a separate security model before it is offered. |
+| Hardware | One Framework Desktop (§1, §4); RTX 4070 Ti Super for interim testing only | Framework node plus external RTX eGPUs; multiple nodes funded by members, with a public ledger and votes | Live-data endpoints describe one node until more hardware exists. eGPU-over-USB4 on Strix Halo is unvalidated. |
+| Models | No model selected until benchmarked (§5) | Nemotron 3.5 (sparse MoE, Quick) and Llama 70B (dense, Deep) named in UI and pricing | Model names stay sample data; LiteLLM aliases (`fast`, `reasoning`) remain the contract. |
+| Mobile | Open WebUI PWA for v1; Conduit later; OpenCode out of scope (§3) | Native app forked from OpenCode Mobile, including coding-agent runs and approvals | Mobile work is limited to the PWA manifest and icons. |
+| Coding agents | Post-v1, separate product line (§1) | Agent runs on mobile; IDE sidebar kit | Not built in v1. The IDE kit is reference only. |
+| Website and live data | Not in scope | aaru.ai marketing site, public `/api/status`, members-only `/api/hardware/*`, `/api/votes`, `/api/founders` | `/api/status` is compatible with v1 if it exposes no per-user data. The fund, ledger and vote endpoints depend on the billing decision. |
+| Custom code | Infrastructure only; no custom application code; integrations evaluated per need (§1) | Client-side crypto layer, Stripe checkout and webhooks, tier gating, and five live-data endpoints, all new application code | Theme and branding work stays inside the Open WebUI fork in its own languages. Each backend workstream needs an explicit per-need exception. |
+| Upstream encryption | n/a | n/a | Open WebUI 0.12.3 adds opt-in MLS-encrypted *ephemeral* channel chats (not stored). It does not encrypt stored chat history, files or vectors, so it does not satisfy the handoff's claim. |
+
+### Workstreams (from the handoff) and v1 status
+
+| # | Workstream | v1 status |
+| --- | --- | --- |
+| 1 | Tokens and theme layer in the Open WebUI fork | **In progress** on `CorpLynx/open-webui` branch `aaru/theme-tokens` |
+| 2 | Encrypted storage of chats, titles, files, embeddings | Blocked on decision 10 |
+| 3 | Passphrase login, key derivation, recovery kit | Blocked on decision 10 |
+| 4 | Stripe subscriptions, webhooks, tier gating | Blocked on decision 11 |
+| 5 | Reskinned Open WebUI screens 01–06 | Can proceed for visuals that make no encryption or billing claim (sidebar, chat thread, model selector, composer, metrics) |
+| 6 | Live data API | `/api/status` can proceed; the rest is blocked on decision 11 |
+| 7 | Marketing website | Not started; no repository |
+| 8 | Mobile app | PWA manifest only (decision 8) |
 
 ## 8. Security and privacy model
 
@@ -390,7 +430,12 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 6. Should Cloudflare be a trusted data processor, or should public ingress use a different provider/architecture?
 7. Which identity and subscription billing systems will be authoritative for account status and entitlements?
 8. ~~Is the Open WebUI PWA sufficient for launch, or is a native mobile client required?~~ **Decided: PWA for v1.** A dedicated Aaru native mobile app is planned for a future phase. Conduit (GPL-3.0, Flutter) is the leading candidate for the native app base; evaluate its source-distribution and app-store obligations before forking.
-9. What GitHub user/organization namespace should own the Open WebUI fork and (if selected) Conduit fork?
+9. ~~What GitHub user/organization namespace should own the Open WebUI fork and (if selected) Conduit fork?~~ **Decided: `CorpLynx`.**
+10. **Zero-knowledge storage (from the design handoff).** Adopt client-side encryption of chats, titles, files and embeddings as a v1 requirement, or rewrite the handoff's security copy to match this spec's server-side model? Adopting it reverses the §1 non-goal and the §11 release gate, and requires a security review of how server-side inference and RAG get plaintext (`design/specs/encryption.md`, "The hard part"). It also answers decision 2.
+11. **Tiers and billing.** Adopt the handoff's four tiers ($10 Casual through Founders) with Stripe, or keep the invite-only $25/$70/$150 proposal with billing deferred? Affects decisions 1 and 7, and §6.
+12. **Founders entitlements.** Are rootless Podman container access and dedicated VRAM reservations offered? If yes, they need their own isolation model, as with coding agents (§1).
+13. **Mobile base.** The handoff assumes an OpenCode Mobile fork with agent runs; this spec chose the PWA and then Conduit (decision 8). Which one wins?
+14. **Multi-node and eGPU hardware.** Is an external RTX GPU on the Framework host part of the production plan? It needs validation on Strix Halo before the UI names a "Boost engine".
 
 ## 13. References
 
