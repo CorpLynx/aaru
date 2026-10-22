@@ -66,6 +66,7 @@ Optional native chat app ─> Web UI (user login) or LiteLLM (individual virtual
 | Optional native mobile chat | [Conduit](https://github.com/cogwheel0/conduit) | Native iOS/Android client for Open WebUI and direct OpenAI-compatible endpoints, including LiteLLM-style APIs. GPL-3.0; evaluate distribution/source obligations before forking. The Open WebUI PWA remains the default and simplest mobile option. |
 | Security guidance | [OWASP GenAI Security Project](https://genai.owasp.org/llm-top-10/) | Use its guidance as a review checklist; no classifier or prompt filter makes an LLM secure by itself. |
 | Public ingress | [cloudflared](https://github.com/cloudflare/cloudflared) + Cloudflare Tunnel/WAF | The connector is open source; the edge service is a third-party dependency and sees traffic at the Cloudflare edge. Review its data handling and plan limits. |
+| Container log viewer | [Dozzle](https://github.com/amir20/dozzle) | MIT-licensed, lightweight real-time log viewer for Podman/Docker. No log storage — purely live viewing. Admin-only access via Tailscale. |
 
 Re-check licenses, release status, hardware compatibility, and security advisories when pinning versions. A project being popular or open source does not make it a security boundary.
 
@@ -99,6 +100,13 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 - Conduit is GPL-3.0. If Aaru distributes a modified client, preserve notices and provide corresponding source under GPL-3.0; confirm app-store/signing and distribution obligations before adopting. Do not assume its license permits a closed-source reskin.
 - Test the PWA first. Fork Conduit only if native workflows materially improve the product; record the user's current 50-user Open WebUI branding cap separately from Conduit's GPL obligations.
 - **OpenCode/OpenChamber are out of scope for Aaru v1.** They provide coding-agent runtimes/workspaces and remote tool execution. Aaru does not run an OpenCode server, and those clients are not substitutes for mobile chat over Aaru's OpenAI-compatible inference API.
+
+### Logging and monitoring
+
+- **Dozzle** ([amir20/dozzle](https://github.com/amir20/dozzle)): MIT-licensed, lightweight real-time container log viewer. Supports Podman/Docker. No log storage — purely live viewing. Useful for operational debugging without setting up a full Loki/Grafana stack.
+- Dozzle connects to the Podman socket (read-only) to stream container logs. It must be restricted to admin access via Tailscale or a private network — never exposed publicly.
+- For persistent log retention and alerting, evaluate **Loki + Grafana** as a later addition. Dozzle is sufficient for v1 operational debugging.
+- Dozzle does not store logs; pair with `podman logs` and systemd journal for persistent audit trails.
 
 ## 4. Host and AMD unified-memory configuration
 
