@@ -6,7 +6,7 @@ Wants=network-online.target
 [Container]
 Image=docker.io/amir20/dozzle:latest
 ContainerName=dozzle
-Network=aaru-internal.network
+Network=aaru-admin.network
 PublishPort=127.0.0.1:8088:8080
 Volume=/run/user/%U/podman/podman.sock:/var/run/docker.sock:ro,z
 NoNewPrivileges=true

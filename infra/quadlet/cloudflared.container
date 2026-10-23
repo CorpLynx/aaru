@@ -6,10 +6,10 @@ Wants=network-online.target
 [Container]
 Image=docker.io/cloudflare/cloudflared:latest
 ContainerName=cloudflared
-Network=aaru-internal.network
+# Ingress only: no route to PostgreSQL or inference (spec §9).
+Network=aaru-ingress.network
 Exec=tunnel run
 Secret=cloudflared-token,type=env,target=TUNNEL_TOKEN
-Environment=TUNNEL_TOKEN={env:TUNNEL_TOKEN}
 NoNewPrivileges=true
 Memory=256m
 
