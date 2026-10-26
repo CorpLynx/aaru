@@ -1,7 +1,7 @@
-# Framework AI Inference Platform — Build Specification
+# Aaru — Build Specification
 
-**Status:** Draft for iteration (v0.8) — server scaffold started; design handoff imported; web UI theme layer in progress
-**Last reviewed:** 2026-10-22  
+**Status:** Draft for iteration (v0.9) — server scaffold and operator scripts written; design handoff imported; web UI theme layer done
+**Last reviewed:** 2026-10-26  
 **Target:** Single-host Fedora deployment serving local models through an OpenAI-compatible API, with a web chat/RAG front end.
 
 ## 1. Goals, scope, and assumptions
@@ -13,16 +13,16 @@
 - Separate public ingress, applications, databases, and inference services.
 - Keep persistent user data encrypted at rest and minimize sensitive logging.
 - Reuse maintained projects rather than implementing a model server, gateway, UI, or vector database from scratch.
-- **Custom codebase language:** Infrastructure only — shell scripts, Quadlet configs, YAML, and Markdown. No custom application code. Upstream projects dictate their own languages (Python for LiteLLM/Open WebUI, C++ for llama.cpp, Go for Podman). Any future custom integrations (billing webhooks, plugins) will be evaluated per-need.
+- **Custom codebase language:** Infrastructure only — shell scripts, Quadlet configs, YAML, and Markdown. No custom application code. Upstream projects dictate their own languages (Python for LiteLLM/Open WebUI, C++ for llama.cpp, Go for Podman). Any future custom integrations (for example, plugins) will be evaluated per-need.
 
 ### Initial scope
 
-- **Target hardware not yet acquired:** Framework Desktop with AMD Ryzen AI Max+ 395 (Strix Halo, gfx1151), 128GB LPDDR5X-8000, Radeon 8060S iGPU (40 CUs), 2× M.2 2280 NVMe slots. Available pre-built with Fedora or as DIY. Framework confirms 128GB runs DeepSeek V4 Flash 0731 (UD-IQ2_XXS, ~90.9GB) with headroom for context.
-- **Interim test hardware available:** NVIDIA RTX 4070 Ti Super (16GB VRAM), Ryzen 7/9, 64GB RAM. Useful for validating container infrastructure, Quadlet deployment, LiteLLM gateway, Open WebUI integration, and security hardening. Inference will use CUDA/vLLM instead of Vulkan/llama.cpp on the iGPU. AMD-specific validation (TTM tuning, Vulkan backend, unified memory) remains blocked until the Framework Desktop arrives.
+- **Production host:** a single machine with an AMD GPU, served through llama.cpp on Vulkan. This spec does not record the exact hardware; size models and limits on the host itself (§4, §5).
+- **Interim test host:** a machine with an NVIDIA GPU. Useful for validating container infrastructure, Quadlet deployment, LiteLLM gateway, Open WebUI integration, and security hardening. Inference there uses CUDA/vLLM instead of Vulkan/llama.cpp. AMD-specific validation (GPU memory tuning, Vulkan backend) waits for the production host.
 - One inference backend and one or more pinned model artifacts for the first release.
 - OpenAI-compatible chat/completions API; streaming support must be verified end to end.
 - Open WebUI is the primary chat UI and its installable PWA is the default mobile experience. A separate native mobile app is optional; RAG is not required for the first API proof of concept.
-- The service is invite-only in v1. The proposed $25/$70/$150 subscription tiers are future commercial requirements to validate, not current v1 scope; key provisioning is operator-controlled.
+- The service is invite-only and unpaid; key provisioning is operator-controlled.
 - Initial Open WebUI deployment is capped at 50 users in any rolling 30-day period to match the selected current-license rebranding path; revisit licensing before raising the cap.
 
 ### Explicit non-goals for v1
@@ -31,13 +31,14 @@
 - Running a coding-agent runtime, shell/PTY tools, or per-user code workspaces. Aaru serves model inference; it does not run OpenCode servers in v1.
 - Arbitrary model tool execution, web browsing, or user-provided plugins in the first release.
 - Guaranteed throughput or unlimited use until a capacity test and fair-use policy exist.
+- Pricing, payments or billing.
 
 ### Future roadmap: coding agents (post-v1)
-- A separate coding-agent tier (likely $150+ or add-on) running isolated OpenCode servers per user or team.
+- A separate coding-agent service running isolated OpenCode servers per user or team.
 - Each coding-agent host requires: per-user workspace isolation, authentication, shell/PTY permission controls, and least-privilege OpenCode policies.
 - Coding-agent traffic must be routed through a separate authenticated endpoint, not the public inference API (`api.<domain>`).
 - OpenCode's built-in web UI (password-protected, localhost-bound) or a self-hosted OpenChamber instance provides the coding-agent interface.
-- This is a distinct product line with its own security model, capacity planning, and billing — not a feature toggle on the inference platform.
+- This is a distinct product line with its own security model and capacity planning — not a feature toggle on the inference platform.
 
 ## 2. Proposed architecture
 
@@ -65,12 +66,13 @@ Optional native chat app ─> Web UI (user login) or LiteLLM (individual virtual
 | Capability | Proposed project | Notes / decision |
 | --- | --- | --- |
 | Containers and lifecycle | [Podman](https://github.com/containers/podman) + systemd [Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html) | Use rootless containers where practical. Prefer Quadlet-managed systemd units over introducing `podman-compose` for a single-host service. |
-| Primary inference | [llama.cpp](https://github.com/ggml-org/llama.cpp) | Start with Vulkan on the AMD iGPU and its OpenAI-compatible server. Pin image/source revision and model artifact; benchmark on the actual machine before promising model or throughput tiers. |
-| Alternative inference | [vLLM](https://github.com/vllm-project/vllm) | Current vLLM docs list AMD Ryzen AI Max/gfx1151 and ROCm support. Treat it as an experiment/alternative: validate the exact Fedora kernel, ROCm stack, container device access, model, and performance before adopting. CUDA/RTX 3090 is not a requirement for vLLM. |
+| Primary inference | [llama.cpp](https://github.com/ggml-org/llama.cpp) | Start with Vulkan on the AMD GPU and its OpenAI-compatible server. Pin image/source revision and model artifact; benchmark on the actual machine before promising models or throughput. |
+| Model loading and swapping | [llama-swap](https://github.com/mostlygeek/llama-swap) | Proxy in front of llama-server (MIT). Loads a model on its first request, swaps models, unloads idle ones (`ttl`), and requires an API key that only LiteLLM holds. Chosen over LM Studio (`lms`) plus a custom router: it ships pinned, non-root Vulkan images, needs no egress, and adds no custom code. Its request capture is turned off so prompts stay out of memory buffers and the UI. |
+| New-model scanning | [Anubis](https://github.com/CorpLynx/Anubis) | Scans each new GGUF (metadata, chat templates, provenance) when `fetch-model.sh` stages it; HIGH/CRITICAL findings or an incomplete scan quarantine the download. Runs in a no-network, read-only container pinned by digest (built by `build-anubis-image.sh`). Not part of normal operation. |
+| Alternative inference | [vLLM](https://github.com/vllm-project/vllm) | Current vLLM docs list ROCm support for recent AMD GPUs. Treat it as an experiment/alternative: validate the exact Fedora kernel, ROCm stack, container device access, model, and performance before adopting. |
 | API gateway and keys | [LiteLLM Proxy](https://github.com/BerriAI/litellm) | Existing virtual keys, model allowlists, rate limits, budgets, and usage tracking avoid a custom gateway. Verify exact OSS feature/license needs and test quota enforcement under concurrent load. |
 | Web chat / mobile PWA / RAG | [Open WebUI](https://github.com/open-webui/open-webui) | Primary UI; it includes an installable PWA for iOS/Android browsers, so a second app is not required for v1. Its current license has a branding condition; the selected reskin plan is capped at 50 users per rolling 30 days. If strict OSI-approved licensing is required, evaluate LibreChat (MIT) and account for its different backing services/configuration. |
 | Relational DB / vectors | [PostgreSQL](https://www.postgresql.org/) + [pgvector](https://github.com/pgvector/pgvector) | pgvector provides vector and hybrid search inside Postgres. Use only if the selected UI/RAG implementation supports it well; otherwise choose a supported vector store such as [Qdrant](https://github.com/qdrant/qdrant), with tenant isolation designed explicitly. |
-| Subscription billing (paid launch) | [Lago](https://github.com/getlago/lago) or an existing payment/billing provider | Lago is a self-hostable billing/metering platform (AGPLv3) with subscription and usage features. Evaluate its license, payment-provider integration, and operational footprint before adopting; it is likely too much for the invite-only pilot. LiteLLM is not a substitute for billing. |
 | Optional native mobile chat | [Conduit](https://github.com/cogwheel0/conduit) | Native iOS/Android client for Open WebUI and direct OpenAI-compatible endpoints, including LiteLLM-style APIs. GPL-3.0; evaluate distribution/source obligations before forking. The Open WebUI PWA remains the default and simplest mobile option. |
 | Security guidance | [OWASP GenAI Security Project](https://genai.owasp.org/llm-top-10/) | Use its guidance as a review checklist; no classifier or prompt filter makes an LLM secure by itself. |
 | Public ingress | [cloudflared](https://github.com/cloudflare/cloudflared) + Cloudflare Tunnel/WAF | The connector is open source; the edge service is a third-party dependency and sees traffic at the Cloudflare edge. Review its data handling and plan limits. |
@@ -107,16 +109,18 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 - For persistent log retention and alerting, evaluate **Loki + Grafana** as a later addition. Dozzle is sufficient for v1 operational debugging.
 - Dozzle does not store logs; pair with `podman logs` and systemd journal for persistent audit trails.
 
-## 4. Host and AMD unified-memory configuration
+## 4. Host and GPU configuration
 
-- Use a supported Fedora Server release with current firmware and a kernel containing the AMD Ryzen AI Max/gfx1151 support fixes. Current AMD documentation identifies kernel 6.18.4 or later for generic distributions and lists Fedora 43 as including the required native fixes; verify the actual release/kernel in use.
+- Use a supported Fedora Server release with current firmware and a kernel that carries the driver fixes AMD documents for the production GPU; verify the actual release/kernel in use.
 - Keep SELinux enforcing and firewalld enabled. Do not use privileged containers or disable SELinux as a shortcut for GPU access.
-- The Radeon 8060S uses physically shared system memory. A “124 GB VRAM allocation” is not a separate reservation and leaves insufficient headroom for Fedora, containers, PostgreSQL, and request buffers.
-- Do **not** use `amdgpu.gttsize=126976` as the allocation recipe: the kernel documents `gttsize` as a deprecated restriction/testing parameter. Start with defaults, benchmark, then tune the TTM `pages_limit` only if needed and retain explicit host-memory headroom. Follow AMD's current [RDNA 3.5 memory guidance](https://rocm.docs.amd.com/en/latest/reference/system-optimization/rdna3-5.html).
+- If the GPU shares system memory, it has no separate reservation. Do not hand nearly all of it to the GPU; leave headroom for Fedora, containers, PostgreSQL, and request buffers.
+- Do **not** use an `amdgpu.gttsize` override as the allocation recipe: the kernel documents `gttsize` as a deprecated restriction/testing parameter. Start with defaults, benchmark, then tune the TTM `pages_limit` only if needed and retain explicit host-memory headroom. Follow AMD's current system-optimization guidance for the GPU.
 - Run the Podman services under a dedicated unprivileged service account. Pass only the required render/compute device nodes to the inference container and verify that rootless user-namespace and SELinux permissions remain in effect.
 - Install only required host packages (for example, Podman, firewalld, and GPU/runtime dependencies). Pin the Fedora release and schedule updates rather than blindly updating the production host on every boot.
 
 ## 4a. Security hardening and host lockdown
+
+`infra/scripts/harden-host.sh` applies the account, SSH, firewalld, fail2ban, sysctl, auditd, dnf-automatic, SELinux and AIDE items below (dry run by default). It also installs Lynis with a weekly audit (`aaru-lynis-audit.timer`) whose summary — hardening index, its change since last week, and the top warnings — appears in the admin login banner (`/etc/motd.d/aaru-lynis`, readable by `wheel` only). OpenSCAP stays manual.
 
 ### User and access model
 
@@ -134,11 +138,12 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 - Enable Tailscale SSH (`tailscale up --ssh`) to provide authenticated, MFA-gated SSH access over the tailnet. This eliminates the need to expose port 22 to the internet or configure SSH key distribution manually.
 - Restrict Tailscale ACLs to allow only the admin account's devices to reach the host on port 22. Deny all other tailnet devices.
 - Tailscale should be used for all administrative access. The public SSH port (22) should be firewalled off entirely or bound to localhost only.
-- Do not use Tailscale for application traffic (API/UI access) — that goes through Cloudflare Tunnel. Tailscale is for admin/operational access only.
+- Do not use Tailscale for application traffic (API/UI access) once the Cloudflare path is live. **Interim exception:** until then, members reach the web app and the LiteLLM `/v1` API through a tagged Tailscale node (`tailscale.container` on `aaru-ingress`) shared with each member; the policy (`infra/terraform/tailscale`) lets shared users reach only ports 443 and 8443 on that node. Admin SSH uses a separate host node (`tag:aaru-host`) that only admins can reach.
 
 ### Firewall (firewalld)
 
 - Default zone: `drop` or `block` — deny all inbound traffic by default.
+- Setting the default zone is not enough: Fedora Server binds its interface to the `FedoraServer` zone (SSH, Cockpit and DHCPv6 open). Move every interface into `drop`, put the management path in its own SSH-only zone with target `DROP`, and disable Cockpit (`cockpit.socket`, port 9090). `harden-host.sh` does this and refuses to run if it would cut off an open SSH session; `verify.sh` fails on any other active zone or open service.
 - Allow only:
   - SSH (port 22) from the admin's management IP or Tailscale interface only.
   - HTTPS (port 443) if needed for local testing; production traffic goes through Cloudflare Tunnel (outbound).
@@ -206,28 +211,27 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 
 ## 5. Inference service
 
-- **Initial backend:** `llama.cpp` server using Vulkan, listening on its container network only (for example, port `8080`). Do not publish this port on the host or route a public hostname to it.
-- Download model files through a controlled operator workflow. Record model name, exact revision/hash, source, license, quantization, context length, and benchmark results. Mount model artifacts read-only at runtime.
+- **Initial backend:** `llama.cpp` server using Vulkan, listening on its container network only (for example, port `8080`). Do not publish this port on the host or route a public hostname to it. llama-swap fronts it (`llamacpp.container`): the models it may load are listed in the gitignored `infra/config/llama-swap/config.yaml`, nothing is downloaded at runtime, and the container memory limit caps every loaded model together.
+- Use official model sources only: the author's own GGUFs, or ggml-org (the llama.cpp project) where the author publishes none. No community requantizations. The deployed set and its pinned commits are `infra/config/models.catalog`: Qwen3.6-35B-A3B (`fast`), Qwen3.8-27B (`dense`), gpt-oss-120b (`reasoning`), Qwen3-Embedding 8B and 0.6B (`embed`, `embed-small`). Qwen-Image-2512 is deferred: Qwen publishes it only in diffusers format, which stable-diffusion.cpp cannot load, and every GGUF of it is a community build.
+- Download model files through a controlled operator workflow. Record model name, exact revision/hash, source, license, quantization, context length, and benchmark results. Mount model artifacts read-only at runtime. `infra/scripts/fetch-model.sh` resolves the revision to a commit, checks every file against the hub's SHA-256, and writes this record next to the model. Which model a host serves, and its memory limit, live in gitignored per-host files (`<unit>.container.d/local.conf`, `config/litellm/models.yaml`).
 - Select the model after measuring prompt processing, generation speed, context memory, warm-up time, and concurrent sessions. Candidate model names in the previous draft are examples only; no model is selected until its artifact, license, and hardware compatibility are confirmed.
 - Disable inference-container egress after model setup where feasible. Do not mount the host filesystem, Podman socket, user home, or secrets into the model container.
-- A second backend is a later capacity decision. vLLM can target AMD ROCm as well as NVIDIA CUDA; adding a second model process on a 128 GB shared-memory APU may reduce total capacity rather than increase it. Benchmark before deploying both.
+- A second backend is a later capacity decision. vLLM can target AMD ROCm as well as NVIDIA CUDA; adding a second model process on a shared-memory GPU may reduce total capacity rather than increase it. Benchmark before deploying both.
 
-## 6. Gateway, identities, tiers, and billing
+## 6. Gateway and identities
 
 - LiteLLM is the sole public OpenAI-compatible API. Expose only required inference routes; keep admin, key-management, health/debug, and configuration endpoints private or operator-authenticated.
 - Use LiteLLM virtual keys with explicit model allowlists, RPM/TPM limits, concurrency limits, expiration, and (where suitable) budgets. Create keys through an authenticated operator or provisioning workflow. Store the master key as a secret and rotate it.
-- Use stable internal model aliases (for example, `fast` and `reasoning`) rather than hard-coding marketing names in clients. Map subscription entitlements to allowed aliases and quotas in one provisioning source of truth.
-- LiteLLM quotas and usage tracking are not a complete recurring subscription/payment system. A billing integration must provision, downgrade, suspend, and revoke keys when a subscription changes. It must also define refunds, cancellation timing, fair use, and usage disputes. A manual invite/key flow is acceptable for a private pilot; automate billing before general sale.
-- Flat monthly tiers need tested fair-use limits: one GPU is a shared queue, and API token quotas alone do not guarantee latency. Define maximum parallel requests, queue behavior, token/context caps, and overload responses.
-- **$25 tier:** Inference-only access (fast model, strict TPM/RPM limits).
-- **$70 tier:** Inference + agentic tool use within Open WebUI (web search, code interpreter, custom functions, MCP tools). Still no coding-agent server access.
-- **$150 (Sponsor) tier:** All of the above with higher quotas and priority. Future: potential access to a separate coding-agent service (post-v1, distinct product line).
-- **Web UI identity is a separate integration risk:** verify how each authenticated UI user maps to an individual LiteLLM key or entitlement. A single shared UI-to-LiteLLM key defeats per-user gateway limits and usage attribution. Do not solve this by exposing an admin/master key. If user-key propagation is unsupported, use an authenticated provisioning/proxy integration or defer per-user UI quotas.
+- Use stable internal model aliases (for example, `fast` and `reasoning`) rather than hard-coding marketing names in clients. Keep each member's allowed aliases and quotas in one provisioning source of truth.
+- Membership is invite-only and unpaid. The operator creates, rotates, and revokes keys by hand; there is no billing integration.
+- Every member gets the same model allowlist and limits by default; the operator can narrow an individual key.
+- Members share one GPU queue, and API token quotas alone do not guarantee latency. Define and test maximum parallel requests, queue behavior, token/context caps, and overload responses.
+- **Web UI identity is a separate integration risk:** verify how each authenticated UI user maps to an individual LiteLLM key. A single shared UI-to-LiteLLM key defeats per-user gateway limits and usage attribution. Do not solve this by exposing an admin/master key. If user-key propagation is unsupported, use an authenticated provisioning/proxy integration or defer per-user UI quotas. Status: `infra/scripts/member.sh` issues one key per member (`user_id` = email). The web app forwards the signed-in member (`ENABLE_FORWARD_USER_INFO_HEADERS`) and LiteLLM records it as the end user (`user_header_name`), so web usage is attributed per member; per-member *limits* in the web app still ride on the shared web app key.
 - Do not duplicate prompts, completions, uploaded contents, bearer tokens, or API keys in application/telemetry logs by default. If the UI stores chat history as a product feature, disclose that storage, protect it as user data, and define retention/deletion separately from operational logs. Keep gateway usage metadata to the minimum needed and verify behavior in pinned versions.
 
 ## 7. Web UI and RAG
 
-- Host the UI at `chat.<domain>` and require authenticated accounts; disable open registration for the pilot. Add OIDC/MFA or equivalent account lifecycle controls before serving paying users broadly.
+- Host the UI at `chat.<domain>` and require authenticated accounts; disable open registration for the pilot. The deployment pins the web app's settings in `openwebui.container` with `ENABLE_PERSISTENT_CONFIG=false` (otherwise Open WebUI reads its environment once and keeps database copies): sign-up off, community sharing off, admin chat access and export off, secure cookies, 7-day sessions, and CORS limited to the public URL (per-host drop-in). The first account created becomes admin even with sign-up off, so the admin is created over an SSH tunnel before member ingress starts; `verify.sh` checks all of this. Add OIDC/MFA or equivalent account lifecycle controls before inviting members broadly.
 - Use the UI's supported PostgreSQL configuration only when verified for the pinned release. Store the UI's full persistent data directory—not only the upload folder—on the protected data volume. Keep LiteLLM and UI database roles separate.
 - Open WebUI downloads its embedding model (`sentence-transformers/all-MiniLM-L6-v2`, all format variants) from Hugging Face on first start; observed taking several minutes with the upstream 0.12.3 image. Bake the model into the Aaru image or pre-seed the data volume, then set offline mode, so the web app needs no Hugging Face egress at runtime.
 - RAG is a phase-two feature. Enforce per-user or per-tenant authorization on both document metadata and vector retrieval; filtering only in the UI is insufficient. Test that one user's query cannot retrieve another user's chunk.
@@ -238,8 +242,8 @@ Re-check licenses, release status, hardware compatibility, and security advisori
 
 The design handoff lives in `design/`. Start with `design/README.md` and `design/CLAUDE.md`.
 
-- **Design system:** `design/design-system/`. Tokens (`tokens/*.css`), a Tailwind preset, 29 reference React primitives, guidelines, logo and logo motion. Dark only, Geist plus JetBrains Mono, Lucide icons, five accents that each carry one meaning (Ember generating, Cipher encrypted/local, Signal citations, Caution warnings, Fault errors).
-- **Surface specs:** `design/specs/`. `openwebui.md` (web app reskin), `website.md` (marketing site), `mobile.md`, `live-data-api.md`, `billing-stripe.md`, `encryption.md`, `logo-motion.md`.
+- **Design system:** `design/design-system/`. Tokens (`tokens/*.css`), a Tailwind preset, 27 reference React primitives, guidelines, logo and logo motion. Dark only, Geist plus JetBrains Mono, Lucide icons, five accents that each carry one meaning (Ember generating, Cipher encrypted/local, Signal citations, Caution warnings, Fault errors).
+- **Surface specs:** `design/specs/`. `openwebui.md` (web app reskin), `website.md` (marketing site), `mobile.md`, `live-data-api.md`, `encryption.md`, `logo-motion.md`.
 - **Design references:** `design/designs/*.dc.html` open in a browser. They are reference prototypes, not code to ship. They load React, Babel, Google Fonts and Lucide from public CDNs when opened.
 - **Rules carried into code:** use tokens, never hard-coded hex; tag edits to files inherited from Open WebUI with `AARU:` (the handoff's "keep the upstream diff small" rule no longer applies; see §3); self-host fonts in production surfaces (no third-party font or icon CDNs on member-facing pages); security copy in the UI must match what the code does. Where it cannot, flag it rather than ship it.
 
@@ -250,14 +254,12 @@ This spec stays authoritative until each row is decided. The handoff was designe
 | Topic | This spec (v1) | Design handoff | Consequence until decided |
 | --- | --- | --- | --- |
 | Encryption claim | Zero-knowledge is a non-goal; release gate forbids the claim (§1, §8, §11) | Zero-knowledge storage of chats, titles, files and embeddings; passphrase-derived keys (Argon2id, XChaCha20-Poly1305); "the admin can't read this" (`specs/encryption.md`) | No zero-knowledge, E2EE, "sealed" or "admin can't read" copy ships. The login passphrase, Encryption settings tab, Seal badges and Vault sealing states are not built. |
-| Tiers and price | Invite-only; $25 / $70 / $150 proposed, billing deferred (§1, §6) | Casual $10, Chat $25, Dev $70, Founders $150 for 12 months then $15 for life; Stripe Checkout, webhooks and portal now (`specs/billing-stripe.md`) | No billing or tier gating is built. Tier badges are not shown. |
-| Tier entitlements | $70 adds Open WebUI tools; $150 adds quotas and priority; no shell access | Dev adds dense 70B models and RAG; Founders adds VRAM reservations, voting, and rootless Podman container access | Podman access for members conflicts with the v1 non-goal of shell/PTY and per-user workspaces. Needs a separate security model before it is offered. |
-| Hardware | One Framework Desktop (§1, §4); RTX 4070 Ti Super for interim testing only | Framework node plus external RTX eGPUs; multiple nodes funded by members, with a public ledger and votes | Live-data endpoints describe one node until more hardware exists. eGPU-over-USB4 on Strix Halo is unvalidated. |
-| Models | No model selected until benchmarked (§5) | Nemotron 3.5 (sparse MoE, Quick) and Llama 70B (dense, Deep) named in UI and pricing | Model names stay sample data; LiteLLM aliases (`fast`, `reasoning`) remain the contract. |
+| Hardware | One production host (§1, §4); an interim test host | Several nodes plus external "Boost" GPUs | Live-data endpoints describe one node until more hardware exists. External GPUs on the production host are unvalidated. |
+| Models | No model selected until benchmarked (§5) | Nemotron 3.5 (sparse MoE, Quick) and Llama 70B (dense, Deep) named in the UI | Model names stay sample data; LiteLLM aliases (`fast`, `reasoning`) remain the contract. |
 | Mobile | Open WebUI PWA for v1; Conduit later; OpenCode out of scope (§3) | Native app forked from OpenCode Mobile, including coding-agent runs and approvals | Mobile work is limited to the PWA manifest and icons. |
 | Coding agents | Post-v1, separate product line (§1) | Agent runs on mobile; IDE sidebar kit | Not built in v1. The IDE kit is reference only. |
-| Website and live data | Not in scope | aaru.ai marketing site, public `/api/status`, members-only `/api/hardware/*`, `/api/votes`, `/api/founders` | `/api/status` is compatible with v1 if it exposes no per-user data. The fund, ledger and vote endpoints depend on the billing decision. |
-| Custom code | Infrastructure only; no custom application code; integrations evaluated per need (§1) | Client-side crypto layer, Stripe checkout and webhooks, tier gating, and five live-data endpoints, all new application code | Theme and branding work stays inside the Open WebUI fork in its own languages. Each backend workstream needs an explicit per-need exception. |
+| Website and live data | Not in scope | aaru.ai marketing site, public `/api/status`, members-only `/api/hardware/nodes` | `/api/status` is compatible with v1 if it exposes no per-user data. `/api/hardware/nodes` needs a member session. |
+| Custom code | Infrastructure only; no custom application code; integrations evaluated per need (§1) | Client-side crypto layer, invitations, and two live-data endpoints, all new application code | Theme and branding work stays inside the Open WebUI fork in its own languages. Each backend workstream needs an explicit per-need exception. |
 | Upstream encryption | n/a | n/a | Open WebUI 0.12.3 adds opt-in MLS-encrypted *ephemeral* channel chats (not stored). It does not encrypt stored chat history, files or vectors, so it does not satisfy the handoff's claim. |
 
 ### Workstreams (from the handoff) and v1 status
@@ -267,9 +269,9 @@ This spec stays authoritative until each row is decided. The handoff was designe
 | 1 | Tokens and theme layer in the web app | **Done** on `CorpLynx/aaru-web` `main` |
 | 2 | Encrypted storage of chats, titles, files, embeddings | Blocked on decision 10 |
 | 3 | Passphrase login, key derivation, recovery kit | Blocked on decision 10 |
-| 4 | Stripe subscriptions, webhooks, tier gating | Blocked on decision 11 |
-| 5 | Reskinned Open WebUI screens 01–06 | Can proceed for visuals that make no encryption or billing claim (sidebar, chat thread, model selector, composer, metrics) |
-| 6 | Live data API | `/api/status` can proceed; the rest is blocked on decision 11 |
+| 4 | Invitations and per-member API keys | Operator-run key provisioning (§6) for v1 |
+| 5 | Reskinned Open WebUI screens 01–06 | Can proceed for visuals that make no encryption claim (sidebar, chat thread, model selector, composer, metrics) |
+| 6 | Live data API | `/api/status` can proceed; `/api/hardware/nodes` follows member sign-in |
 | 7 | Marketing website | Not started; no repository |
 | 8 | Mobile app | PWA manifest only (decision 8) |
 
@@ -299,6 +301,7 @@ This spec stays authoritative until each row is decided. The handoff was designe
 
 ## 9. Network and edge routing
 
+- Until Cloudflare is live, the interim member path is Tailscale (§4a): node sharing, TLS terminated in the Aaru container with a tailnet certificate, so no third party sees plaintext; Tailscale sees connection metadata. Retiring it is stopping one container.
 - Use Cloudflare Tunnel for outbound origin connectivity. Configure separate routes for API and UI hostnames; do not expose ports `4000`, `8080`, database ports, or UI admin ports through host firewall/NAT.
 - Attach `cloudflared` only to the ingress-facing network it needs. It should not have direct access to PostgreSQL or inference containers.
 - Apply WAF/rate/abuse controls at Cloudflare and again at LiteLLM. Add Cloudflare Access only where its identity flow is compatible with the intended clients; API clients still need per-user API-key authentication.
@@ -311,8 +314,8 @@ This spec stays authoritative until each row is decided. The handoff was designe
 - Define a deployment repository containing Quadlet units, pinned configuration, schema/setup steps, and non-secret examples. Pin container images by digest (or an equivalent immutable version) and record model hashes.
 - Build and test the web UI independently. If a native client is later adopted, maintain its source, license inventory, signing credentials, and upstream security-update cadence separately.
 - Scan images/dependencies before production updates, stage updates, and maintain a rollback path. Update Fedora/kernel/firmware deliberately because inference compatibility can change with the GPU stack.
-- Monitor host RAM/swap, GPU availability, temperature, disk capacity, request latency, queue depth, errors, and container health. Alert on disk exhaustion, failed backups, unexpected restarts, and sustained overload.
-- Back up PostgreSQL and user files on a defined schedule to encrypted off-host storage. Include configuration and key-recovery instructions, but keep secrets protected separately. Perform a restore drill before onboarding paying users.
+- Monitor host RAM/swap, GPU availability, temperature, disk capacity, request latency, queue depth, errors, and container health. Alert on disk exhaustion, failed backups, unexpected restarts, and sustained overload. v1 uses `infra/scripts/healthcheck.sh` on a 5-minute timer, alerting through ntfy on state changes, and `OnFailure=` on the backup unit; latency and queue depth need metrics (Prometheus) later.
+- Back up PostgreSQL and user files on a defined schedule to encrypted off-host storage. Include configuration and key-recovery instructions, but keep secrets protected separately. Perform a restore drill before onboarding members.
  
 ### Encrypted S3 backups (customer-managed KMS key)
 - **Target:** AWS S3 bucket with server-side encryption using a customer-managed KMS key (SSE-KMS). The KMS key is owned and controlled by the customer (CorpLynx), not AWS. This ensures only the customer can decrypt backup data, even if AWS is compromised or subpoenaed.
@@ -361,27 +364,27 @@ This spec stays authoritative until each row is decided. The handoff was designe
   - Client-side encryption with `age` provides an additional layer: even if the KMS key is compromised, the archive remains encrypted with a separate key.
   - Rotate the KMS key annually and re-encrypt older backups. Audit KMS usage via CloudTrail and alert on unexpected decrypt calls.
 - Define data retention, account deletion, document deletion across original files and vectors, log retention, and backup expiry. Deletion from the live database does not immediately remove old backup copies.
-- Treat the single host, home/office power and internet, and Cloudflare as availability dependencies. Publish maintenance expectations and an outage/support contact before offering a paid service.
+- Treat the single host, home/office power and internet, and Cloudflare as availability dependencies. Publish maintenance expectations and an outage/support contact before inviting members.
 
 ## 11. Delivery phases and acceptance criteria
 
 ### Phase 0 — Hardware and model proof (interim: NVIDIA test hardware)
  
-- **Interim test hardware:** RTX 4070 Ti Super (16GB VRAM), Ryzen 7/9, 64GB RAM. Use this to validate the full stack (containers, gateway, UI, security) before the Framework Desktop arrives.
-- On the test machine, use vLLM with CUDA backend instead of llama.cpp/Vulkan. Select a model that fits in 16GB VRAM (e.g., Qwen 2.5 7B or Llama 3.1 8B at Q4).
+- **Interim test host:** an NVIDIA GPU machine. Use it to validate the full stack (containers, gateway, UI, security) before the production host is in place.
+- On the test machine, use vLLM with CUDA backend instead of llama.cpp/Vulkan. Select a model that fits the test GPU's memory with room for KV cache.
 - Validate: container deployment, Quadlet lifecycle, LiteLLM key enforcement, Open WebUI integration, Cloudflare Tunnel routing, security hardening (Lynis, firewalld, SELinux).
-- **Blocked until Framework Desktop arrives:** AMD-specific validation (TTM tuning, Vulkan backend, unified memory behavior, model selection for 128GB). The test machine validates architecture and operations, not final performance.
-- Only then select the TTM limit, model artifact, and initial tier limits on the production hardware.
+- **Blocked until the production host is in place:** AMD-specific validation (GPU memory tuning, Vulkan backend, model selection). The test machine validates architecture and operations, not final performance.
+- Only then select the GPU memory limit, model artifact, and initial per-key limits on the production host.
 
 ### Phase 1 — Private API pilot
 
 - Deploy Podman/Quadlet, LiteLLM, PostgreSQL, llama.cpp, and cloudflared with no public UI or RAG.
-- Confirm no direct host port is reachable for PostgreSQL or inference; API calls without a valid virtual key fail; tier-restricted keys cannot call disallowed aliases; RPM/TPM/concurrency limits reject excess use.
+- Confirm no direct host port is reachable for PostgreSQL or inference; API calls without a valid virtual key fail; keys restricted to some aliases cannot call the others; RPM/TPM/concurrency limits reject excess use.
 - Confirm model containers have no unexpected outbound network access and logs do not contain prompt text or credentials.
 
 ### Phase 2 — Authenticated UI and RAG
 
-- Select UI after license review; add account provisioning, user-to-gateway entitlement mapping, and protected UI storage.
+- Select UI after license review; add account provisioning, user-to-gateway key mapping, and protected UI storage.
 - Verify private conversations and RAG documents cannot be accessed across users. Verify deletion removes document records, source files, and vectors according to the retention policy.
 - Test uploads with oversized, malformed, and unsupported files; ensure plugins/tools and arbitrary URL fetching remain disabled unless explicitly reviewed.
 
@@ -401,43 +404,40 @@ This spec stays authoritative until each row is decided. The handoff was designe
  
 - Complete operator-controlled key provisioning/revocation, account lifecycle, privacy disclosures, model/license information, and support/outage expectations.
 - Test load with expected concurrent invited users, Cloudflare streaming/timeouts, backup restore, key rotation, account removal, and incident response before broader launch.
-- Subscription billing integration remains a future phase if public tiers are introduced.
 
 ### Release gates
 
 - A clean external scan finds no exposed database or inference port.
 - Rootless/SELinux confinement remains enabled for the deployed services.
-- Per-plan key tests, UI identity mapping, and tenant-isolation tests pass.
+- Per-key allowlist tests, UI identity mapping, and tenant-isolation tests pass.
 - Backup restore and user-data deletion tests pass.
 - Measured capacity supports the published concurrency, context, and usage limits without exhausting host memory.
 - Privacy language accurately states that the operator and Cloudflare can process plaintext; no “zero-knowledge” claim is made.
 
 ## 12. Open decisions
 
-1. ~~Is the service strictly private/invite-only, or intended for general public sign-up and paid subscriptions?~~ **Decided: invite-only.** The service will not offer public self-service sign-up in v1. Key provisioning is operator-controlled. If public subscription tiers are added later, revisit billing, support, privacy disclosures, and capacity planning.
+1. ~~Is the service strictly private/invite-only, or intended for general public sign-up?~~ **Decided: invite-only and unpaid.** The service will not offer public self-service sign-up. Key provisioning is operator-controlled.
 2. Is protecting data from the host administrator a hard requirement? If yes, the current single-host/server-side design must change substantially.
 3. The selected web UI plan is current Open WebUI with full reskin under a hard cap of 50 users per rolling 30 days. What license path should be used if the cap needs to increase?
-4. What are target concurrent users, context lengths, expected monthly tokens, uptime, and acceptable response latency for each proposed tier?
+4. What are target concurrent users, context lengths, expected monthly tokens, uptime, and acceptable response latency?
 5. Is RAG required for v1, and must documents be isolated per person, per team, or both?
 6. Should Cloudflare be a trusted data processor, or should public ingress use a different provider/architecture?
-7. Which identity and subscription billing systems will be authoritative for account status and entitlements?
+7. Which identity system will be authoritative for account status?
 8. ~~Is the Open WebUI PWA sufficient for launch, or is a native mobile client required?~~ **Decided: PWA for v1.** A dedicated Aaru native mobile app is planned for a future phase. Conduit (GPL-3.0, Flutter) is the leading candidate for the native app base; evaluate its source-distribution and app-store obligations before forking.
 9. ~~What GitHub user/organization namespace should own the Open WebUI fork and (if selected) Conduit fork?~~ **Decided: `CorpLynx`.**
 10. **Zero-knowledge storage (from the design handoff).** Adopt client-side encryption of chats, titles, files and embeddings as a v1 requirement, or rewrite the handoff's security copy to match this spec's server-side model? Adopting it reverses the §1 non-goal and the §11 release gate, and requires a security review of how server-side inference and RAG get plaintext (`design/specs/encryption.md`, "The hard part"). It also answers decision 2.
-11. **Tiers and billing.** Adopt the handoff's four tiers ($10 Casual through Founders) with Stripe, or keep the invite-only $25/$70/$150 proposal with billing deferred? Affects decisions 1 and 7, and §6.
-12. **Founders entitlements.** Are rootless Podman container access and dedicated VRAM reservations offered? If yes, they need their own isolation model, as with coding agents (§1).
+11. ~~**Pricing and billing.**~~ **Decided: none.** Aaru is invite-only and unpaid; the handoff's pricing, payment, fund, ledger and voting designs were removed.
+12. ~~**Member container access.**~~ **Withdrawn.** Rootless container access for members stays out of scope (§1).
 13. **Mobile base.** The handoff assumes an OpenCode Mobile fork with agent runs; this spec chose the PWA and then Conduit (decision 8). Which one wins?
-14. **Multi-node and eGPU hardware.** Is an external RTX GPU on the Framework host part of the production plan? It needs validation on Strix Halo before the UI names a "Boost engine".
+14. **Multi-node and external GPU hardware.** Is an external GPU on the production host part of the plan? It needs validation on that host before the UI names a "Boost engine".
 
 ## 13. References
 
-- [AMD RDNA 3.5 system optimization / TTM guidance](https://rocm.docs.amd.com/en/latest/reference/system-optimization/rdna3-5.html)
 - [Linux kernel AMDGPU module parameters](https://docs.kernel.org/gpu/amdgpu/module-parameters.html)
 - [Podman Quadlet documentation](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
 - [llama.cpp](https://github.com/ggml-org/llama.cpp)
 - [vLLM AMD ROCm installation](https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.rocm.inc.md)
 - [LiteLLM virtual keys](https://docs.litellm.ai/docs/proxy/virtual_keys)
-- [Lago](https://github.com/getlago/lago) (subscription/metering candidate; AGPLv3)
 - [pgvector](https://github.com/pgvector/pgvector)
 - [Open WebUI license](https://docs.openwebui.com/license/), [PWA/mobile install guide](https://docs.openwebui.com/getting-started/open-webui-as-app/), and [LibreChat](https://github.com/LibreChat-AI/LibreChat)
 - [Conduit native mobile client](https://github.com/cogwheel0/conduit) (GPL-3.0; Open WebUI and OpenAI-compatible API support)
