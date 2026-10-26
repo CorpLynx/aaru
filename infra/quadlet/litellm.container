@@ -4,7 +4,16 @@ After=network-online.target postgres.service
 Wants=network-online.target
 
 [Container]
-Image=ghcr.io/berriai/litellm:main-stable
+# Pinned by digest to v1.106.2 (the current stable release).
+# Never use a floating tag here. LiteLLM's release pipeline was compromised in
+# October 2026 via stolen GitHub CLI OAuth tokens; version 1.107.0 shipped a
+# credential stealer and a backdoor, and the malicious images were published
+# under the ordinary release tags. A floating tag pulls whatever was pushed
+# last, with no review step.
+# Verify before pulling, then update the digest when bumping:
+#   cosign verify --key https://raw.githubusercontent.com/BerriAI/litellm/0112e53046018d726492c814b3644b7d376029d0/cosign.pub \
+#     ghcr.io/berriai/litellm@sha256:7294b90f868c5c38c99b83021c7ba46f9b439e95f8e32964c925c7d2563a03f7
+Image=ghcr.io/berriai/litellm@sha256:7294b90f868c5c38c99b83021c7ba46f9b439e95f8e32964c925c7d2563a03f7
 ContainerName=litellm
 Network=aaru-ingress.network
 Network=aaru-internal.network:ip=10.231.0.30
@@ -13,16 +22,20 @@ AddHost=postgres:10.231.0.10
 AddHost=llamacpp:10.231.0.20
 AddHost=vllm:10.231.0.21
 PublishPort=127.0.0.1:4000:4000
-Volume=%h/aaru/infra/config/litellm_config.yaml:/app/config.yaml:ro,z
+# The whole directory, so config.yaml can include the host-specific models.yaml.
+Volume=%h/aaru/infra/config/litellm:/app/config:ro,z
 # Without --config the image ignores the mounted file and serves no models.
-Exec=--config /app/config.yaml --port 4000
+Exec=--config /app/config/config.yaml --port 4000
 Secret=litellm-master-key,type=env,target=LITELLM_MASTER_KEY
 Secret=litellm-database-url,type=env,target=DATABASE_URL
+# llama-swap requires this key on every inference route (models.yaml uses it).
+Secret=llama-swap-api-key,type=env,target=LLAMA_SWAP_API_KEY
 HealthCmd=python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health')"
 HealthInterval=30s
 HealthRetries=3
 HealthStartPeriod=30s
 NoNewPrivileges=true
+DropCapability=ALL
 ReadOnly=true
 Tmpfs=/tmp:size=100m
 Memory=2g

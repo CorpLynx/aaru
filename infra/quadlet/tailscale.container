@@ -1,0 +1,44 @@
+[Unit]
+Description=Tailscale member access (interim, until Cloudflare)
+After=network-online.target openwebui.service litellm.service
+Wants=network-online.target
+
+[Container]
+# Interim member ingress while the Cloudflare path is not live (spec §9). Joins
+# the tailnet as the tagged node "aaru" and serves, over HTTPS with a tailnet
+# certificate terminated in this container:
+#   https://aaru.<tailnet>.ts.net/          the web app
+#   https://aaru.<tailnet>.ts.net:8443/v1/  the LiteLLM API (/v1 only; no admin UI or key routes)
+# Members reach it through node sharing; ACLs in infra/terraform/tailscale.
+# Retire it with: systemctl --user stop tailscale.service && rm the unit.
+#
+# Pinned by digest to v1.102.5; never use a floating tag (see litellm.container).
+Image=docker.io/tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065
+ContainerName=tailscale
+# Ingress only, like cloudflared: no route to PostgreSQL or inference (spec §9).
+Network=aaru-ingress.network
+# Userspace networking (containerboot's default): no /dev/net/tun, no capabilities.
+Environment=TS_USERSPACE=true
+Environment=TS_HOSTNAME=aaru
+Environment=TS_STATE_DIR=/var/lib/tailscale
+Environment=TS_AUTH_ONCE=true
+Environment=TS_ACCEPT_DNS=false
+Environment=TS_SERVE_CONFIG=/config/serve.json
+Environment=TS_EXTRA_ARGS=--advertise-tags=tag:aaru-app
+# One-time, tagged, pre-authorized key from infra/terraform/tailscale
+# (set-tailscale-authkey.sh). After the first login the node key lives in the
+# state volume and the auth key is no longer used.
+Secret=tailscale-authkey,type=env,target=TS_AUTHKEY
+Volume=tailscale-state.volume:/var/lib/tailscale:Z
+Volume=%h/aaru/infra/config/tailscale:/config:ro,z
+NoNewPrivileges=true
+DropCapability=ALL
+ReadOnly=true
+Memory=256m
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

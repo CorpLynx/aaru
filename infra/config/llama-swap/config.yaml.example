@@ -1,0 +1,99 @@
+# llama-swap configuration for the llamacpp container.
+# Copy to config.yaml (gitignored) and add one entry per model staged with
+# infra/scripts/fetch-model.sh. Edits apply without a restart (-watch-config).
+# Reference: https://github.com/mostlygeek/llama-swap/blob/v266/docs/config.example.yaml
+#
+# How it behaves (the lmstudio-router features, minus downloads):
+#   - a model loads on its first request
+#   - a request for another model unloads the current one first, unless a
+#     group below lets them run together
+#   - a model unloads after `ttl` idle seconds
+#   - GET /v1/models lists every model here, loaded or not
+# Nothing is ever downloaded: cmd must point at a file under /models.
+
+# Only LiteLLM holds this key (the llama-swap-api-key Podman secret). Every
+# route except /health requires it, including /unload, /running and /ui.
+apiKeys:
+  - "${env.LLAMA_SWAP_API_KEY}"
+
+# Seconds to wait for llama-server to load a model. The first request for a
+# cold model waits this long at most; LiteLLM's timeout must be longer.
+healthCheckTimeout: 600
+logLevel: info
+# Request and log capture stays off: prompts must not reach the logs (spec §8).
+captureBuffer: 0
+
+macros:
+  # llama-server listens on loopback inside the container; only llama-swap reaches it.
+  server: >-
+    /app/llama-server --host 127.0.0.1 --port ${PORT}
+    --n-gpu-layers 999 --no-webui
+
+# Model IDs are what LiteLLM's models.yaml points at (openai/<id>). Files come
+# from infra/config/models.catalog (infra/scripts/fetch-models.sh), each scanned
+# by Anubis before it lands under /models.
+models:
+  # Chat, sparse MoE: the fast default (LiteLLM alias "fast"). Vision via mmproj.
+  "qwen3.6-35b-a3b":
+    cmd: >-
+      ${server} --jinja --ctx-size 32768
+      --model /models/qwen3.6-35b-a3b/Qwen3.6-35B-A3B-Q8_0.gguf
+      --mmproj /models/qwen3.6-35b-a3b/mmproj-Qwen3.6-35B-A3B-Q8_0.gguf
+    # Unload after this many idle seconds; 0 keeps it loaded.
+    ttl: 3600
+
+  # Chat, dense (alias "dense"). Vision via mmproj.
+  "qwen3.8-27b":
+    cmd: >-
+      ${server} --jinja --ctx-size 32768
+      --model /models/qwen3.8-27b/Qwen3.8-27B-Q8_0.gguf
+      --mmproj /models/qwen3.8-27b/mmproj-Qwen3.8-27B-Q8_0.gguf
+    ttl: 1800
+
+  # Reasoning (alias "reasoning"). The chat template carries gpt-oss's harmony format.
+  "gpt-oss-120b":
+    cmd: >-
+      ${server} --jinja --ctx-size 32768
+      --model /models/gpt-oss-120b/gpt-oss-120b-MXFP4.gguf
+    ttl: 900
+
+  # Embeddings (aliases "embed-small" and "embed"). Qwen3-Embedding uses
+  # last-token pooling; a batch must hold a whole input, hence -b/-ub = ctx.
+  "qwen3-embedding-0.6b":
+    cmd: >-
+      ${server} --embedding --pooling last --ctx-size 8192
+      --batch-size 8192 --ubatch-size 8192
+      --model /models/qwen3-embedding-0.6b/Qwen3-Embedding-0.6B-Q8_0.gguf
+    ttl: 0
+
+  "qwen3-embedding-8b":
+    cmd: >-
+      ${server} --embedding --pooling last --ctx-size 8192
+      --batch-size 8192 --ubatch-size 8192
+      --model /models/qwen3-embedding-8b/Qwen3-Embedding-8B-Q8_0.gguf
+    ttl: 0
+
+# The embedding models stay loaded and never swap; the chat models swap among
+# themselves (one at a time) without unloading the embeddings. Size the
+# container's Memory= (llamacpp.container.d/local.conf) for both embedding
+# models plus the largest chat model and its KV cache.
+routing:
+  router:
+    use: group
+    settings:
+      groups:
+        embeddings:
+          persistent: true
+          swap: false
+          exclusive: false
+          members: ["qwen3-embedding-0.6b", "qwen3-embedding-8b"]
+        chat:
+          swap: true
+          exclusive: false
+          members: ["qwen3.6-35b-a3b", "qwen3.8-27b", "gpt-oss-120b"]
+
+# Load the web app's RAG embedding model at startup, so the first document
+# upload does not wait for it.
+hooks:
+  on_startup:
+    preload: ["qwen3-embedding-8b"]

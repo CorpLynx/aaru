@@ -1,0 +1,47 @@
+# Copy to models.yaml (gitignored). Clients only ever see the alias in
+# model_name, so changing the backing model needs no client change.
+#
+# Production host: llama-swap in front of llama.cpp. The name after openai/ is
+# a model ID from infra/config/llama-swap/config.yaml; llama-swap loads it on
+# the first request and swaps chat models as needed. A cold model can take
+# minutes to load, so timeouts sit above llama-swap's healthCheckTimeout.
+
+model_list:
+  - model_name: fast
+    litellm_params: &llamaswap
+      model: openai/qwen3.6-35b-a3b
+      api_base: http://llamacpp:8080/v1
+      api_key: os.environ/LLAMA_SWAP_API_KEY
+      timeout: 900
+      stream_timeout: 900
+
+  - model_name: dense
+    litellm_params:
+      <<: *llamaswap
+      model: openai/qwen3.8-27b
+
+  - model_name: reasoning
+    litellm_params:
+      <<: *llamaswap
+      model: openai/gpt-oss-120b
+
+  # Embeddings. "embed" is the web app's RAG model (openwebui.container).
+  - model_name: embed
+    litellm_params:
+      <<: *llamaswap
+      model: openai/qwen3-embedding-8b
+    model_info:
+      mode: embedding
+
+  - model_name: embed-small
+    litellm_params:
+      <<: *llamaswap
+      model: openai/qwen3-embedding-0.6b
+    model_info:
+      mode: embedding
+
+  # Interim test host: vLLM on CUDA (one model, no swapping). Use instead of the above.
+  # - model_name: fast
+  #   litellm_params:
+  #     model: openai/<served-model-name>
+  #     api_base: http://vllm:8000/v1

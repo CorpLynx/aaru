@@ -1,10 +1,12 @@
 [Unit]
-Description=Open WebUI
+Description=Aaru Web App (aaru-web, based on Open WebUI)
 After=network-online.target postgres.service litellm.service
 Wants=network-online.target
 
 [Container]
-Image=ghcr.io/open-webui/open-webui:main
+# Built from CorpLynx/aaru-web by infra/scripts/build-openwebui-image.sh, which
+# rewrites this line. Never use a floating tag (see litellm.container).
+Image=ghcr.io/corplynx/aaru-web@sha256:726a02d27b71df586324442ece7b3ee58951d1bb52ab5e7beee4d778e7007bfd
 ContainerName=openwebui
 Network=aaru-ingress.network
 Network=aaru-internal.network:ip=10.231.0.40
@@ -16,14 +18,58 @@ Environment=OPENAI_API_BASE_URL=http://litellm:4000/v1
 # openai-api-key must be a LiteLLM virtual key for Open WebUI, never the master key (spec §2).
 Secret=openai-api-key,type=env,target=OPENAI_API_KEY
 Secret=openwebui-database-url,type=env,target=DATABASE_URL
+# Signs sessions and JWTs. Without it start.sh writes a generated key into
+# /app/backend, which ReadOnly forbids and which a container rebuild would lose.
+Secret=openwebui-secret-key,type=env,target=WEBUI_SECRET_KEY
 Environment=WEBUI_AUTH=true
 Environment=ENABLE_SIGNUP=false
+# Send the signed-in member with each request (X-OpenWebUI-User-*), so LiteLLM can
+# attribute web usage to the member rather than the shared web app key (spec §6).
+Environment=ENABLE_FORWARD_USER_INFO_HEADERS=true
+# RAG embeddings come from LiteLLM's "embed" alias (Qwen3-Embedding on llama-swap),
+# over the same base URL and key as chat. The baked sentence-transformers model is
+# not used, and OFFLINE_MODE stops Hugging Face downloads and update checks.
+Environment=RAG_EMBEDDING_ENGINE=openai
+Environment=RAG_EMBEDDING_MODEL=embed
+Environment=RAG_EMBEDDING_BATCH_SIZE=16
+Environment=OFFLINE_MODE=true
+# Settings come from this unit on every start, not from the database: without
+# this, Open WebUI reads its environment once, stores it, and ignores later
+# changes here. The trade-off is that changes made in the admin UI's settings
+# revert on restart, so make them here (or in the host drop-in) instead.
+Environment=ENABLE_PERSISTENT_CONFIG=false
+# Member privacy: no chat sharing to openwebui.com, and admins can neither open
+# nor bulk-export members' chats in the app. (The operator can still read the
+# database directly; Aaru is not zero-knowledge, spec §8.)
+Environment=ENABLE_COMMUNITY_SHARING=false
+Environment=ENABLE_ADMIN_CHAT_ACCESS=false
+Environment=ENABLE_ADMIN_EXPORT=false
+# Models come only from LiteLLM; there is no Ollama to probe.
+Environment=ENABLE_OLLAMA_API=false
+# Members reach the app over HTTPS only (Tailscale, later Cloudflare). Browsers
+# still accept secure cookies on http://localhost, so the admin SSH tunnel works.
+Environment=WEBUI_SESSION_COOKIE_SECURE=true
+Environment=WEBUI_AUTH_COOKIE_SECURE=true
+Environment=JWT_EXPIRES_IN=7d
+# WEBUI_URL and CORS_ALLOW_ORIGIN name the public URL, which is per host:
+# openwebui.container.d/local.conf (gitignored; see local.conf.example).
+HealthCmd=curl --silent --fail http://localhost:8080/health
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=120s
 NoNewPrivileges=true
+DropCapability=ALL
+ReadOnly=true
+# Podman mounts tmpfs on /tmp, /var/tmp and /run under ReadOnly. At startup the
+# app also copies /app/build/static into open_webui/static (config.py); Podman's
+# tmpfs starts from the image's copy of the directory. Model and embedding caches
+# are all under /app/backend/data (the volume).
+Tmpfs=/app/backend/open_webui/static:size=50m
 Memory=2g
 
 [Service]
 Restart=on-failure
-TimeoutStartSec=120
+TimeoutStartSec=300
 
 [Install]
 WantedBy=default.target

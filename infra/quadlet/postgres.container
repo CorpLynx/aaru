@@ -4,7 +4,8 @@ After=network-online.target
 Wants=network-online.target
 
 [Container]
-Image=docker.io/library/postgres:16-alpine
+# Pinned by digest to 16.15-alpine; never use a floating tag (see litellm.container).
+Image=docker.io/library/postgres@sha256:f4610795587492cd4fb887c2dc3de301b813278bb6f616992061141b5f15ac36
 ContainerName=postgres
 Network=aaru-internal.network:ip=10.231.0.10
 Volume=postgres-data.volume:/var/lib/postgresql/data:Z

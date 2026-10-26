@@ -1,0 +1,3 @@
+# Tailscale node key and state; losing it means re-authenticating the node.
+[Volume]
+VolumeName=tailscale-state

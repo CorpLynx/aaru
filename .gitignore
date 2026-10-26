@@ -8,10 +8,16 @@ credentials/
 .DS_Store
 ._*
 
-# Models (large binary files)
-models/*.gguf
-models/*.safetensors
-models/*.bin
+# Models (large binary files), one directory per model
+models/
+
+# Host-specific settings: model choice, memory limits (see the *.example files)
+infra/quadlet/*.container.d/local.conf
+infra/config/litellm/models.yaml
+infra/config/llama-swap/config.yaml
+
+# Backup staging
+backup-staging/
 
 # Podman volumes and runtime data
 data/
@@ -25,5 +31,18 @@ __pycache__/
 # Build artifacts
 dist/
 build/
+
+# Terraform state and local backend config
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/backend.hcl
+**/terraform.tfvars
+**/override.tf
+**/override.tofu
+crash.log
+
 # Local clone of CorpLynx/aaru-web (the web app); it has its own repository
 web/
+# Local clone of CorpLynx/Anubis (the model scanner); built by build-anubis-image.sh
+anubis/

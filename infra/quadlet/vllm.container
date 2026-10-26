@@ -4,22 +4,36 @@ After=network-online.target aaru-internal-network.service
 Wants=network-online.target
 
 [Container]
-Image=docker.io/vllm/vllm-openai:latest
+# Pinned by digest to v0.32.0; never use a floating tag (see litellm.container).
+# Must stay at 0.31.0 or later: CVE-2026-114053 (critical RCE via mm_processor_kwargs).
+Image=docker.io/vllm/vllm-openai@sha256:befccf0e7e4089aa23926bb6f887a85c0d46c2a99e6de5c5ffdf5cb7957c5b34
 ContainerName=vllm
 Network=aaru-internal.network:ip=10.231.0.21
 # No host port published — internal only
-AddDevice=/dev/nvidia0
-AddDevice=/dev/nvidiactl
-AddDevice=/dev/nvidia-uvm
-AddDevice=/dev/nvidia-uvm-tools
+# The GPU through CDI, which also injects the host driver's libcuda. Raw /dev/nvidia*
+# nodes alone leave the container without a driver. Generate the spec once as root:
+#   nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+AddDevice=nvidia.com/gpu=all
 SecurityLabelType=container_t
 NoNewPrivileges=true
-Tmpfs=/tmp:size=200m
-Memory=20g
-Environment=VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
-Environment=VLLM_HOST=0.0.0.0
-Environment=VLLM_PORT=8000
+DropCapability=ALL
+ReadOnly=true
+# vLLM and Triton write compile caches under $HOME; keep them off the read-only root.
+Environment=HOME=/var/cache/vllm
+Tmpfs=/var/cache/vllm:size=4g
+ShmSize=2g
+Environment=HF_HUB_OFFLINE=1
+Environment=VLLM_NO_USAGE_STATS=1
+Environment=DO_NOT_TRACK=1
 Volume=%h/aaru/models:/models:ro,z
+# aaru-internal has no egress, so the model is staged on the host first with
+# infra/scripts/fetch-model.sh. The model, its arguments and the memory limit
+# depend on the test GPU and live in vllm.container.d/local.conf (gitignored;
+# see local.conf.example). The image's entrypoint is `vllm serve`.
+HealthCmd=python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=300s
 
 [Service]
 Restart=on-failure
