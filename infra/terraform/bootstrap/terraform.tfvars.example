@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+
+# The account ID is appended to this prefix to make the bucket name unique.
+# If the bucket already exists, use the prefix it was created with, or set
+# state_bucket_name to its exact name; a different name means a new bucket.
+state_bucket_prefix = "<prefix>-tfstate"

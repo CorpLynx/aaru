@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+
+region        = "us-east-1"
+bucket_prefix = "<prefix>-backups"
+
+# GOVERNANCE until the first restore drill passes, then COMPLIANCE (spec §10).
+# object_lock_mode = "COMPLIANCE"

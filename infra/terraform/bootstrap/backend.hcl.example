@@ -1,0 +1,14 @@
+# Copy to backend.hcl and fill in. backend.hcl is gitignored.
+#
+# This is the state for the bucket that holds every other stack's state, so
+# it lives in the bucket too. Run the bootstrap stack once with
+# -backend=false to create the bucket, then migrate into it:
+#
+#   terraform init -backend=false && terraform apply
+#   terraform init -migrate-state -backend-config=backend.hcl
+
+bucket       = "<state_bucket_prefix>-<aws-account-id>"
+key          = "aaru/bootstrap/terraform.tfstate"
+region       = "us-east-1"
+encrypt      = true
+use_lockfile = true
