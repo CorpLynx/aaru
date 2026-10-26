@@ -37,7 +37,7 @@ input::placeholder{color:#6E7682}
     </nav>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <a onClick="{{ goSignin }}" style="padding:8px 12px;font-size:14px;color:#A6ADB8;cursor:pointer" style-hover="color:#EDEFF2">Sign in</a>
-      <a onClick="{{ goJoin }}" style="height:36px;padding:0 16px;border-radius:8px;background:#EDEFF2;color:#050607;font-size:13px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer" style-hover="background:#FFFFFF;color:#050607">Join the collective</a>
+      <a onClick="{{ goJoin }}" style="height:36px;padding:0 16px;border-radius:8px;background:#EDEFF2;color:#050607;font-size:13px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer" style-hover="background:#FFFFFF;color:#050607">Get an invite</a>
     </div>
   </div>
 </header>
@@ -49,14 +49,14 @@ input::placeholder{color:#6E7682}
     <div style="display:flex;flex-direction:column;gap:24px">
       <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 10px;border-radius:4px;background:rgba(61,220,151,0.10);border:1px solid rgba(61,220,151,0.35);color:#3DDC97;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.06em"><i class="icon-lock" style="font-size:12px"></i>ZERO-KNOWLEDGE · LOCAL COMPUTE</span>
       <h1 style="margin:0;font-size:clamp(40px,6vw,64px);line-height:1.02;font-weight:600;letter-spacing:-0.035em;text-wrap:balance">Your models. Your metal. Sealed by default.</h1>
-      <p style="margin:0;font-size:18px;line-height:28px;color:#A6ADB8;max-width:540px;text-wrap:pretty">Aaru is a member-funded AI server running open-weight models on hardware we own. Your chats and documents are encrypted with your key before they're stored. The admin can't read them.</p>
+      <p style="margin:0;font-size:18px;line-height:28px;color:#A6ADB8;max-width:540px;text-wrap:pretty">Aaru is an invite-only AI server running open-weight models on hardware we own. Your chats and documents are encrypted with your key before they're stored. The admin can't read them.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <a onClick="{{ goJoin }}" style="height:44px;padding:0 20px;border-radius:10px;background:#EDEFF2;color:#050607;font-size:15px;font-weight:500;display:inline-flex;align-items:center;gap:8px;cursor:pointer" style-hover="background:#FFFFFF;color:#050607">Join from $10/mo<i class="icon-arrow-right" style="font-size:16px"></i></a>
+        <a onClick="{{ goJoin }}" style="height:44px;padding:0 20px;border-radius:10px;background:#EDEFF2;color:#050607;font-size:15px;font-weight:500;display:inline-flex;align-items:center;gap:8px;cursor:pointer" style-hover="background:#FFFFFF;color:#050607">Invite only<i class="icon-arrow-right" style="font-size:16px"></i></a>
         <a onClick="{{ goPrivacy }}" style="height:44px;padding:0 20px;border-radius:10px;border:1px solid #2A3039;background:#101318;color:#EDEFF2;font-size:15px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer" style-hover="background:#1F242C;border-color:#3A414C;color:#EDEFF2">How the encryption works</a>
       </div>
       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E7682;padding-top:8px">
-        <span style="display:flex;align-items:center;gap:6px"><i class="icon-cpu" style="font-size:13px"></i>Ryzen AI Max+ 395</span>
-        <span style="display:flex;align-items:center;gap:6px"><i class="icon-microchip" style="font-size:13px"></i>External RTX GPUs</span>
+        <span style="display:flex;align-items:center;gap:6px"><i class="icon-cpu" style="font-size:13px"></i>Onboard GPU nodes</span>
+        <span style="display:flex;align-items:center;gap:6px"><i class="icon-microchip" style="font-size:13px"></i>Boost GPUs</span>
         <span style="display:flex;align-items:center;gap:6px"><i class="icon-plug" style="font-size:13px"></i>OpenAI-compatible API</span>
       </div>
     </div>
@@ -91,7 +91,7 @@ input::placeholder{color:#6E7682}
         <span><span style="color:#6E7682">$</span> export OPENAI_BASE_URL=<span style="color:#EDEFF2">https://api.aaru.ai/v1</span></span>
         <span><span style="color:#6E7682">$</span> export OPENAI_API_KEY=<span style="color:#EDEFF2">aaru_sk_••••••••</span></span>
         <span><span style="color:#6E7682">$</span> python agent.py --model <span style="color:#EDEFF2">llama-70b</span></span>
-        <span style="color:#6E7682;margin-top:12px">→ routed to eGPU · first token 312 ms</span>
+        <span style="color:#6E7682;margin-top:12px">→ routed to Boost · first token 312 ms</span>
         <span style="color:#FF7A33">→ streaming 48.2 tok/s</span>
         <span style="color:#3DDC97">→ response sealed · key 7F3A·C219</span>
       </div>
@@ -109,12 +109,12 @@ input::placeholder{color:#6E7682}
       <div style="padding:40px 24px;display:flex;flex-direction:column;gap:12px;border-right:1px solid #1E232A">
         <i class="icon-server" style="font-size:22px;color:#A6ADB8"></i>
         <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em">Hardware you can name</div>
-        <div style="font-size:14px;line-height:22px;color:#A6ADB8">Models run on bare metal: Framework Ryzen AI Max+ 395 nodes with external RTX GPUs. No third-party inference APIs, no telemetry.</div>
+        <div style="font-size:14px;line-height:22px;color:#A6ADB8">Models run on bare metal: our own nodes, some with external boost GPUs. No third-party inference APIs, no telemetry.</div>
       </div>
       <div style="padding:40px 24px;display:flex;flex-direction:column;gap:12px">
-        <i class="icon-users" style="font-size:22px;color:#E6C27A"></i>
-        <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em">Funded by members</div>
-        <div style="font-size:14px;line-height:22px;color:#A6ADB8">Monthly memberships cover running costs. Founders buy the hardware in year one, then keep access for $15/mo with voting rights.</div>
+        <i class="icon-users" style="font-size:22px;color:#A6ADB8"></i>
+        <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em">Invite only</div>
+        <div style="font-size:14px;line-height:22px;color:#A6ADB8">Members are invited by the operator. No public sign-up, no ads, no data sales.</div>
       </div>
     </div>
   </section>
@@ -162,80 +162,6 @@ input::placeholder{color:#6E7682}
     </div>
   </section>
 
-  <section style="border-top:1px solid #1E232A;background:#0A0C0F">
-    <div style="max-width:1200px;margin:0 auto;padding:80px 24px;display:flex;flex-direction:column;gap:32px">
-      <div style="display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap">
-        <h2 style="margin:0;font-size:clamp(28px,3.5vw,40px);line-height:1.15;font-weight:600;letter-spacing:-0.025em">Four ways to belong</h2>
-        <a onClick="{{ goPricing }}" style="margin-left:auto;font-size:14px;display:inline-flex;align-items:center;gap:6px;cursor:pointer">Compare plans<i class="icon-arrow-right" style="font-size:14px"></i></a>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px">
-        <div style="border:1px dashed #2A3039;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px"><span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px dashed rgba(138,147,160,0.5);border-radius:4px;color:#8A93A0;font-size:12px;font-weight:500"><i class="icon-message-circle" style="font-size:13px"></i>Casual</span><span style="font-size:28px;font-weight:600;letter-spacing:-0.02em">$10<span style="font-size:14px;font-weight:400;color:#6E7682">/mo</span></span><span style="font-size:13px;line-height:20px;color:#A6ADB8">Fast MoE models in the web app.</span></div>
-        <div style="border:1px solid #2A3039;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px"><span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(180,188,200,0.4);border-radius:4px;color:#B4BCC8;font-size:12px;font-weight:500"><i class="icon-message-square" style="font-size:13px"></i>Chat</span><span style="font-size:28px;font-weight:600;letter-spacing:-0.02em">$25<span style="font-size:14px;font-weight:400;color:#6E7682">/mo</span></span><span style="font-size:13px;line-height:20px;color:#A6ADB8">Priority routing, API key, mobile and CLI.</span></div>
-        <div style="border:1px solid rgba(160,139,255,0.35);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px"><span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(160,139,255,0.5);background:rgba(160,139,255,0.12);border-radius:4px;color:#A08BFF;font-size:12px;font-weight:500"><i class="icon-terminal" style="font-size:13px"></i>Dev</span><span style="font-size:28px;font-weight:600;letter-spacing:-0.02em">$70<span style="font-size:14px;font-weight:400;color:#6E7682">/mo</span></span><span style="font-size:13px;line-height:20px;color:#A6ADB8">Heavy dense models and multi-agent workloads.</span></div>
-        <div style="border:1px solid rgba(230,194,122,0.45);box-shadow:0 0 0 3px #0A0C0F,0 0 0 4px rgba(230,194,122,0.25);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px"><span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(230,194,122,0.6);background:rgba(230,194,122,0.12);border-radius:4px;color:#E6C27A;font-size:12px;font-weight:500"><i class="icon-gem" style="font-size:13px"></i>Founders</span><span style="font-size:28px;font-weight:600;letter-spacing:-0.02em">$150<span style="font-size:14px;font-weight:400;color:#6E7682">/mo → $15</span></span><span style="font-size:13px;line-height:20px;color:#A6ADB8">Buy the hardware in year one, keep access for life.</span></div>
-      </div>
-    </div>
-  </section>
-</sc-if>
-
-<sc-if value="{{ isPricing }}" hint-placeholder-val="{{ false }}">
-  <section style="max-width:1200px;margin:0 auto;padding:80px 24px 48px;display:flex;flex-direction:column;gap:16px">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">PRICING</div>
-    <h1 style="margin:0;font-size:clamp(36px,5vw,52px);line-height:1.05;font-weight:600;letter-spacing:-0.03em;max-width:760px;text-wrap:balance">Memberships, not metered tokens.</h1>
-    <p style="margin:0;font-size:17px;line-height:28px;color:#A6ADB8;max-width:620px">Every plan is unmetered and private. Higher tiers get bigger models, longer context and routing priority on the shared hardware.</p>
-  </section>
-  <section style="max-width:1200px;margin:0 auto;padding:0 24px 64px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:16px;align-items:stretch">
-    <div style="border:1px dashed #2A3039;border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:20px">
-      <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px dashed rgba(138,147,160,0.5);border-radius:4px;color:#8A93A0;font-size:12px;font-weight:500"><i class="icon-message-circle" style="font-size:13px"></i>Casual</span>
-      <div><span style="font-size:40px;font-weight:600;letter-spacing:-0.03em">$10</span><span style="font-size:14px;color:#6E7682"> / month</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:20px;color:#A6ADB8">
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#8A93A0;margin-top:2px"></i>Fast MoE models (Nemotron 3.5)</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#8A93A0;margin-top:2px"></i>Standard queue priority, 10–50+ tok/s</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#8A93A0;margin-top:2px"></i>8,000-token context window</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#8A93A0;margin-top:2px"></i>Web chat access</span>
-      </div>
-      <a onClick="{{ joinCasual }}" style="margin-top:auto;height:40px;border-radius:8px;border:1px solid #2A3039;background:#101318;color:#EDEFF2;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#1F242C;color:#EDEFF2">Choose Casual</a>
-    </div>
-    <div style="border:1px solid #2A3039;border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:20px">
-      <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(180,188,200,0.4);border-radius:4px;color:#B4BCC8;font-size:12px;font-weight:500"><i class="icon-message-square" style="font-size:13px"></i>Chat</span>
-      <div><span style="font-size:40px;font-weight:600;letter-spacing:-0.03em">$25</span><span style="font-size:14px;color:#6E7682"> / month</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:20px;color:#A6ADB8">
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#B4BCC8;margin-top:2px"></i>Priority MoE routing, always fast</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#B4BCC8;margin-top:2px"></i>16,000-token context window</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#B4BCC8;margin-top:2px"></i>API key for VS Code / Continue.dev</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#B4BCC8;margin-top:2px"></i>CLI and mobile app</span>
-      </div>
-      <a onClick="{{ joinChat }}" style="margin-top:auto;height:40px;border-radius:8px;border:1px solid #2A3039;background:#101318;color:#EDEFF2;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#1F242C;color:#EDEFF2">Choose Chat</a>
-    </div>
-    <div style="border:1px solid rgba(160,139,255,0.35);border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:20px">
-      <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(160,139,255,0.5);background:rgba(160,139,255,0.12);border-radius:4px;color:#A08BFF;font-size:12px;font-weight:500"><i class="icon-terminal" style="font-size:13px"></i>Dev</span>
-      <div><span style="font-size:40px;font-weight:600;letter-spacing:-0.03em">$70</span><span style="font-size:14px;color:#6E7682"> / month</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:20px;color:#A6ADB8">
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#A08BFF;margin-top:2px"></i>Heavy dense models (Llama 70B)</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#A08BFF;margin-top:2px"></i>Maximum API routing priority</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#A08BFF;margin-top:2px"></i>32,000+ token context window</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#A08BFF;margin-top:2px"></i>Built for multi-agent workflows</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#A08BFF;margin-top:2px"></i>Advanced RAG and large document parsing</span>
-      </div>
-      <a onClick="{{ joinDev }}" style="margin-top:auto;height:40px;border-radius:8px;background:#EDEFF2;color:#050607;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#FFFFFF;color:#050607">Choose Dev</a>
-    </div>
-    <div style="border:1px solid rgba(230,194,122,0.45);box-shadow:0 0 0 3px #050607,0 0 0 4px rgba(230,194,122,0.25);border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:20px">
-      <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(230,194,122,0.6);background:rgba(230,194,122,0.12);border-radius:4px;color:#E6C27A;font-size:12px;font-weight:500"><i class="icon-gem" style="font-size:13px"></i>Founders</span>
-      <div><span style="font-size:40px;font-weight:600;letter-spacing:-0.03em">$150</span><span style="font-size:14px;color:#6E7682"> / month, first year</span><div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#E6C27A;margin-top:4px">then $15/mo for life</div></div>
-      <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:20px;color:#A6ADB8">
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#E6C27A;margin-top:2px"></i>Everything in Dev</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#E6C27A;margin-top:2px"></i>Hardware equity and collective voting rights</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#E6C27A;margin-top:2px"></i>Dedicated VRAM reservations</span>
-        <span style="display:flex;gap:10px"><i class="icon-check" style="font-size:15px;color:#E6C27A;margin-top:2px"></i>Rootless Podman container access</span>
-      </div>
-      <a onClick="{{ joinSponsor }}" style="margin-top:auto;height:40px;border-radius:8px;border:1px solid rgba(230,194,122,0.5);background:rgba(230,194,122,0.08);color:#E6C27A;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:rgba(230,194,122,0.16);color:#E6C27A">Become a Founder</a>
-    </div>
-  </section>
-  <section style="max-width:1200px;margin:0 auto;padding:0 24px 96px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:32px">
-    <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:16px;font-weight:500">What does "unmetered" mean?</div><div style="font-size:14px;line-height:22px;color:#A6ADB8">There are no per-token charges. When the hardware is busy, requests queue by tier priority instead of being billed or cut off.</div></div>
-    <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:16px;font-weight:500">Why does the Founders rate drop?</div><div style="font-size:14px;line-height:22px;color:#A6ADB8">The first twelve months pay for the hardware. After that, Founders cover only their share of power and upkeep: $15/mo.</div></div>
-    <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:16px;font-weight:500">Can I switch plans?</div><div style="font-size:14px;line-height:22px;color:#A6ADB8">Yes, at any time. Your encrypted history and vault stay with your account on every tier.</div></div>
-  </section>
 </sc-if>
 
 <sc-if value="{{ isPrivacy }}" hint-placeholder-val="{{ false }}">
@@ -271,7 +197,7 @@ input::placeholder{color:#6E7682}
     <div style="border:1px solid #1E232A;border-radius:12px;background:#0A0C0F;padding:28px;display:flex;flex-direction:column;gap:16px">
       <div style="display:flex;align-items:center;gap:10px;font-size:16px;font-weight:500"><i class="icon-eye" style="font-size:18px;color:#A6ADB8"></i>What the admin can see</div>
       <div style="display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:22px;color:#A6ADB8">
-        <span style="display:flex;gap:10px"><i class="icon-dot" style="font-size:14px;color:#6E7682;margin-top:4px"></i>Your email address and membership tier, for billing</span>
+        <span style="display:flex;gap:10px"><i class="icon-dot" style="font-size:14px;color:#6E7682;margin-top:4px"></i>Your email address, for sign-in</span>
         <span style="display:flex;gap:10px"><i class="icon-dot" style="font-size:14px;color:#6E7682;margin-top:4px"></i>Request counts, timing and token totals, for queue fairness</span>
         <span style="display:flex;gap:10px"><i class="icon-dot" style="font-size:14px;color:#6E7682;margin-top:4px"></i>Storage used by your encrypted vault</span>
         <span style="display:flex;gap:10px"><i class="icon-dot" style="font-size:14px;color:#6E7682;margin-top:4px"></i>GPU load and system health</span>
@@ -291,35 +217,20 @@ input::placeholder{color:#6E7682}
   <section style="max-width:560px;margin:0 auto;padding:120px 24px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center">
     <span style="width:56px;height:56px;border-radius:16px;border:1px solid #2A3039;background:#0A0C0F;display:flex;align-items:center;justify-content:center"><i class="icon-lock" style="font-size:22px;color:#A6ADB8"></i></span>
     <h1 style="margin:0;font-size:32px;line-height:40px;font-weight:600;letter-spacing:-0.025em">Members only</h1>
-    <p style="margin:0;font-size:15px;line-height:24px;color:#A6ADB8">The hardware dashboard shows live server load, the collective's ledger and Founders voting. Sign in to view it.</p>
+    <p style="margin:0;font-size:15px;line-height:24px;color:#A6ADB8">The hardware dashboard shows live server load. Sign in to view it.</p>
     <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
       <a onClick="{{ goSigninHw }}" style="height:44px;padding:0 20px;border-radius:10px;background:#EDEFF2;color:#050607;font-size:15px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer" style-hover="background:#FFFFFF;color:#050607">Sign in</a>
-      <a onClick="{{ goJoin }}" style="height:44px;padding:0 20px;border-radius:10px;border:1px solid #2A3039;background:#101318;color:#EDEFF2;font-size:15px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer" style-hover="background:#1F242C;color:#EDEFF2">Join the collective</a>
+      <a onClick="{{ goJoin }}" style="height:44px;padding:0 20px;border-radius:10px;border:1px solid #2A3039;background:#101318;color:#EDEFF2;font-size:15px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer" style-hover="background:#1F242C;color:#EDEFF2">Get an invite</a>
     </div>
   </section>
 </sc-if>
 
 <sc-if value="{{ isHardwareMember }}" hint-placeholder-val="{{ false }}">
   <section style="max-width:1200px;margin:0 auto;padding:80px 24px 40px;display:flex;flex-direction:column;gap:16px">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">HARDWARE &amp; COLLECTIVE FUND</div>
-    <h1 style="margin:0;font-size:clamp(36px,5vw,52px);line-height:1.05;font-weight:600;letter-spacing:-0.03em;max-width:760px;text-wrap:balance">The metal, and who paid for it.</h1>
-    <p style="margin:0;font-size:17px;line-height:28px;color:#A6ADB8;max-width:620px">Every machine Aaru runs on is listed here with its funding status. Founders' first-year payments go straight into this ledger.</p>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">HARDWARE</div>
+    <h1 style="margin:0;font-size:clamp(36px,5vw,52px);line-height:1.05;font-weight:600;letter-spacing:-0.03em;max-width:760px;text-wrap:balance">The metal it runs on.</h1>
+    <p style="margin:0;font-size:17px;line-height:28px;color:#A6ADB8;max-width:620px">Every machine Aaru runs on is listed here with its live load.</p>
     <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:4px;border:1px solid #2A3039;color:{{ dataSourceColor }};font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.04em"><i class="icon-radio" style="font-size:11px"></i>MEMBERS ONLY · {{ dataSource }}</span>
-  </section>
-
-  <section style="max-width:1200px;margin:0 auto;padding:0 24px 48px">
-    <div style="border:1px solid rgba(230,194,122,0.45);box-shadow:0 0 0 3px #050607,0 0 0 4px rgba(230,194,122,0.25);border-radius:16px;background:#0A0C0F;padding:32px;display:flex;flex-direction:column;gap:24px">
-      <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-end">
-        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">HARDWARE FUND</span><span style="font-family:'JetBrains Mono',monospace;font-size:clamp(32px,4vw,44px);font-weight:500;letter-spacing:-0.02em">{{ fundRaised }} <span style="font-size:16px;color:#6E7682">{{ fundGoal }}</span></span></div>
-        <div style="display:flex;gap:32px;margin-left:auto;flex-wrap:wrap">
-          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">FOUNDERS</span><span style="font-family:'JetBrains Mono',monospace;font-size:20px">{{ fundFounders }}</span></div>
-          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">MEMBERS</span><span style="font-family:'JetBrains Mono',monospace;font-size:20px">{{ fundMembers }}</span></div>
-          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">NEXT PURCHASE</span><span style="font-family:'JetBrains Mono',monospace;font-size:20px;color:#E6C27A">{{ fundNext }}</span></div>
-        </div>
-      </div>
-      <div style="height:10px;border-radius:2px;background:#1F242C;overflow:hidden;display:flex"><div style="width:{{ fundPct }};background:#E6C27A;transition:width 600ms"></div></div>
-      <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682"><span>{{ fundLeft }}</span><span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:999px;background:#3DDC97"></span>Synced from Stripe · {{ updatedAgo }}</span></div>
-    </div>
   </section>
 
   <section style="max-width:1200px;margin:0 auto;padding:0 24px 48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px">
@@ -336,60 +247,11 @@ input::placeholder{color:#6E7682}
         <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;order:1">
           <span style="color:#6E7682">ROLE</span><span>{{ h.role }}</span>
           <span style="color:#6E7682">SPEC</span><span>{{ h.spec }}</span>
-          <span style="color:#6E7682">FUNDED</span><span style="color:{{ h.statusColor }}">{{ h.funded }}</span>
         </div>
       </div>
     </sc-for>
   </section>
 
-  <section style="max-width:1200px;margin:0 auto;padding:0 24px 48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px;align-items:start">
-    <div style="border:1px solid rgba(230,194,122,0.35);border-radius:12px;background:#0A0C0F;padding:24px;display:flex;flex-direction:column;gap:16px">
-      <div style="display:flex;align-items:center;gap:10px"><i class="icon-vote" style="font-size:18px;color:#E6C27A"></i><span style="font-size:16px;font-weight:500">Next purchase</span><span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682">VOTE #8 · CLOSES NOV 15</span></div>
-      <sc-for list="{{ voteOpts }}" as="o" hint-placeholder-count="3">
-        <div style="border:1px solid {{ o.border }};border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;gap:12px;align-items:flex-start">
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">{{ o.title }}</span><span style="font-size:12px;line-height:18px;color:#A6ADB8">{{ o.body }} <span style="font-family:'JetBrains Mono',monospace;color:#6E7682">{{ o.cost }}</span></span></div>
-            <button onClick="{{ o.cast }}" style="height:28px;padding:0 10px;border-radius:6px;border:1px solid {{ o.border }};background:transparent;color:{{ o.btnColor }};font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">{{ o.btn }}</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px"><div style="flex:1;height:4px;border-radius:1px;background:#1F242C;overflow:hidden"><div style="width:{{ o.pct }};height:4px;background:#E6C27A;transition:width 300ms"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8;min-width:72px;text-align:right">{{ o.votes }}</span></div>
-        </div>
-      </sc-for>
-      <span style="font-size:12px;color:#6E7682">{{ voteTotal }}. One vote per Founder; you can change it until the vote closes.</span>
-    </div>
-    <div style="border:1px solid #1E232A;border-radius:12px;background:#0A0C0F;padding:24px;display:flex;flex-direction:column;gap:16px">
-      <div style="display:flex;align-items:center;gap:10px"><i class="icon-gem" style="font-size:18px;color:#E6C27A"></i><span style="font-size:16px;font-weight:500">Founders</span>
-        <button onClick="{{ toggleShowName }}" style="margin-left:auto;display:flex;align-items:center;gap:8px;border:0;background:transparent;color:#A6ADB8;font-family:inherit;font-size:12px;cursor:pointer"><span style="position:relative;width:32px;height:18px;border-radius:999px;background:{{ nameTrack }};border:1px solid #2A3039;transition:background 200ms"><span style="position:absolute;top:1px;left:{{ nameKnob }};width:14px;height:14px;border-radius:999px;background:#EDEFF2;transition:left 200ms"></span></span>{{ nameToggleLabel }}</button>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        <sc-for list="{{ founderNames }}" as="nm" hint-placeholder-count="9">
-          <span style="height:28px;padding:0 10px;border-radius:999px;border:1px solid rgba(230,194,122,0.3);color:#EDEFF2;font-size:13px;display:inline-flex;align-items:center">{{ nm }}</span>
-        </sc-for>
-      </div>
-      <span style="font-size:12px;color:#6E7682">{{ foundersListed }}. Names appear only with consent.</span>
-    </div>
-  </section>
-
-  <section style="max-width:1200px;margin:0 auto;padding:0 24px 96px">
-    <div style="font-size:18px;font-weight:600;margin-bottom:16px">Ledger</div>
-    <div style="border:1px solid #1E232A;border-radius:12px;overflow:hidden;overflow-x:auto">
-      <div style="min-width:640px">
-        <div style="display:grid;grid-template-columns:110px minmax(0,2fr) minmax(0,1fr) 110px;gap:16px;padding:12px 20px;background:#0A0C0F;border-bottom:1px solid #1E232A;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682"><span>DATE</span><span>ITEM</span><span>FUNDED BY</span><span style="text-align:right">AMOUNT</span></div>
-        <sc-for list="{{ ledgerRows }}" as="l" hint-placeholder-count="5">
-          <div style="border-bottom:1px solid #1E232A;background:{{ l.bg }}">
-            <div onClick="{{ l.toggle }}" style="display:grid;grid-template-columns:110px minmax(0,2fr) minmax(0,1fr) 110px;gap:16px;padding:14px 20px;font-size:13px;align-items:center;cursor:pointer" style-hover="background:#0A0C0F">
-              <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E7682">{{ l.date }}</span><span style="display:flex;align-items:center;gap:8px"><i class="{{ l.chev }}" style="font-size:13px;color:#6E7682"></i>{{ l.item }}</span><span style="color:#A6ADB8">{{ l.by }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right">{{ l.amount }}</span>
-            </div>
-            <sc-if value="{{ l.open }}" hint-placeholder-val="{{ false }}">
-              <div style="padding:0 20px 16px 146px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:12px">
-                <span style="font-family:'JetBrains Mono',monospace;color:#A6ADB8">{{ l.ref }}</span>
-                <a style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><i class="icon-file-text" style="font-size:13px"></i>{{ l.doc }}</a>
-              </div>
-            </sc-if>
-          </div>
-        </sc-for>
-      </div>
-    </div>
-  </section>
 </sc-if>
 
 <sc-if value="{{ isDocs }}" hint-placeholder-val="{{ false }}">
@@ -409,7 +271,7 @@ input::placeholder{color:#6E7682}
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">DOCS · QUICKSTART</div>
         <h1 style="margin:0;font-size:36px;line-height:44px;font-weight:600;letter-spacing:-0.025em">Make your first request</h1>
-        <p style="margin:0;font-size:16px;line-height:26px;color:#A6ADB8">Aaru exposes an OpenAI-compatible API. API keys are included with the Chat tier and above.</p>
+        <p style="margin:0;font-size:16px;line-height:26px;color:#A6ADB8">Aaru exposes an OpenAI-compatible API. Every member can create API keys.</p>
       </div>
       <h2 style="margin:16px 0 0;font-size:20px;line-height:28px;font-weight:600">1. Create an API key</h2>
       <p style="margin:0;font-size:15px;line-height:24px;color:#A6ADB8">In the web app, open Settings → API keys and select <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#EDEFF2;background:#161A20;padding:2px 6px;border-radius:4px">New key</span>. Keys start with <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#EDEFF2;background:#161A20;padding:2px 6px;border-radius:4px">aaru_sk_</span> and are shown once.</p>
@@ -425,9 +287,9 @@ input::placeholder{color:#6E7682}
       </div>
       <h2 style="margin:16px 0 0;font-size:20px;line-height:28px;font-weight:600">3. Pick a model</h2>
       <div style="border:1px solid #1E232A;border-radius:12px;overflow:hidden">
-        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px;padding:10px 16px;background:#0A0C0F;border-bottom:1px solid #1E232A;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682"><span>MODEL ID</span><span>TYPE</span><span>FROM TIER</span></div>
-        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px;padding:12px 16px;border-bottom:1px solid #1E232A;font-size:13px;align-items:center"><span style="font-family:'JetBrains Mono',monospace;font-size:12px">nemotron-3.5</span><span style="color:#A6ADB8">Quick · sparse MoE</span><span style="color:#8A93A0">Casual</span></div>
-        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px;padding:12px 16px;font-size:13px;align-items:center"><span style="font-family:'JetBrains Mono',monospace;font-size:12px">llama-70b</span><span style="color:#A6ADB8">Deep · heavy dense</span><span style="color:#A08BFF">Dev</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px;padding:10px 16px;background:#0A0C0F;border-bottom:1px solid #1E232A;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682"><span>MODEL ID</span><span>TYPE</span><span>CONTEXT</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px;padding:12px 16px;border-bottom:1px solid #1E232A;font-size:13px;align-items:center"><span style="font-family:'JetBrains Mono',monospace;font-size:12px">nemotron-3.5</span><span style="color:#A6ADB8">Quick · sparse MoE</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#A6ADB8">16K</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px;padding:12px 16px;font-size:13px;align-items:center"><span style="font-family:'JetBrains Mono',monospace;font-size:12px">llama-70b</span><span style="color:#A6ADB8">Deep · heavy dense</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#A6ADB8">32K</span></div>
       </div>
       <h2 style="margin:16px 0 0;font-size:20px;line-height:28px;font-weight:600">4. Connect your editor</h2>
       <p style="margin:0;font-size:15px;line-height:24px;color:#A6ADB8">In Continue.dev, add a model with provider <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#EDEFF2;background:#161A20;padding:2px 6px;border-radius:4px">openai</span>, set <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#EDEFF2;background:#161A20;padding:2px 6px;border-radius:4px">apiBase</span> to the Aaru URL, and paste your key. Any tool that lets you override the OpenAI base URL works the same way.</p>
@@ -440,51 +302,21 @@ input::placeholder{color:#6E7682}
   <section style="max-width:1080px;margin:0 auto;padding:72px 24px 96px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:48px;align-items:start">
     <div style="display:flex;flex-direction:column;gap:24px">
       <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">JOIN THE COLLECTIVE</div>
-        <h1 style="margin:0;font-size:clamp(32px,4vw,44px);line-height:1.08;font-weight:600;letter-spacing:-0.03em">Choose a membership</h1>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">INVITE ONLY</div>
+        <h1 style="margin:0;font-size:clamp(32px,4vw,44px);line-height:1.08;font-weight:600;letter-spacing:-0.03em">Aaru is invite-only</h1>
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <sc-for list="{{ tierOpts }}" as="t" hint-placeholder-count="4">
-          <div onClick="{{ t.pick }}" style="display:flex;align-items:center;gap:14px;padding:16px;border-radius:12px;background:{{ t.bg }};border:1px solid {{ t.border }};cursor:pointer">
-            <span style="width:18px;height:18px;border-radius:999px;border:1px solid {{ t.radio }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:8px;height:8px;border-radius:999px;background:{{ t.dot }}"></span></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:500;color:{{ t.color }}">{{ t.label }}</span><span style="font-size:13px;color:#A6ADB8">{{ t.desc }}</span></div>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#EDEFF2;white-space:nowrap">{{ t.price }}</span>
-          </div>
-        </sc-for>
-      </div>
+      <p style="margin:0;font-size:16px;line-height:26px;color:#A6ADB8">There is no public sign-up. The operator adds members by invitation, and every invitation comes with a one-time code. If you have one, create your account here.</p>
     </div>
     <div style="border:1px solid #1E232A;border-radius:16px;background:#0A0C0F;padding:28px;display:flex;flex-direction:column;gap:20px">
-      <div style="font-size:18px;font-weight:600">Create your account</div>
+      <div style="font-size:18px;font-weight:600">Accept your invitation</div>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500;color:#A6ADB8">Invitation code</span><input placeholder="From your invitation email" style="height:40px;padding:0 12px;border-radius:8px;background:#161A20;border:1px solid #2A3039;color:#EDEFF2;font-family:'JetBrains Mono',monospace;font-size:14px;outline:none"></label>
       <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500;color:#A6ADB8">Email</span><input placeholder="you@example.com" style="height:40px;padding:0 12px;border-radius:8px;background:#161A20;border:1px solid #2A3039;color:#EDEFF2;font-family:inherit;font-size:14px;outline:none"></label>
       <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500;color:#A6ADB8">Passphrase</span><input type="password" placeholder="At least 4 words" style="height:40px;padding:0 12px;border-radius:8px;background:#161A20;border:1px solid #2A3039;color:#EDEFF2;font-family:inherit;font-size:14px;outline:none"><span style="font-size:12px;line-height:18px;color:#6E7682">This derives your encryption key in the browser. We never receive it.</span></label>
       <div style="border-radius:12px;background:rgba(61,220,151,0.06);border:1px solid rgba(61,220,151,0.25);padding:16px;display:flex;gap:12px">
         <i class="icon-key-round" style="font-size:16px;color:#3DDC97;margin-top:2px"></i>
         <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:500">Save your recovery kit</span><span style="font-size:13px;line-height:20px;color:#A6ADB8">After sign-up you'll download a recovery file. Without it or your passphrase, your history can't be restored.</span></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;padding-top:8px;border-top:1px solid #1E232A">
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:#A6ADB8">{{ joinSummary }}</span><span style="font-family:'JetBrains Mono',monospace">{{ joinPrice }}</span></div>
-        <span style="font-size:12px;line-height:18px;color:#6E7682">{{ joinSchedule }}</span>
-      </div>
-      <a onClick="{{ goCheckout }}" style="height:44px;border-radius:10px;background:#EDEFF2;color:#050607;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:#FFFFFF;color:#050607"><i class="icon-lock" style="font-size:14px"></i>Continue to secure checkout</a>
-      <span style="font-size:12px;line-height:18px;color:#6E7682;text-align:center">Payments are processed by Stripe. Aaru never sees your card number.</span>
-    </div>
-  </section>
-</sc-if>
-
-<sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
-  <section style="max-width:520px;margin:0 auto;padding:120px 24px;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center">
-    {{ spinner }}
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="font-size:24px;line-height:32px;font-weight:600;letter-spacing:-0.015em">Opening secure checkout</div>
-      <div style="font-size:15px;line-height:24px;color:#A6ADB8">You're being sent to Stripe to enter payment details. You'll come back here when it's done.</div>
-    </div>
-    <div style="width:100%;border:1px solid #1E232A;border-radius:12px;background:#0A0C0F;padding:16px 20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;text-align:left;font-size:13px">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682;padding-top:2px">PLAN</span><span>{{ joinSummary }}</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682;padding-top:2px">BILLED</span><span>{{ joinSchedule }}</span>
-    </div>
-    <div style="display:flex;gap:16px;font-size:13px">
-      <a onClick="{{ goSuccess }}" style="cursor:pointer">Simulate successful payment</a>
-      <a onClick="{{ goJoinBack }}" style="color:#A6ADB8;cursor:pointer">Cancel</a>
+      <a onClick="{{ goSuccess }}" style="height:44px;border-radius:10px;background:#EDEFF2;color:#050607;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:#FFFFFF;color:#050607"><i class="icon-lock" style="font-size:14px"></i>Create account</a>
     </div>
   </section>
 </sc-if>
@@ -492,9 +324,9 @@ input::placeholder{color:#6E7682}
 <sc-if value="{{ isSuccess }}" hint-placeholder-val="{{ false }}">
   <section style="max-width:720px;margin:0 auto;padding:88px 24px 96px;display:flex;flex-direction:column;gap:32px">
     <div style="display:flex;flex-direction:column;gap:16px">
-      <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 10px;border-radius:4px;background:rgba(61,220,151,0.10);border:1px solid rgba(61,220,151,0.35);color:#3DDC97;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.06em"><i class="icon-circle-check" style="font-size:12px"></i>PAYMENT CONFIRMED</span>
+      <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 10px;border-radius:4px;background:rgba(61,220,151,0.10);border:1px solid rgba(61,220,151,0.35);color:#3DDC97;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.06em"><i class="icon-circle-check" style="font-size:12px"></i>ACCOUNT CREATED</span>
       <h1 style="margin:0;font-size:clamp(32px,4vw,44px);line-height:1.08;font-weight:600;letter-spacing:-0.03em">Welcome to the collective.</h1>
-      <p style="margin:0;font-size:16px;line-height:26px;color:#A6ADB8">Your {{ joinSummary }} is active. A receipt is on its way to your inbox from Stripe.</p>
+      <p style="margin:0;font-size:16px;line-height:26px;color:#A6ADB8">Your membership is active. Two more steps and you are set up.</p>
     </div>
 
     <div style="border:1px solid #1E232A;border-radius:12px;background:#0A0C0F;overflow:hidden">
@@ -508,19 +340,11 @@ input::placeholder{color:#6E7682}
         <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:500">Start your first chat</span><span style="font-size:13px;line-height:20px;color:#A6ADB8">Sign in at chat.aaru.ai with your email and passphrase.</span></div>
         <a href="#" style="height:36px;padding:0 14px;border-radius:8px;background:#EDEFF2;color:#050607;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap" style-hover="background:#FFFFFF;color:#050607">Open chat<i class="icon-arrow-up-right" style="font-size:14px"></i></a>
       </div>
-      <sc-if value="{{ hasApi }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;align-items:center;gap:16px;padding:20px">
         <span style="width:28px;height:28px;border-radius:999px;border:1px solid #3A414C;color:#A6ADB8;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;flex-shrink:0">3</span>
         <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:500">Connect your editor</span><span style="font-size:13px;line-height:20px;color:#A6ADB8">Create an API key in Settings and follow the quickstart.</span></div>
         <a onClick="{{ goDocs }}" style="height:36px;padding:0 14px;border-radius:8px;border:1px solid #2A3039;background:#101318;color:#EDEFF2;font-size:13px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer;white-space:nowrap" style-hover="background:#1F242C;color:#EDEFF2">Quickstart</a>
       </div>
-      </sc-if>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:#6E7682">
-      <i class="icon-credit-card" style="font-size:15px"></i>
-      <span>Invoices, card changes and cancellation are handled in the Stripe billing portal.</span>
-      <a href="#" style="font-size:13px">Manage billing</a>
     </div>
   </section>
 </sc-if>
@@ -552,7 +376,7 @@ input::placeholder{color:#6E7682}
       </sc-if>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid #1E232A;font-size:13px;color:#A6ADB8">
-      <span>New to Aaru?</span><a onClick="{{ goJoin }}" style="cursor:pointer">Join the collective</a>
+      <span>Aaru is invite-only.</span><a onClick="{{ goJoin }}" style="cursor:pointer">Have an invitation?</a>
     </div>
     <span style="align-self:center;display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682"><i class="icon-lock" style="font-size:11px;color:#3DDC97"></i>KEY DERIVED LOCALLY · ARGON2ID</span>
   </section>
@@ -580,7 +404,7 @@ input::placeholder{color:#6E7682}
         </sc-for>
       </div>
       <div style="border:1px solid #1E232A;border-radius:12px;background:#0A0C0F;overflow:hidden">
-        <div style="padding:14px 20px;border-bottom:1px solid #1E232A;font-size:15px;font-weight:500">Queue wait by tier</div>
+        <div style="padding:14px 20px;border-bottom:1px solid #1E232A;font-size:15px;font-weight:500">Queue wait</div>
         <div style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
           <sc-for list="{{ stQueues }}" as="q" hint-placeholder-count="4">
             <div style="display:grid;grid-template-columns:80px minmax(0,1fr) 64px;align-items:center;gap:12px;font-size:13px">
@@ -592,8 +416,7 @@ input::placeholder{color:#6E7682}
         </div>
         <div style="padding:14px 20px;border-top:1px solid #1E232A;display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682"><span>GPU MEMORY</span><span style="color:#A6ADB8;letter-spacing:0">{{ stCapUsed }}</span></div>
-          <div style="position:relative;height:6px;border-radius:1px;background:#1F242C;overflow:hidden"><div style="width:{{ stCapW }};height:6px;background:#EDEFF2"></div><div style="position:absolute;right:0;top:0;width:{{ stCapResW }};height:6px;background:rgba(230,194,122,0.6)"></div></div>
-          <span style="font-size:11px;color:#6E7682">{{ stCapRes }}</span>
+          <div style="height:6px;border-radius:1px;background:#1F242C;overflow:hidden"><div style="width:{{ stCapW }};height:6px;background:#EDEFF2"></div></div>
         </div>
       </div>
     </div>
@@ -641,22 +464,22 @@ input::placeholder{color:#6E7682}
         <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6.5"><rect x="47" y="10" width="13" height="46" rx="6.5"></rect><rect x="47" y="10" width="13" height="46" rx="6.5" transform="rotate(60 50 50)"></rect><rect x="47" y="10" width="13" height="46" rx="6.5" transform="rotate(120 50 50)"></rect><rect x="47" y="10" width="13" height="46" rx="6.5" transform="rotate(180 50 50)"></rect><rect x="47" y="10" width="13" height="46" rx="6.5" transform="rotate(240 50 50)"></rect><rect x="47" y="10" width="13" height="46" rx="6.5" transform="rotate(300 50 50)"></rect></svg>
         <span style="font-weight:600;font-size:19px;letter-spacing:-0.03em">aaru</span>
       </span>
-      <span style="font-size:13px;line-height:20px;color:#6E7682">A member-owned AI server. Open-weight models, sealed by default.</span>
+      <span style="font-size:13px;line-height:20px;color:#6E7682">An invite-only AI server. Open-weight models, sealed by default.</span>
     </div>
     <div style="margin-left:auto;display:flex;gap:48px;flex-wrap:wrap;font-size:13px">
-      <div style="display:flex;flex-direction:column;gap:10px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">PRODUCT</span><a onClick="{{ goPricing }}" style="color:#A6ADB8;cursor:pointer">Pricing</a><a onClick="{{ goDocs }}" style="color:#A6ADB8;cursor:pointer">Docs</a><a onClick="{{ goStatus }}" style="color:#A6ADB8;cursor:pointer">Status</a></div>
-      <div style="display:flex;flex-direction:column;gap:10px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">COLLECTIVE</span><a onClick="{{ goHardware }}" style="color:#A6ADB8;cursor:pointer">Hardware fund</a><a onClick="{{ goPrivacy }}" style="color:#A6ADB8;cursor:pointer">Privacy</a><a href="#" style="color:#A6ADB8">Governance</a></div>
+      <div style="display:flex;flex-direction:column;gap:10px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">PRODUCT</span><a onClick="{{ goDocs }}" style="color:#A6ADB8;cursor:pointer">Docs</a><a onClick="{{ goStatus }}" style="color:#A6ADB8;cursor:pointer">Status</a></div>
+      <div style="display:flex;flex-direction:column;gap:10px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">COLLECTIVE</span><a onClick="{{ goHardware }}" style="color:#A6ADB8;cursor:pointer">Hardware</a><a onClick="{{ goPrivacy }}" style="color:#A6ADB8;cursor:pointer">Privacy</a></div>
     </div>
   </div>
 </footer>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;startPage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;pricing&quot;,&quot;privacy&quot;,&quot;hardware&quot;,&quot;status&quot;,&quot;docs&quot;,&quot;join&quot;,&quot;checkout&quot;,&quot;success&quot;,&quot;signin&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;heroVisual&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chat&quot;,&quot;terminal&quot;],&quot;default&quot;:&quot;chat&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;memberPreview&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;apiBase&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;startPage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;privacy&quot;,&quot;hardware&quot;,&quot;status&quot;,&quot;docs&quot;,&quot;join&quot;,&quot;success&quot;,&quot;signin&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;heroVisual&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chat&quot;,&quot;terminal&quot;],&quot;default&quot;:&quot;chat&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;memberPreview&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;apiBase&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
-  state = { page: null, tier: 'dev' };
+  state = { page: null };
   componentDidMount() {
     this._live = setInterval(() => this.setState(s => ({ tick: (s.tick || 0) + 1 })), 2000);
-    this._polls = [['nodes', '/api/hardware/nodes', 5000, true], ['fund', '/api/hardware/fund', 60000, true], ['ledger', '/api/hardware/ledger?limit=50', 60000, true], ['vote', '/api/votes/current', 30000, true], ['founders', '/api/founders', 60000, true], ['status', '/api/status', 15000, false]]
+    this._polls = [['nodes', '/api/hardware/nodes', 5000, true], ['status', '/api/status', 15000, false]]
       .map(([key, path, ms, auth]) => { const run = () => this.pull(key, path, auth); run(); return setInterval(run, ms); });
   }
   componentWillUnmount() { clearInterval(this._live); clearTimeout(this._t); (this._polls || []).forEach(clearInterval); }
@@ -699,7 +522,6 @@ class Component extends DCLogic {
   }
   hwMember() { return !!this.state.member || !!this.props.memberPreview; }
   go(p) { return () => { this.setState({ page: p }); window.scrollTo(0, 0); }; }
-  join(t) { return () => { this.setState({ page: 'join', tier: t }); window.scrollTo(0, 0); }; }
   renderVals() {
     const v = this.baseVals();
     const A = this.state.api || {};
@@ -708,33 +530,13 @@ class Component extends DCLogic {
     v.dataSource = !live ? 'SAMPLE DATA' : errs ? 'LIVE · ' + errs + ' FEED(S) UNREACHABLE, SHOWING SAMPLE' : 'LIVE DATA';
     v.dataSourceColor = !live ? '#6E7682' : errs ? '#F2C14E' : '#3DDC97';
     if (A.nodes && A.nodes.nodes) {
-      const C = { online: '#3DDC97', degraded: '#F2C14E', offline: '#FF5468', funding: '#E6C27A' };
+      const C = { online: '#3DDC97', degraded: '#F2C14E', offline: '#FF5468' };
       v.liveNodes = A.nodes.nodes.map(n => {
-        const has = n.status !== 'funding' && n.load_pct != null;
+        const has = n.load_pct != null;
         const p = has ? this.pts(n.history_24h || [n.load_pct]) : { points: '', area: '' };
-        return { icon: n.gpu_kind === 'egpu' ? 'icon-microchip' : 'icon-server', name: n.name, role: n.role, spec: n.spec, funded: n.funded || (n.status === 'funding' ? 'in progress' : '100%'), status: String(n.status).toUpperCase(), statusColor: C[n.status] || '#A6ADB8', hasLive: has,
-          load: has ? n.load_pct + '%' : '', loadW: has ? n.load_pct + '%' : '0%', temp: has && n.temp_c != null ? n.temp_c + '°C' : '', gpuLabel: n.gpu_kind === 'egpu' ? 'eGPU LOAD' : 'iGPU LOAD', barColor: n.load_pct > 85 ? '#F2C14E' : '#EDEFF2', ...p };
+        return { icon: n.gpu_kind === 'boost' ? 'icon-microchip' : 'icon-server', name: n.name, role: n.role, spec: n.spec, status: String(n.status).toUpperCase(), statusColor: C[n.status] || '#A6ADB8', hasLive: has,
+          load: has ? n.load_pct + '%' : '', loadW: has ? n.load_pct + '%' : '0%', temp: has && n.temp_c != null ? n.temp_c + '°C' : '', gpuLabel: n.gpu_kind === 'boost' ? 'BOOST LOAD' : 'ONBOARD LOAD', barColor: n.load_pct > 85 ? '#F2C14E' : '#EDEFF2', ...p };
       });
-    }
-    if (A.fund) {
-      const f = A.fund, pct = Math.round(f.raised_cents / f.goal_cents * 100);
-      Object.assign(v, { fundRaised: this.money(f.raised_cents), fundGoal: '/ ' + this.money(f.goal_cents), fundPct: pct + '%', fundLeft: pct + '% funded · ' + this.money(f.goal_cents - f.raised_cents) + ' to go', fundFounders: String(f.founders), fundMembers: String(f.members), fundNext: f.next_purchase, updatedAgo: this.ago(f.synced_at) });
-    }
-    if (A.ledger && A.ledger.rows) {
-      v.ledgerRows = A.ledger.rows.map(r => { const open = this.state.openRow === r.id; return { id: r.id, date: r.date, item: r.item, by: r.by, amount: (r.amount_cents > 0 ? '+' : '') + this.money(r.amount_cents), ref: r.ref + (r.vote_id ? ' · approved by vote #' + r.vote_id : ''), doc: r.doc_url ? 'View receipt' : '', open, chev: open ? 'icon-chevron-up' : 'icon-chevron-down', bg: open ? '#0A0C0F' : 'transparent', toggle: () => this.setState({ openRow: open ? null : r.id }) }; });
-    }
-    if (A.vote && A.vote.options) {
-      const vt = A.vote, total = vt.options.reduce((a, o) => a + o.votes, 0) || 1;
-      v.voteOpts = vt.options.map(o => { const mine = vt.my_vote === o.key; return { ...o, votes: o.votes + ' votes', pct: Math.round(o.votes / total * 100) + '%', mine, border: mine ? 'rgba(230,194,122,0.55)' : '#1E232A', btn: !vt.can_vote ? 'Founders only' : mine ? 'Your vote' : 'Vote', btnColor: mine ? '#E6C27A' : vt.can_vote ? '#EDEFF2' : '#474E59',
-        cast: async () => { if (!vt.can_vote) return; const res = await this.send('/api/votes/current', 'POST', { option: mine ? null : o.key }); if (res) this.setState(s => ({ api: { ...s.api, vote: res } })); } }; });
-      v.voteTotal = vt.cast + ' of ' + vt.eligible + ' Founders voted';
-    }
-    if (A.founders) {
-      const fd = A.founders;
-      v.founderNames = fd.listed; v.showName = fd.me_listed;
-      v.foundersListed = fd.listed.length + ' of ' + fd.total + ' listed · the rest are anonymous';
-      v.nameToggleLabel = fd.me_listed ? 'Listed publicly' : 'Show my name'; v.nameKnob = fd.me_listed ? '16px' : '2px'; v.nameTrack = fd.me_listed ? '#E6C27A' : '#1F242C';
-      v.toggleShowName = async () => { const res = await this.send('/api/founders/me', 'PUT', { listed: !fd.me_listed }); if (res) this.setState(s => ({ api: { ...s.api, founders: res } })); };
     }
     Object.assign(v, this.statusVals(A.status || this.sampleStatus()));
     v.statusSource = A.status ? 'Live · updated ' + this.ago(A.status.updated_at) : live ? 'Status feed unreachable · showing sample data' : 'Sample data';
@@ -746,18 +548,18 @@ class Component extends DCLogic {
       overall: 'degraded',
       models: [
         { label: 'Nemotron 3.5', kind: 'Sparse MoE · Quick', status: 'operational', tok_s: 47.8 },
-        { label: 'Llama 70B', kind: 'Heavy dense · Deep', status: 'degraded', tok_s: 9.1, note: 'eGPU at thermal limit' },
+        { label: 'Llama 70B', kind: 'Heavy dense · Deep', status: 'degraded', tok_s: 9.1, note: 'Boost at thermal limit' },
       ],
-      queues: [{ tier: 'casual', wait_s: 4.2 }, { tier: 'chat', wait_s: 0.8 }, { tier: 'dev', wait_s: 0.3 }, { tier: 'founders', wait_s: 0.1 }],
+      queues: [{ label: 'Quick', wait_s: 0.4 }, { label: 'Deep', wait_s: 3.1 }],
       components: [
         { label: 'API', uptime_90d: 99.94, days: days(1, [33]) },
         { label: 'Web app', uptime_90d: 99.98, days: days(2, []) },
         { label: 'Node 01', uptime_90d: 99.81, days: days(3, [33, 72]) },
-        { label: 'eGPU A', uptime_90d: 99.62, days: days(4, [18, 72, 89]) },
+        { label: 'Boost A', uptime_90d: 99.62, days: days(4, [18, 72, 89]) },
       ],
-      capacity: { vram_used_gb: 98.4, vram_total_gb: 120, founders_reserved_gb: 16 },
+      capacity: { gpu_memory_used_pct: 82 },
       incidents: [
-        { title: 'Llama 70B slowed', status: 'monitoring', started_at: 'Today 12:40 UTC', updates: [{ at: '13:10', text: 'Fan curve adjusted; throughput recovering.' }, { at: '12:52', text: 'eGPU A hit its thermal limit under sustained dense load. Requests are slower but completing.' }] },
+        { title: 'Llama 70B slowed', status: 'monitoring', started_at: 'Today 12:40 UTC', updates: [{ at: '13:10', text: 'Fan curve adjusted; throughput recovering.' }, { at: '12:52', text: 'Boost A hit its thermal limit under sustained dense load. Requests are slower but completing.' }] },
         { title: 'API errors for 14 minutes', status: 'resolved', started_at: 'Sep 19 · 02:05 UTC', updates: [{ at: '02:19', text: 'Restarted the router after a failed config reload. All requests succeeding.' }] },
       ],
       maintenance: [{ title: 'Node 01 kernel update', starts_at: 'Oct 26 · 03:00 UTC', minutes: 20 }],
@@ -766,19 +568,16 @@ class Component extends DCLogic {
   statusVals(s) {
     const SC = { operational: ['Operational', '#3DDC97'], degraded: ['Degraded', '#F2C14E'], outage: ['Outage', '#FF5468'], maintenance: ['Maintenance', '#6FA8FF'] };
     const DC = { ok: '#3DDC97', minor: '#F2C14E', major: '#FF5468', maint: '#6FA8FF', none: '#1F242C' };
-    const TC = { casual: ['Casual', '#8A93A0'], chat: ['Chat', '#B4BCC8'], dev: ['Dev', '#A08BFF'], founders: ['Founders', '#E6C27A'] };
     const ov = SC[s.overall] || SC.operational;
-    const cap = s.capacity || { vram_used_gb: 0, vram_total_gb: 1, founders_reserved_gb: 0 };
+    const cap = s.capacity || { gpu_memory_used_pct: 0 };
     return {
       stOverall: s.overall === 'operational' ? 'All systems operational' : s.overall === 'outage' ? 'Service disruption' : s.overall === 'maintenance' ? 'Scheduled maintenance in progress' : 'Some systems degraded',
       stOverallColor: ov[1], stOverallIcon: s.overall === 'operational' ? 'icon-circle-check' : 'icon-triangle-alert',
       stModels: s.models.map(m => ({ label: m.label, kind: m.kind, speed: m.tok_s != null ? m.tok_s.toFixed(1) + ' tok/s' : '—', note: m.note || '', sLabel: (SC[m.status] || SC.operational)[0], sColor: (SC[m.status] || SC.operational)[1] })),
-      stQueues: s.queues.map(q => ({ label: (TC[q.tier] || [q.tier])[0], color: (TC[q.tier] || [0, '#A6ADB8'])[1], wait: q.wait_s < 1 ? Math.round(q.wait_s * 1000) + ' ms' : q.wait_s.toFixed(1) + ' s', w: Math.min(100, Math.max(3, q.wait_s / 5 * 100)) + '%' })),
+      stQueues: s.queues.map(q => ({ label: q.label, color: '#A6ADB8', wait: q.wait_s < 1 ? Math.round(q.wait_s * 1000) + ' ms' : q.wait_s.toFixed(1) + ' s', w: Math.min(100, Math.max(3, q.wait_s / 5 * 100)) + '%' })),
       stComponents: s.components.map(c => ({ label: c.label, uptime: c.uptime_90d.toFixed(2) + '%', days: (c.days || []).slice(-90).map((d, i) => ({ k: c.label + i, color: DC[d] || DC.none })) })),
-      stCapUsed: cap.vram_used_gb.toFixed(1) + ' / ' + cap.vram_total_gb + ' GB',
-      stCapW: (cap.vram_used_gb / cap.vram_total_gb * 100) + '%',
-      stCapResW: (cap.founders_reserved_gb / cap.vram_total_gb * 100) + '%',
-      stCapRes: cap.founders_reserved_gb + ' GB reserved for Founders',
+      stCapUsed: cap.gpu_memory_used_pct + '% used',
+      stCapW: cap.gpu_memory_used_pct + '%',
       stIncidents: (s.incidents || []).map((x, i) => ({ k: 'i' + i, title: x.title, when: x.started_at, sLabel: x.status === 'resolved' ? 'Resolved' : x.status === 'monitoring' ? 'Monitoring' : 'Investigating', sColor: x.status === 'resolved' ? '#6E7682' : '#F2C14E', updates: (x.updates || []).map((u, j) => ({ k: i + '-' + j, at: u.at, text: u.text })) })),
       stMaint: (s.maintenance || []).map((m, i) => ({ k: 'm' + i, title: m.title, when: m.starts_at + ' · ' + m.minutes + ' min' })),
       hasMaint: (s.maintenance || []).length > 0,
@@ -786,69 +585,26 @@ class Component extends DCLogic {
   }
   baseVals() {
     const page = this.state.page || this.props.startPage || 'home';
-    const tier = this.state.tier;
-    const T = {
-      casual: { label: 'Casual', price: '$10/mo', desc: 'Fast MoE models, web chat', color: '#8A93A0', tint: 'transparent', line: 'rgba(138,147,160,0.5)' },
-      chat: { label: 'Chat', price: '$25/mo', desc: 'Priority routing, API key, mobile', color: '#B4BCC8', tint: 'rgba(180,188,200,0.06)', line: 'rgba(180,188,200,0.45)' },
-      dev: { label: 'Dev', price: '$70/mo', desc: 'Dense 70B, 32K+ context, agents', color: '#A08BFF', tint: 'rgba(160,139,255,0.08)', line: 'rgba(160,139,255,0.5)' },
-      sponsor: { label: 'Founders', price: '$150/mo', desc: 'Year one, then $15/mo for life', color: '#E6C27A', tint: 'rgba(230,194,122,0.08)', line: 'rgba(230,194,122,0.55)' },
-    };
-    const navDef = [['Pricing', 'pricing'], ['Privacy', 'privacy'], ['Hardware', 'hardware'], ['Docs', 'docs']];
+    const navDef = [['Privacy', 'privacy'], ['Hardware', 'hardware'], ['Docs', 'docs']];
     const pulse = React.createElement('span', { style: { width: 6, height: 6, borderRadius: 999, background: '#FF7A33', display: 'inline-block', flexShrink: 0, animation: 'aaruPulse 1.2s ease-in-out infinite' } });
     const hero = this.props.heroVisual || 'chat';
     return {
       pulse,
       heroChat: hero === 'chat', heroCode: hero === 'terminal',
-      isHome: page === 'home', isPricing: page === 'pricing', isPrivacy: page === 'privacy', isHardware: page === 'hardware', isDocs: page === 'docs', isJoin: page === 'join',
+      isHome: page === 'home', isPrivacy: page === 'privacy', isHardware: page === 'hardware', isDocs: page === 'docs', isJoin: page === 'join',
       nav: navDef.map(([label, p]) => ({ label, go: this.go(p), color: page === p ? '#EDEFF2' : '#A6ADB8' })),
-      goHome: this.go('home'), goPricing: this.go('pricing'), goPrivacy: this.go('privacy'), goHardware: this.go('hardware'), goDocs: this.go('docs'), goJoin: this.go('join'),
-      joinCasual: this.join('casual'), joinChat: this.join('chat'), joinDev: this.join('dev'), joinSponsor: this.join('sponsor'),
-      tierOpts: Object.entries(T).map(([k, t]) => {
-        const on = k === tier;
-        return { ...t, pick: () => this.setState({ tier: k }), bg: on ? t.tint : '#0A0C0F', border: on ? t.line : '#1E232A', radio: on ? t.color : '#3A414C', dot: on ? t.color : 'transparent', color: t.color };
-      }),
-      joinSummary: T[tier].label + ' membership',
-      joinPrice: T[tier].price,
-      joinSchedule: tier === 'sponsor' ? '12 monthly payments of $150, then $15/mo automatically. Cancel anytime.' : 'Billed monthly. Switch plans or cancel anytime; changes are prorated.',
-      isCheckout: page === 'checkout', isSuccess: page === 'success', isSignin: page === 'signin',
+      goHome: this.go('home'), goPrivacy: this.go('privacy'), goHardware: this.go('hardware'), goDocs: this.go('docs'), goJoin: this.go('join'),
+      isSuccess: page === 'success', isSignin: page === 'signin',
       isStatus: page === 'status', goStatus: this.go('status'),
       isHardwareGate: page === 'hardware' && !this.hwMember(),
       isHardwareMember: page === 'hardware' && this.hwMember(),
       goSigninHw: () => { this.setState({ page: 'signin', signin: 0, recover: false, after: 'hardware' }); window.scrollTo(0, 0); },
       updatedAgo: ((this.state.tick || 0) % 15) * 2 + 's ago',
-      fundRaised: '$31,280', fundGoal: '/ $46,000', fundPct: '68%', fundLeft: '68% funded · $14,720 to go', fundFounders: '26', fundMembers: '212', fundNext: 'Node 03',
       dataSource: 'SAMPLE DATA', dataSourceColor: '#6E7682',
       liveNodes: (() => { const L = this.live(); return [
-        { icon: 'icon-server', name: 'Node 01', role: 'MoE inference, web', spec: 'Framework · Ryzen AI Max+ 395 · 128 GB', funded: '100% · 2025-11', status: 'ONLINE', statusColor: '#3DDC97', hasLive: true, ...L.n1, gpuLabel: 'iGPU LOAD', barColor: L.n1.hot ? '#F2C14E' : '#EDEFF2' },
-        { icon: 'icon-microchip', name: 'eGPU A', role: 'Dense 70B, API priority', spec: 'External RTX GPU', funded: '100% · 2026-02', status: 'ONLINE', statusColor: '#3DDC97', hasLive: true, ...L.e1, gpuLabel: 'eGPU LOAD', barColor: L.e1.hot ? '#F2C14E' : '#EDEFF2' },
-        { icon: 'icon-server', name: 'Node 03', role: 'Expansion · Founders VRAM', spec: 'Framework · Ryzen AI Max+ 395 + eGPU', funded: '68% · in progress', status: 'FUNDING', statusColor: '#E6C27A', hasLive: false, load: '', loadW: '0%', temp: '', points: '', area: '', gpuLabel: '', barColor: '#1F242C' },
+        { icon: 'icon-server', name: 'Node 01', role: 'MoE inference, web', spec: 'Onboard GPU node', status: 'ONLINE', statusColor: '#3DDC97', hasLive: true, ...L.n1, gpuLabel: 'ONBOARD LOAD', barColor: L.n1.hot ? '#F2C14E' : '#EDEFF2' },
+        { icon: 'icon-microchip', name: 'Boost A', role: 'Dense 70B, API workloads', spec: 'External boost GPU', status: 'ONLINE', statusColor: '#3DDC97', hasLive: true, ...L.e1, gpuLabel: 'BOOST LOAD', barColor: L.e1.hot ? '#F2C14E' : '#EDEFF2' },
       ]; })(),
-      ledgerRows: [
-        { id: 'l1', date: '2026-10-01', item: 'Founders contributions, October', by: '26 Founders', amount: '+$3,900', ref: 'Stripe payout po_1Q8…7Kd · 26 invoices', doc: 'View payout summary' },
-        { id: 'l2', date: '2026-09-18', item: 'NVMe storage for vault', by: 'Fund', amount: '−$640', ref: '2 × 4 TB NVMe · order #A-20931 · approved by vote #7', doc: 'View receipt (PDF)' },
-        { id: 'l3', date: '2026-09-01', item: 'Founders contributions, September', by: '24 Founders', amount: '+$3,600', ref: 'Stripe payout po_1PxR…2aB · 24 invoices', doc: 'View payout summary' },
-        { id: 'l4', date: '2026-02-11', item: 'eGPU A purchase', by: 'Fund', amount: '−$2,180', ref: 'External RTX GPU + enclosure · approved by vote #3', doc: 'View receipt (PDF)' },
-        { id: 'l5', date: '2025-11-04', item: 'Node 01 purchase', by: 'First Founders', amount: '−$2,490', ref: 'Framework Desktop, Ryzen AI Max+ 395, 128 GB', doc: 'View receipt (PDF)' },
-      ].map(r => { const open = this.state.openRow === r.id; return { ...r, open, chev: open ? 'icon-chevron-up' : 'icon-chevron-down', bg: open ? '#0A0C0F' : 'transparent', toggle: () => this.setState({ openRow: open ? null : r.id }) }; }),
-      voteOpts: (() => {
-        const base = { a: 14, b: 8, c: 3 };
-        const v = this.state.vote;
-        if (v) base[v]++;
-        const total = base.a + base.b + base.c;
-        return [
-          { k: 'a', title: 'Node 03: second Ryzen node with eGPU', body: 'Doubles MoE capacity and adds Founders VRAM reservations.', cost: '$14,720 left' },
-          { k: 'b', title: 'Larger eGPU for dense models', body: 'Faster Llama 70B and room for longer context.', cost: '≈ $2,400' },
-          { k: 'c', title: 'Vault storage expansion', body: 'Another 8 TB of encrypted document storage.', cost: '≈ $700' },
-        ].map(o => ({ ...o, votes: base[o.k] + ' votes', pct: Math.round(base[o.k] / total * 100) + '%', mine: v === o.k, border: v === o.k ? 'rgba(230,194,122,0.55)' : '#1E232A', btn: v === o.k ? 'Your vote' : 'Vote', btnColor: v === o.k ? '#E6C27A' : '#EDEFF2', cast: () => this.setState({ vote: v === o.k ? null : o.k }) }));
-      })(),
-      voteTotal: (25 + (this.state.vote ? 1 : 0)) + ' of 26 Founders voted',
-      showName: !!this.state.showName,
-      toggleShowName: () => this.setState(s => ({ showName: !s.showName })),
-      nameToggleLabel: this.state.showName ? 'Listed publicly' : 'Show my name',
-      nameKnob: this.state.showName ? '16px' : '2px',
-      nameTrack: this.state.showName ? '#E6C27A' : '#1F242C',
-      founderNames: (this.state.showName ? ['Mara K. (you)'] : []).concat(['Anders H.', 'Priya S.', 'Tomás R.', 'Lena W.', 'J. Okafor', 'Sam B.', 'Yuki T.', 'D. Marsh', 'Ines P.']),
-      foundersListed: (this.state.showName ? 10 : 9) + ' of 26 listed · the rest are anonymous',
       goSignin: () => { this.setState({ page: 'signin', signin: 0, recover: false }); window.scrollTo(0, 0); },
       showRecover: !!this.state.recover,
       toggleRecover: () => this.setState(s => ({ recover: !s.recover })),
@@ -857,28 +613,13 @@ class Component extends DCLogic {
       signinStep: ['', 'Deriving key on this device…', 'Verifying with server…', 'Unlocked · opening chat.aaru.ai'][this.state.signin || 0],
       signinLabel: (this.state.signin || 0) > 0 ? 'Unlocking…' : 'Sign in',
       doSignin: () => { if (this.state.signin) return; let n = 1; this.setState({ signin: 1 }); const t = setInterval(() => { n++; if (n > 3 || this.state.page !== 'signin') { clearInterval(t); if (n > 3) { this.setState({ member: true, page: this.state.after || 'hardware', signin: 0, after: null }); window.scrollTo(0, 0); } return; } this.setState({ signin: n }); }, 700); },
-      hasApi: tier !== 'casual',
-      goCheckout: () => { this.setState({ page: 'checkout' }); window.scrollTo(0, 0); clearTimeout(this._t); this._t = setTimeout(() => { if (this.state.page === 'checkout') this.setState({ page: 'success' }); }, 2400); },
-      goSuccess: () => { clearTimeout(this._t); this.setState({ page: 'success' }); },
-      goJoinBack: () => { clearTimeout(this._t); this.setState({ page: 'join' }); },
+      goSuccess: () => { this.setState({ page: 'success' }); window.scrollTo(0, 0); },
       spinner: React.createElement('span', { style: { width: 40, height: 40, borderRadius: 999, border: '2px solid #1F242C', borderTopColor: '#EDEFF2', display: 'inline-block', animation: 'aaruSpin 0.9s linear infinite' } }),
       flow: [
         { n: '01', icon: 'icon-laptop', title: 'Your device', body: 'Your passphrase derives an encryption key locally. Messages and files are encrypted before upload.', tag: 'KEY STAYS HERE', tagIcon: 'icon-key-round', tagBg: 'rgba(61,220,151,0.10)', tagColor: '#3DDC97' },
         { n: '02', icon: 'icon-arrow-right-left', title: 'In transit', body: 'Requests travel over TLS to the collective\'s server. No third-party relays or inference APIs.', tag: 'TLS 1.3', tagIcon: 'icon-lock', tagBg: 'rgba(61,220,151,0.10)', tagColor: '#3DDC97' },
         { n: '03', icon: 'icon-cpu', title: 'Inference', body: 'The model reads your prompt in GPU memory on our own hardware, generates the reply, then discards it.', tag: 'IN MEMORY ONLY', tagIcon: 'icon-microchip', tagBg: '#161A20', tagColor: '#A6ADB8' },
         { n: '04', icon: 'icon-database', title: 'Storage', body: 'History, vault documents and their embeddings are stored as ciphertext. Only your key opens them.', tag: 'CIPHERTEXT AT REST', tagIcon: 'icon-lock', tagBg: 'rgba(61,220,151,0.10)', tagColor: '#3DDC97' },
-      ],
-      nodes: [
-        { icon: 'icon-server', name: 'Node 01', role: 'MoE inference, web', spec: 'Framework · Ryzen AI Max+ 395 · 128 GB', funded: '100% · 2025-11', status: 'ONLINE', statusColor: '#3DDC97' },
-        { icon: 'icon-microchip', name: 'eGPU A', role: 'Dense 70B, API priority', spec: 'External RTX GPU', funded: '100% · 2026-02', status: 'ONLINE', statusColor: '#3DDC97' },
-        { icon: 'icon-server', name: 'Node 03', role: 'Expansion · Founders VRAM', spec: 'Framework · Ryzen AI Max+ 395 + eGPU', funded: '68% · in progress', status: 'FUNDING', statusColor: '#E6C27A' },
-      ],
-      ledger: [
-        { date: '2026-10-01', item: 'Founders contributions, October', by: '26 Founders', amount: '+$3,900' },
-        { date: '2026-09-18', item: 'NVMe storage for vault', by: 'Fund', amount: '−$640' },
-        { date: '2026-09-01', item: 'Founders contributions, September', by: '24 Founders', amount: '+$3,600' },
-        { date: '2026-02-11', item: 'eGPU A purchase', by: 'Fund', amount: '−$2,180' },
-        { date: '2025-11-04', item: 'Node 01 purchase', by: 'First Founders', amount: '−$2,490' },
       ],
     };
   }

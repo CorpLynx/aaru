@@ -1,7 +1,7 @@
 export interface MetricChipProps {
-  /** speed = tok/s, engine = iGPU/eGPU, context = window usage. @default "speed" */
+  /** speed = tok/s, engine = Onboard/Boost, context = window usage. @default "speed" */
   kind?: "speed" | "engine" | "context";
-  /** Display string, e.g. "48.2 tok/s", "eGPU · RTX". Context defaults to percent. */
+  /** Display string, e.g. "48.2 tok/s", "Boost". Context defaults to percent. */
   value?: string;
   /** Speed only: Ember while tokens stream; settles to gray when done. */
   live?: boolean;

@@ -1,13 +1,13 @@
 # Handoff: Aaru
 
 ## Overview
-Aaru is a member-funded ("collective") self-hosted AI server. It runs open-weight LLMs on Framework hardware (Ryzen AI Max+ 395 iGPU plus external RTX eGPUs) with zero-knowledge encryption of chats and RAG documents. This bundle contains everything designed so far:
+Aaru is an invite-only ("collective") self-hosted AI server. It runs open-weight LLMs on its own hardware (a GPU node plus external boost GPUs) with zero-knowledge encryption of chats and RAG documents. This bundle contains everything designed so far:
 
-1. **Design system:** tokens, Tailwind preset, 29 React primitives, guidelines, logo and logo animation.
-2. **Marketing website** (aaru.ai): Home, Pricing, Privacy, Hardware (members only, live data), Status (public, live data), Docs, Join, Stripe checkout handoff, success page, and Sign in.
+1. **Design system:** tokens, Tailwind preset, 27 React primitives, guidelines, logo and logo animation.
+2. **Marketing website** (aaru.ai): Home, Privacy, Hardware (members only, live data), Status (public, live data), Docs, Join (accept an invitation), success page, and Sign in.
 3. **Web app:** a reskin and extension of the user's **Open WebUI fork** (`CorpLynx/open-webui`). It has six screens.
 4. **Mobile app:** a native app forked from **OpenCode Mobile**. It has six screens, each for iOS and Android.
-5. **Specs:** the live-data API contract, the Stripe billing model, encryption requirements and logo motion.
+5. **Specs:** the live-data API contract, encryption requirements and logo motion.
 
 ## About the design files
 The files in `designs/` and `design-system/ui_kits/` are **design references built in HTML**. They are prototypes showing the intended look and behavior, not production code to copy. The job is to **recreate them in each target codebase using its own patterns**:
@@ -28,7 +28,7 @@ The `design-system/components/*.jsx` files are real, self-contained React compon
 2. `design-system/tokens/*.css`: every token, with hex values (summarized below).
 3. `specs/website.md`, then `specs/openwebui.md`, then `specs/mobile.md`.
 4. `specs/live-data-api.md`: the endpoint contract for the Hardware and Status pages and the in-app status.
-5. `specs/billing-stripe.md` and `specs/encryption.md`: the backend work these designs depend on.
+5. `specs/encryption.md`: the backend work these designs depend on.
 6. `specs/logo-motion.md`: the animated logo for the splash and loading screens.
 
 ## Design tokens (summary; source of truth is `design-system/tokens/`)
@@ -73,15 +73,6 @@ The `design-system/components/*.jsx` files are real, self-contained React compon
 
 Tints run at 10–12% alpha behind accent text.
 
-**Tiers** (badge treatment escalates in hue, fill and glyph)
-
-| Tier | Price | Color | Badge treatment | Glyph |
-| --- | --- | --- | --- | --- |
-| Casual | $10 | Graphite `#8A93A0` | Dashed outline | message-circle |
-| Chat | $25 | Quartz `#B4BCC8` | Solid outline | message-square |
-| Dev | $70 | Arc `#A08BFF` | Tint | terminal |
-| Founders | $150 for 12 months, then $15 for life | Aurum `#E6C27A` | Tint plus a double ring | gem |
-
 **Type**
 - **Geist** (UI), weights 400, 500 and 600.
 - **JetBrains Mono** (code, metrics, overlines), with tabular numerals.
@@ -118,15 +109,15 @@ Tints run at 10–12% alpha behind accent text.
 | 1 | Tokens and theme layer | OWUI fork (`static/custom.css` plus a Tailwind config extension); website | none |
 | 2 | Encrypted storage (chats, titles, files, embeddings) | OWUI backend | 1 |
 | 3 | Login with an encryption passphrase, key derivation, recovery kit | OWUI frontend | 2 |
-| 4 | Stripe subscriptions, webhooks, tier gating | OWUI backend plus website | none |
+| 4 | Invitations and per-member API keys | OWUI backend plus website | none |
 | 5 | Reskinned OWUI screens 01–06 | OWUI frontend | 1, 3, 4 |
-| 6 | Live data API (`/api/hardware/*`, `/api/status`, `/api/votes`, `/api/founders`) | Backend, alongside OWUI | 4 |
+| 6 | Live data API (`/api/hardware/nodes`, `/api/status`) | Backend, alongside OWUI | 4 |
 | 7 | Marketing website | New repo or OWUI static routes | 4, 6 |
 | 8 | Mobile app | OpenCode Mobile fork | 2, 3, 6 |
 
 ## Repositories
 - `CorpLynx/open-webui` (main): the web app fork. Splash is in `src/app.html`; static assets are in `static/static/`.
-- `CorpLynx/aaru` (main): infra scripts and `framework_ai_server_architecture-2.md`. Read it for the hardware and serving topology.
+- `CorpLynx/aaru` (main): infra scripts and `architecture.md`. Read it for the serving topology.
 - **License:** the Open WebUI branding clause allows a full rebrand at 50 or fewer end users in a rolling 30-day window. Aaru expects 2–10. The admin screen shows this count; keep it accurate.
 
 ## Files in this bundle
@@ -150,6 +141,6 @@ design-system/
   assets/                     logo SVGs, favicon, animated mark
 specs/
   website.md  openwebui.md  mobile.md  logo-motion.md
-  live-data-api.md  billing-stripe.md  encryption.md
+  live-data-api.md  encryption.md
 CLAUDE.md                     drop-in instructions for Claude Code
 ```

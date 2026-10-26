@@ -14,11 +14,11 @@ loadAaruDS("../../").then(NS => {
   return <div style={{ padding: 20, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <L>L0 · AMBIENT STATUS</L>
-      <AmbientStatus speed={48} engine="egpu" />
-      <AmbientStatus speed={11} engine="igpu" verb="Thinking" />
-      <AmbientStatus generating={false} speed={32} engine="egpu" />
+      <AmbientStatus speed={48} engine="boost" />
+      <AmbientStatus speed={11} engine="onboard" verb="Thinking" />
+      <AmbientStatus generating={false} speed={32} engine="boost" />
       <L>L1 · METRIC CHIPS</L>
-      <Row gap={4}><MetricChip kind="speed" value="48.2 tok/s" live /><MetricChip kind="speed" value="44.9 tok/s avg" /><MetricChip kind="engine" value="eGPU · RTX" /><MetricChip kind="context" percent={31} /><MetricChip kind="context" percent={86} /></Row>
+      <Row gap={4}><MetricChip kind="speed" value="48.2 tok/s" live /><MetricChip kind="speed" value="44.9 tok/s avg" /><MetricChip kind="engine" value="Boost" /><MetricChip kind="context" percent={31} /><MetricChip kind="context" percent={86} /></Row>
     </div>
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <L>CONTEXT BAR</L>

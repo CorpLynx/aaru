@@ -1,5 +1,5 @@
-function Sidebar({ chats, activeId, onSelect, onNew, onPlans, onLock, tier }) {
-  const { Button, HistoryItem, TierBadge, Kbd, IconButton, Logo } = window.DS;
+function Sidebar({ chats, activeId, onSelect, onNew, onLock }) {
+  const { Button, HistoryItem, Kbd, IconButton, Logo } = window.DS;
   const groups = [["TODAY", chats.filter(c => c.group === "today")], ["THIS WEEK", chats.filter(c => c.group === "week")]];
   return (
     <aside style={{ width: 264, flexShrink: 0, background: "var(--bg-chrome)", borderRight: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", padding: "16px 12px", gap: 16 }}>
@@ -18,12 +18,11 @@ function Sidebar({ chats, activeId, onSelect, onNew, onPlans, onLock, tier }) {
       </div>
       <div style={{ padding: 12, borderRadius: 8, border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", gap: 6 }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.04em", color: "var(--text-muted)" }}><span>SERVER</span><span style={{ color: "var(--aaru-cipher)" }}>● ONLINE</span></div>
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-secondary)" }}>iGPU idle · eGPU 62%</div>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-secondary)" }}>Onboard idle · Boost 62%</div>
       </div>
-      <div onClick={onPlans} style={{ display: "flex", alignItems: "center", gap: 8, padding: 4, borderRadius: 8, cursor: "pointer" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: 4, borderRadius: 8 }}>
         <div style={{ width: 28, height: 28, borderRadius: 999, background: "var(--aaru-ink-700)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 500 }}>MK</div>
         <span style={{ flex: 1, fontSize: 13 }}>Mara K.</span>
-        <TierBadge tier={tier} size="sm" />
       </div>
     </aside>
   );

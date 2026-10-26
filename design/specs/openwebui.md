@@ -30,8 +30,8 @@
    - Each row has an 11px Cipher lock glyph.
    - Rows are 7×10px padding with an 8px radius.
    - The active row is Ink 700.
-7. **Server card:** "● ONLINE" and iGPU/eGPU load, fed by `/api/status`.
-8. User row with a tier badge.
+7. **Server card:** "● ONLINE" and Onboard/Boost engine load, fed by `/api/status`.
+8. User row: avatar and name.
 
 ## Screens
 
@@ -61,7 +61,7 @@
 - Prose at 14/24.
 - **Citations:** an 18px Signal pill in mono 10px, showing the file name and §.
 - Action row: copy, edit, regenerate, thumbs up/down.
-- L1 metric chips at the end of the action row: `47.6 tok/s` and `eGPU`. These replace the stock info tooltip.
+- L1 metric chips at the end of the action row: `47.6 tok/s` and `Boost`. These replace the stock info tooltip.
 
 **While generating:** a pulsing 6px Ember dot with "Writing · Instant · Boost engine" (L0 words). The composer shows a 1px Ember scan line along its top and the send button becomes Stop.
 
@@ -78,9 +78,8 @@
   - an icon (zap or brain) and the name
   - a mono spec line: params, context, live tok/s, engine
   - a status dot (Fast, Slow or Down) from `/api/status`
-  - a tier gate badge, e.g. "Dev+" in Arc
-- Models the user's tier can't access show the badge and can't be selected. The server must enforce this too.
-- A hosted-later model appears dimmed with "ON THE VOTE".
+- Models a member's API key or account can't use are hidden. The gateway enforces this too.
+- A hosted-later model appears dimmed with "PLANNED".
 - Switching models mid-chat inserts a divider row: "SWITCHED TO DEEP · HEAVY DENSE 70B".
 
 ### 04 Vault (rename Knowledge; `workspace/Knowledge*`)
@@ -102,27 +101,26 @@
 - **Modal:** 820×600, 16px radius.
 - **Tabs:**
   - Stock, restyled: General, Interface, Personalization, Data controls, Account.
-  - New: **Encryption**, **Metrics**, **API keys**, **Membership**.
+  - New: **Encryption**, **Metrics**, **API keys**.
 - **Encryption tab:**
   - A Cipher status card: "Your data is sealed · N chats and N documents".
   - Key fingerprint, cipher, and an auto-lock select.
   - The unlocked devices list, with Revoke.
   - Download recovery kit, Change passphrase, and "Lock now" (Fault outline).
 - **Metrics tab:** the default disclosure level.
-  - L0, ambient words: the default for Casual and Chat.
-  - L1, chips: the default for Dev and Founders.
+  - L0, ambient words: the default.
+  - L1, chips: an opt-in for members who want numbers.
   - L2, inspector.
-- **Membership tab:** the current plan, the next payment, and a link to the Stripe portal (see `billing-stripe.md`).
 
 ### 06 Admin (`admin/Users.svelte` and new tabs)
-- **Tabs:** Users, **Hardware**, **Ledger**, **Status & incidents**, Models, Settings. The new tabs are the editors behind the website's members-only pages and the public Status page.
+- **Tabs:** Users, **Hardware**, **Status & incidents**, Models, Settings. The new tabs are the editors behind the website's members-only pages and the public Status page.
 - **Stat strip:**
   - Active users (30 days) against the 50 rebrand limit.
-  - MRR.
+  - Pending invitations.
   - Tokens (24 hours).
   - Sealed storage.
 - **Privacy notice:** "Admins see account and usage data only."
-- **Users table columns:** Member, Tier badge, Billing state (from Stripe webhooks: Active, Active · 4/12, Past due · day N), Tokens (30 days), Last active, Role.
+- **Users table columns:** Member, API keys, Tokens (30 days), Last active, Role.
 - **Remove admin chat viewing:** chats are stored as ciphertext, so the stock admin views of user chats should be removed.
 
 ## Not designed yet

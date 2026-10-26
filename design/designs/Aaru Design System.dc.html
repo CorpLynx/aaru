@@ -94,42 +94,6 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
     </sc-for>
   </div>
 
-  <h2 style="font-size:28px;line-height:36px;font-weight:600;letter-spacing:-0.015em;margin:0 0 8px">Tier mapping</h2>
-  <p style="font-size:15px;line-height:24px;color:#A6ADB8;margin:0 0 24px;max-width:640px">Hierarchy escalates on three axes so tiers read even in grayscale: hue (Graphite → Quartz → Arc → Aurum), fill (dashed → outline → tint → tint + double ring), and glyph.</p>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
-    <div style="border:1px dashed #2A3039;border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px dashed rgba(138,147,160,0.5);border-radius:4px;color:#8A93A0;font-size:12px;font-weight:500"><i class="icon-message-circle" style="font-size:13px"></i>Casual</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#A6ADB8">$10/mo</span>
-      </div>
-      <div><div style="font-size:16px;font-weight:500">Graphite</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8;margin-top:2px">#8A93A0 · --aaru-tier-casual</div></div>
-      <div style="font-size:13px;line-height:20px;color:#A6ADB8">Dashed outline, the lightest mark. Web chat with fast MoE models, 8K context. Metrics default to ambient level.</div>
-    </div>
-    <div style="border:1px solid #2A3039;border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(180,188,200,0.4);border-radius:4px;color:#B4BCC8;font-size:12px;font-weight:500"><i class="icon-message-square" style="font-size:13px"></i>Chat</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#A6ADB8">$25/mo</span>
-      </div>
-      <div><div style="font-size:16px;font-weight:500">Quartz</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8;margin-top:2px">#B4BCC8 · --aaru-tier-chat</div></div>
-      <div style="font-size:13px;line-height:20px;color:#A6ADB8">Outline badge only. Web + mobile chat, RAG vault. Metrics default to ambient level.</div>
-    </div>
-    <div style="border:1px solid rgba(160,139,255,0.35);border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(160,139,255,0.5);background:rgba(160,139,255,0.12);border-radius:4px;color:#A08BFF;font-size:12px;font-weight:500"><i class="icon-terminal" style="font-size:13px"></i>Dev</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#A6ADB8">$70/mo</span>
-      </div>
-      <div><div style="font-size:16px;font-weight:500">Arc</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8;margin-top:2px">#A08BFF · --aaru-tier-dev</div></div>
-      <div style="font-size:13px;line-height:20px;color:#A6ADB8">Tinted badge. Adds IDE extension, API keys, eGPU priority. Metrics default to chip level.</div>
-    </div>
-    <div style="border:1px solid rgba(230,194,122,0.45);box-shadow:0 0 0 3px #050607,0 0 0 4px rgba(230,194,122,0.25);border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(230,194,122,0.6);background:rgba(230,194,122,0.12);box-shadow:0 0 0 2px #0A0C0F,0 0 0 3px rgba(230,194,122,0.3);border-radius:4px;color:#E6C27A;font-size:12px;font-weight:500"><i class="icon-gem" style="font-size:13px"></i>Founders</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#A6ADB8">$150 → $15/mo</span>
-      </div>
-      <div><div style="font-size:16px;font-weight:500">Aurum</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8;margin-top:2px">#E6C27A · --aaru-tier-sponsor</div></div>
-      <div style="font-size:13px;line-height:20px;color:#A6ADB8">Tint + double ring, the only tier with a second outline. Shows hardware-fund progress and lifetime rate.</div>
-    </div>
-  </div>
 </section>
 
 <section id="type" style="padding:64px 0;border-bottom:1px solid #1E232A">
@@ -257,18 +221,18 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
 <section id="metrics" style="padding:64px 0;border-bottom:1px solid #1E232A">
   <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682;margin-bottom:16px">06 — PERFORMANCE METRICS</div>
   <h2 style="font-size:28px;line-height:36px;font-weight:600;letter-spacing:-0.015em;margin:0 0 8px">Three levels of disclosure</h2>
-  <p style="font-size:15px;line-height:24px;color:#A6ADB8;margin:0 0 32px;max-width:680px">Metrics sit behind progressive disclosure. Chat tier starts at L0, Dev at L1. Every level is one click or tap away from the next, and the user's choice persists.</p>
+  <p style="font-size:15px;line-height:24px;color:#A6ADB8;margin:0 0 32px;max-width:680px">Metrics sit behind progressive disclosure. Chat starts at L0, the IDE and API surfaces at L1. Every level is one click or tap away from the next, and the user's choice persists.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
     <div style="border:1px solid #1E232A;border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:16px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">L0 · AMBIENT</div>
       <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#A6ADB8">{{ pulse }}<span>Writing</span><span style="color:#474E59">·</span><span>Fast</span><span style="color:#474E59">·</span><span>Boost engine</span></div>
-      <div style="font-size:12px;line-height:18px;color:#6E7682">Words, not numbers. Speed maps to Steady (&lt;15 tok/s), Fast (15–40), Instant (&gt;40). Engine maps to Onboard (iGPU) or Boost (eGPU).</div>
+      <div style="font-size:12px;line-height:18px;color:#6E7682">Words, not numbers. Speed maps to Steady (&lt;15 tok/s), Fast (15–40), Instant (&gt;40). Engine maps to Onboard or Boost.</div>
     </div>
     <div style="border:1px solid #1E232A;border-radius:12px;padding:24px;background:#0A0C0F;display:flex;flex-direction:column;gap:16px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#6E7682">L1 · METRIC CHIPS</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px">
         <span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 6px;border-radius:2px;background:rgba(255,122,51,0.12);color:#FF7A33;font-family:'JetBrains Mono',monospace;font-size:11px;font-variant-numeric:tabular-nums"><i class="icon-zap" style="font-size:11px"></i>48.2 tok/s</span>
-        <span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 6px;border-radius:2px;background:#161A20;color:#A6ADB8;font-family:'JetBrains Mono',monospace;font-size:11px"><i class="icon-microchip" style="font-size:11px"></i>eGPU · RTX</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 6px;border-radius:2px;background:#161A20;color:#A6ADB8;font-family:'JetBrains Mono',monospace;font-size:11px"><i class="icon-microchip" style="font-size:11px"></i>Boost</span>
         <span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 6px;border-radius:2px;background:#161A20;color:#A6ADB8;font-family:'JetBrains Mono',monospace;font-size:11px"><span style="width:28px;height:4px;background:#2A3039;border-radius:1px;overflow:hidden;display:inline-block"><span style="display:block;width:31%;height:4px;background:#EDEFF2"></span></span>31%</span>
       </div>
       <div style="font-size:12px;line-height:18px;color:#6E7682">Mono, tabular numerals, 2px radius. Ember only while tokens stream; it settles to gray with the final average when done.</div>
@@ -278,7 +242,7 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:#1E232A;border-radius:8px;overflow:hidden">
         <div style="background:#000000;padding:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;letter-spacing:0.08em">THROUGHPUT</div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:500;margin-top:4px">48.2<span style="font-size:11px;color:#6E7682"> tok/s</span></div></div>
         <div style="background:#000000;padding:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;letter-spacing:0.08em">FIRST TOKEN</div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:500;margin-top:4px">312<span style="font-size:11px;color:#6E7682"> ms</span></div></div>
-        <div style="background:#000000;padding:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;letter-spacing:0.08em">ENGINE</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:6px">eGPU · RTX 4090</div></div>
+        <div style="background:#000000;padding:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;letter-spacing:0.08em">ENGINE</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:6px">Boost engine</div></div>
         <div style="background:#000000;padding:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;letter-spacing:0.08em">VRAM</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:6px">19.8 / 24 GB</div></div>
       </div>
       <div>
@@ -383,7 +347,7 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
         <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
           <div style="padding:12px;border-radius:8px;border:1px solid #1E232A;display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;letter-spacing:0.04em"><span>SERVER</span><span style="color:#3DDC97">● ONLINE</span></div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8">iGPU idle · eGPU 62%</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8">Onboard idle · Boost 62%</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;padding:4px">
             <div style="width:28px;height:28px;border-radius:999px;background:#1F242C;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500">MK</div>
@@ -459,7 +423,7 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
             <div style="color:#6E7682;font-size:12px;min-height:20px">Ask or type / for commands</div>
             <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#A6ADB8"><span style="height:20px;display:inline-flex;align-items:center;padding:0 4px;border-radius:2px;color:#A6ADB8"><i class="icon-at-sign" style="font-size:12px"></i></span><span style="height:20px;display:inline-flex;align-items:center;gap:2px;padding:0 6px;border-radius:2px;background:#101318">Quick<i class="icon-chevron-down" style="font-size:11px"></i></span><span style="margin-left:auto;width:24px;height:24px;border-radius:4px;background:#EDEFF2;color:#050607;display:flex;align-items:center;justify-content:center"><i class="icon-arrow-up" style="font-size:13px"></i></span></div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;padding:0 4px"><span style="color:#A6ADB8">51 tok/s</span>·<span>eGPU</span>·<span>12% ctx</span><span style="margin-left:auto;color:#A08BFF">DEV</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;padding:0 4px"><span style="color:#A6ADB8">51 tok/s</span>·<span>Boost</span>·<span>12% ctx</span><span style="margin-left:auto;color:#A08BFF">DEV</span></div>
         </div>
       </div>
     </div>
@@ -490,20 +454,15 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
         <div style="width:300px;height:620px;border-radius:40px;border:1px solid #2A3039;background:#000000;overflow:hidden;display:flex;flex-direction:column">
           <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:13px;font-weight:600"><span>9:41</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A6ADB8">●●●</span></div>
           <div style="padding:8px 20px 16px;display:flex;flex-direction:column;gap:4px"><span style="font-size:28px;font-weight:600;letter-spacing:-0.02em">Account</span></div>
-          <div style="margin:0 16px;padding:16px;border-radius:16px;background:#0A0C0F;border:1px solid rgba(230,194,122,0.45);box-shadow:0 0 0 3px #000000,0 0 0 4px rgba(230,194,122,0.25);display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;align-items:center;justify-content:space-between"><span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid rgba(230,194,122,0.6);background:rgba(230,194,122,0.12);border-radius:4px;color:#E6C27A;font-size:12px;font-weight:500"><i class="icon-gem" style="font-size:12px"></i>Founders</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px">$150/mo</span></div>
-            <div style="font-size:13px;line-height:20px;color:#A6ADB8">Your rate drops to <span style="color:#EDEFF2">$15/mo for life</span> once the hardware fund is complete.</div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;margin-bottom:6px"><span>HARDWARE FUND</span><span style="color:#E6C27A">68%</span></div>
-              <div style="height:6px;border-radius:1px;background:#1F242C;overflow:hidden"><div style="width:68%;height:6px;background:#E6C27A"></div></div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;margin-top:6px">sample data · 4 of 6 months paid</div>
-            </div>
+          <div style="margin:0 16px;padding:16px;border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;display:flex;align-items:center;gap:12px">
+            <span style="width:40px;height:40px;border-radius:999px;background:#1F242C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500">MK</span>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:500">Mara K.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">MEMBER SINCE OCT 2026</span></div>
           </div>
           <div style="margin:24px 16px 0;border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;overflow:hidden">
             <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-key-round" style="font-size:18px;color:#3DDC97"></i><span style="flex:1;font-size:15px">Encryption key</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
             <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-library" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">Vault</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E7682">5 docs</span></div>
             <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-server" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">Server status</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#3DDC97">Online</span></div>
-            <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px"><i class="icon-credit-card" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">Billing</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
+            <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px"><i class="icon-key" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">API keys</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
           </div>
         </div>
       </div>
@@ -525,22 +484,12 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
   --text-primary:     <span style="color:#EDEFF2">#EDEFF2</span>;
   --state-generating: <span style="color:#FF7A33">#FF7A33</span>;
   --state-secure:     <span style="color:#3DDC97">#3DDC97</span>;
-  --aaru-tier-casual:  <span style="color:#8A93A0">#8A93A0</span>;
-  --aaru-tier-chat:    <span style="color:#B4BCC8">#B4BCC8</span>;
-  --aaru-tier-dev:     <span style="color:#A08BFF">#A08BFF</span>;
-  --aaru-tier-sponsor: <span style="color:#E6C27A">#E6C27A</span>;
 }</pre>
     <pre style="margin:0;padding:24px;border-radius:12px;background:#000000;border:1px solid #1E232A;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:20px;color:#A6ADB8;overflow-x:auto"><span style="color:#6E7682">// tailwind.preset.js (excerpt)</span>
 colors: {
   ink: { 950: 'var(--aaru-ink-950)', ... },
   ember:  'var(--aaru-ember)',
   cipher: 'var(--aaru-cipher)',
-  tier: {
-    casual:  'var(--aaru-tier-casual)',
-    chat:    'var(--aaru-tier-chat)',
-    dev:     'var(--aaru-tier-dev)',
-    sponsor: 'var(--aaru-tier-sponsor)',
-  },
 },
 fontFamily: {
   sans: ['Geist', ...],
@@ -568,12 +517,12 @@ class Component extends DCLogic {
       moeStyle: seg(m === 'moe'), denseStyle: seg(m === 'dense'),
       setMoe: () => this.setState({ model: 'moe' }),
       setDense: () => this.setState({ model: 'dense' }),
-      modelNote: m === 'moe' ? 'Quick routes each token through a few experts. Best for chat, drafts and code completion. Typically runs on the eGPU at 40+ tok/s.' : 'Deep runs every parameter on every token. Slower, more thorough reasoning for long documents and hard problems. Typically 8–15 tok/s.',
+      modelNote: m === 'moe' ? 'Quick routes each token through a few experts. Best for chat, drafts and code completion. Typically runs on the Boost engine at 40+ tok/s.' : 'Deep runs every parameter on every token. Slower, more thorough reasoning for long documents and hard problems. Typically 8–15 tok/s.',
       principles: [
-        { icon: 'icon-server', title: 'Hardware-honest', body: 'Always show where compute runs. iGPU and eGPU are real places, named plainly.' },
+        { icon: 'icon-server', title: 'Hardware-honest', body: 'Always show where compute runs. Onboard and Boost engines are real places, named plainly.' },
         { icon: 'icon-lock', title: 'Sealed by default', body: 'Encryption is the resting state, shown with one quiet, consistent seal.' },
         { icon: 'icon-gauge', title: 'Dense, not loud', body: 'Every metric is available; none compete with the conversation. Mono carries data.' },
-        { icon: 'icon-users', title: 'Owned together', body: 'Tiers are memberships, not upsells. Founders are recognized, not gated.' },
+        { icon: 'icon-users', title: 'Invite only', body: 'Every member is invited and every member gets the same product. No upsells.' },
       ],
       base: [
         { name: 'Void', hex: '#000000', token: '--aaru-void', use: 'OLED mobile, code wells' },
@@ -607,7 +556,7 @@ class Component extends DCLogic {
         { sample: 'Two of the four contracts allow termination without cause.', family: 'Geist', size: '15px', lh: '24px', weight: 400, track: '0', transform: 'none', token: '--text-body', spec: '15/24 · 400 (mobile 16/26)' },
         { sample: 'Encrypted before it reaches the database.', family: 'Geist', size: '13px', lh: '20px', weight: 400, track: '0', transform: 'none', token: '--text-body-sm', spec: '13/20 · 400 (IDE body)' },
         { sample: 'let ctx = engine.load("qwen3-235b-a22b")?;', family: "'JetBrains Mono'", size: '13px', lh: '20px', weight: 400, track: '0', transform: 'none', token: '--text-code', spec: '13/20 · 400' },
-        { sample: '48.2 tok/s · eGPU · 39.7k / 128k', family: "'JetBrains Mono'", size: '12px', lh: '16px', weight: 500, track: '0', transform: 'none', token: '--text-metric', spec: '12/16 · 500 · tabular' },
+        { sample: '48.2 tok/s · Boost · 39.7k / 128k', family: "'JetBrains Mono'", size: '12px', lh: '16px', weight: 500, track: '0', transform: 'none', token: '--text-metric', spec: '12/16 · 500 · tabular' },
         { sample: 'Engine · context · sealed', family: "'JetBrains Mono'", size: '11px', lh: '16px', weight: 500, track: '0.08em', transform: 'uppercase', token: '--text-overline', spec: '11/16 · 500 · +8% · caps' },
       ],
       spacing: [['--space-0-5', 4], ['--space-1', 8], ['--space-1-5', 12], ['--space-2', 16], ['--space-3', 24], ['--space-4', 32], ['--space-5', 40], ['--space-6', 48], ['--space-8', 64], ['--space-10', 80], ['--space-12', 96]]

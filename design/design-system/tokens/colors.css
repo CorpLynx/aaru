@@ -23,15 +23,6 @@
   --aaru-caution: #F2C14E;   /* warnings, context near limit */
   --aaru-fault: #FF5468;     /* errors, destructive */
 
-  /* Tiers — hierarchy Graphite < Quartz < Arc < Aurum */
-  --aaru-tier-casual: #8A93A0;
-  --aaru-tier-casual-tint: rgba(138,147,160,0.06);
-  --aaru-tier-chat: #B4BCC8;
-  --aaru-tier-chat-tint: rgba(180,188,200,0.08);
-  --aaru-tier-dev: #A08BFF;
-  --aaru-tier-dev-tint: rgba(160,139,255,0.12);
-  --aaru-tier-sponsor: #E6C27A;
-  --aaru-tier-sponsor-tint: rgba(230,194,122,0.12);
 
   /* Semantic aliases */
   --bg-app: var(--aaru-ink-950);
