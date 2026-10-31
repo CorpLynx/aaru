@@ -1,0 +1,9 @@
+# Accepted Trivy findings, for the image scan (image-scan.yml) and the
+# misconfiguration scan (ci.yml). Each entry needs a reason and an expiry;
+# Trivy reports the finding again once the date passes.
+
+# filelock CVE-2026-112940 in the aaru-web image: fixed only in filelock 4.2.1,
+# but every unstructured release requires filelock<4. Exploiting it needs local
+# write access to the lock directory; the container runs read-only with no
+# other users. Same exception as CorpLynx/aaru-web's .trivyignore.
+CVE-2026-112940 exp:2027-01-31
