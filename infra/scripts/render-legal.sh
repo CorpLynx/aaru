@@ -39,7 +39,7 @@ for key, value in conf.items():
 if not conf.get("SERVICE_URL", "").startswith("https://"):
     sys.exit("ERROR: SERVICE_URL must be an https:// URL")
 
-pages = [("terms.html", "Terms"), ("acceptable-use.html", "Acceptable Use"),
+pages = [("guide.html", "Guide"), ("terms.html", "Terms"), ("acceptable-use.html", "Acceptable Use"),
          ("privacy.html", "Privacy"), ("notices.html", "Notices"), ("security.html", "Security")]
 reviewed = conf.get("REVIEWED", "no").lower() == "yes"
 # RFC 9116: Expires is required and should be less than a year away.

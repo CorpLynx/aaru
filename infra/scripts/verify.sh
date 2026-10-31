@@ -371,7 +371,7 @@ if expect_running openwebui; then
     done
 
     # Legal pages: served without sign-in, fully rendered, and marked draft until reviewed.
-    for page in terms acceptable-use privacy notices security; do
+    for page in guide terms acceptable-use privacy notices security; do
         code="$(http "legal-${page}" GET "${WEBAPP}/legal/${page}.html")"
         if [ "${code}" = "200" ] && grep -q '<h1>' "${WORK_DIR}/legal-${page}.body" && ! grep -q '{{' "${WORK_DIR}/legal-${page}.body"; then
             pass "legal page /legal/${page}.html served"
@@ -540,6 +540,12 @@ fi
 section "Operations"
 systemctl --user is-enabled aaru-backup.timer >/dev/null 2>&1 \
     && pass "backup timer enabled" || warn "aaru-backup.timer not enabled"
+drill_file="${XDG_STATE_HOME:-${HOME}/.local/state}/aaru/restore-drill"
+if grep -q '^result=passed' "${drill_file}" 2>/dev/null; then
+    pass "restore drill passed ($(sed -n 's/^date=//p' "${drill_file}"))"
+else
+    warn "no passing restore drill recorded (infra/scripts/restore-drill.sh; required before onboarding, spec §10)"
+fi
 podman secret exists aaru-backup-aws 2>/dev/null && [ -f "${HOME}/.config/aaru/backup.env" ] \
     && pass "backup credentials installed" || warn "backup credentials missing (infra/scripts/set-backup-credentials.sh)"
 case "$(systemctl --user show aaru-backup.service --property=Result --value 2>/dev/null)" in

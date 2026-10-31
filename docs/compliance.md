@@ -51,6 +51,6 @@ still required before launch.
 - [ ] `legal/legal.conf` filled in and pages rendered; `verify.sh` passes the legal and header checks.
 - [ ] Every member has accepted the current terms, recorded with `member.sh add --terms-accepted`.
 - [ ] Contacts for privacy, security and incidents are monitored mailboxes.
-- [ ] A restore drill has passed (spec §10), so the backup retention stated in the Privacy Notice is real.
+- [ ] A restore drill has passed (`infra/scripts/restore-drill.sh`, spec §10), so the backup retention stated in the Privacy Notice is real.
 - [ ] If any member is in the EU or UK: counsel has confirmed the international transfer basis and whether a representative is needed.
 - [ ] A reminder to re-render before `security.txt` expires (about 11 months).
