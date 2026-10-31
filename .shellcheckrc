@@ -1,0 +1,4 @@
+# Resolve "source" paths relative to the script that sources them, wherever
+# shellcheck runs from (CI, hooks, editors).
+source-path=SCRIPTDIR
+external-sources=true

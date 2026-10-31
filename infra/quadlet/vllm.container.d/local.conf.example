@@ -1,0 +1,13 @@
+# Copy to local.conf (gitignored) and size it for the test GPU. setup.sh
+# installs it next to the unit as vllm.container.d/local.conf.
+#
+# The placeholders are not valid values on purpose: an unedited copy fails
+# when Quadlet generates the unit instead of starting with a wrong size.
+#
+# Pick a model whose weights leave room for KV cache on the card; a 4-bit
+# (AWQ/GPTQ) build of a small instruct model is the usual fit. Stage it with:
+#   infra/scripts/fetch-model.sh <hf-repo> <revision> <model-dir>
+
+[Container]
+Memory=<memory limit, e.g. 16g>
+Exec=/models/<model-dir> --served-model-name <served-model-name> --host 0.0.0.0 --port 8000 --max-model-len <context length> --gpu-memory-utilization <fraction, e.g. 0.85>

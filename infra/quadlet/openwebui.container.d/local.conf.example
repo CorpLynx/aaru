@@ -1,0 +1,11 @@
+# Copy to local.conf (gitignored) and set the URL members use. setup.sh installs
+# it next to the unit as openwebui.container.d/local.conf.
+#
+# Until Cloudflare is live that is the Tailscale name; afterwards the
+# chat.<domain> hostname. Without this file, CORS stays open to any origin and
+# verify.sh fails.
+
+[Container]
+Environment=WEBUI_URL=https://aaru.<tailnet>.ts.net
+# Semicolon-separated if more than one origin is live during the switch-over.
+Environment=CORS_ALLOW_ORIGIN=https://aaru.<tailnet>.ts.net

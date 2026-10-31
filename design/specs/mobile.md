@@ -3,7 +3,7 @@
 **References:**
 - `designs/Aaru Mobile App.dc.html`: 12 frames, 6 screens each for iOS and Android.
 - `designs/Aaru Mobile Screen.dc.html`: one screen at a time, chosen with the props `screen` and `platform`.
-- `design-system/ui_kits/mobile/`: a click-through kit with a history drawer, a seal bottom sheet and a billing sub-screen.
+- `design-system/ui_kits/mobile/`: a click-through kit with a history drawer, a seal bottom sheet and an account screen.
 
 **Frame:** 390×844 with a true black (`#000`) background for OLED. All touch targets are at least 44px. Body text is 16/26.
 
@@ -54,18 +54,14 @@
      - Encrypting rows show a 2px progress bar.
      - Files in the current chat get a Signal border and icon.
    - Footer: "6 DOCS · 18.4 MB SEALED".
-5. **Account and tier**
-   - **Founders card:**
-     - Aurum double ring, avatar, name and tier badge, and the price.
-     - A FIRST-YEAR PAYMENTS 4/12 bar.
-     - The line "Drops to $15/mo after June 2027 · Vote #8 open".
+5. **Account**
+   - **Member card:** avatar, name and "MEMBER SINCE" date.
    - **SECURITY group:** encryption key fingerprint, Devices (3), biometric switch.
-   - **MEMBERSHIP group:** Billing (next payment date), Server status (current state in color), API keys.
-   - **Billing sub-screen:** in the kit's `AccountScreen.jsx`. It shows the plan card, card on file, invoices, and "Manage in Stripe", which opens the hosted portal in an in-app browser.
+   - **MEMBERSHIP group:** Server status (current state in color), API keys.
 6. **Server status**
    - A Caution incident banner when the status isn't operational.
    - Model rows with tok/s and an Up, Slow or Down dot.
-   - A 2×2 grid: your queue wait (with tier priority) and GPU memory (with your reservation).
+   - A 2×2 grid: queue wait for the Quick model and GPU memory in use.
    - A sparkline card for each node, with load % and °C.
    - Data comes from `/api/status`, plus `/api/hardware/nodes` for signed-in members.
 

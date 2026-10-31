@@ -5,4 +5,4 @@ Small status label with tint + 1px border.
 <Badge tone="caution" icon="triangle-alert">Context 84%</Badge>
 ```
 
-For encryption use `SealBadge`; for membership use `TierBadge`.
+For encryption use `SealBadge`.

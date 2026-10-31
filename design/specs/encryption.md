@@ -4,7 +4,7 @@ The designs promise the following. Engineering must make each statement true, or
 
 ## Promises made in the UI copy
 - "Chats and uploaded documents are encrypted with a key derived from your passphrase. The database and file store only ever hold ciphertext."
-- "The admin can't read them." Admins see email, tier, usage counts and storage size only.
+- "The admin can't read them." Admins see email, usage counts and storage size only.
 - Chat titles and file names are encrypted too.
 - "Your passphrase never leaves the browser." The key is derived locally.
 - "The honest limit": prompts are plaintext in GPU memory while a request runs, and are never written to disk unencrypted.

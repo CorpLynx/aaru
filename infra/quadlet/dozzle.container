@@ -4,12 +4,15 @@ After=network-online.target
 Wants=network-online.target
 
 [Container]
-Image=docker.io/amir20/dozzle:latest
+# Pinned by digest to v11.3.4; never use a floating tag (see litellm.container).
+Image=docker.io/amir20/dozzle@sha256:8796ae7e1ecbe011482319cb7040e69aae91a0632b87bbe24b3f643e7455d94b
 ContainerName=dozzle
 Network=aaru-admin.network
 PublishPort=127.0.0.1:8088:8080
 Volume=/run/user/%U/podman/podman.sock:/var/run/docker.sock:ro,z
 NoNewPrivileges=true
+DropCapability=ALL
+ReadOnly=true
 Memory=128m
 
 [Service]

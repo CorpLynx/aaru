@@ -1,5 +1,5 @@
-function IdeSidebar({ tier }) {
-  const { IconButton, MessageBubble, Composer, HistoryItem, TierBadge, SealBadge, Logo } = window.DS;
+function IdeSidebar() {
+  const { IconButton, MessageBubble, Composer, HistoryItem, SealBadge, Logo } = window.DS;
   const [view, setView] = React.useState("chat");
   const [draft, setDraft] = React.useState("");
   const [msgs, setMsgs] = React.useState([{ role: "user", text: "Why does this fail to compile?", file: "billing.rs:42–88" }, { role: "assistant", text: "`invoice` is moved into `send()` on line 51, then borrowed again on 54. Pass a reference:", code: true }]);
@@ -50,8 +50,7 @@ function IdeSidebar({ tier }) {
       <div style={{ padding: 8, borderTop: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", gap: 6 }}>
         <Composer density="ide" model="Quick" value={draft} onChange={setDraft} onSend={send} generating={gen} speed={51} onStop={() => setGen(false)} />
         <div style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-muted)", padding: "0 4px" }}>
-          <span style={{ color: gen ? "var(--aaru-ember)" : "var(--text-secondary)" }}>51 tok/s</span>·<span>eGPU</span>·<span>12% ctx</span>
-          <span style={{ marginLeft: "auto" }}><TierBadge tier={tier} compact /></span>
+          <span style={{ color: gen ? "var(--aaru-ember)" : "var(--text-secondary)" }}>51 tok/s</span>·<span>Boost</span>·<span>12% ctx</span>
         </div>
       </div>
     </div>

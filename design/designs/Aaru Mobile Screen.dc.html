@@ -144,17 +144,9 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
   <sc-if value="{{ isAccount }}" hint-placeholder-val="{{ false }}">
     <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
       <div style="padding:8px 20px 16px;font-size:{{ titleSize }};font-weight:600;letter-spacing:-0.02em">Account</div>
-      <div style="margin:0 16px;padding:16px;border-radius:18px;background:#0A0C0F;border:1px solid rgba(230,194,122,0.45);box-shadow:0 0 0 3px #000,0 0 0 4px rgba(230,194,122,0.25);display:flex;flex-direction:column;gap:14px">
-        <div style="display:flex;align-items:center;gap:12px">
-          <span style="width:44px;height:44px;border-radius:999px;background:#1F242C;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">MK</span>
-          <div style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font-size:16px;font-weight:500">Mara K.</span><span style="align-self:flex-start;display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 7px;border:1px solid rgba(230,194,122,0.6);background:rgba(230,194,122,0.12);border-radius:4px;color:#E6C27A;font-size:11px;font-weight:500"><i class="icon-gem" style="font-size:11px"></i>Founders</span></div>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:14px">$150/mo</span>
-        </div>
-        <div>
-          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E7682;margin-bottom:6px"><span>FIRST-YEAR PAYMENTS</span><span style="color:#E6C27A">4 / 12</span></div>
-          <div style="height:6px;border-radius:1px;background:#1F242C;overflow:hidden"><div style="width:33%;height:6px;background:#E6C27A"></div></div>
-          <div style="font-size:12px;color:#6E7682;margin-top:6px">Drops to $15/mo after June 2027 · Vote #8 open</div>
-        </div>
+      <div style="margin:0 16px;padding:16px;border-radius:18px;background:#0A0C0F;border:1px solid #1E232A;display:flex;align-items:center;gap:12px">
+        <span style="width:44px;height:44px;border-radius:999px;background:#1F242C;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">MK</span>
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font-size:16px;font-weight:500">Mara K.</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">MEMBER SINCE OCT 2026</span></div>
       </div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682;padding:24px 20px 8px">SECURITY</div>
       <div style="margin:0 16px;border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;overflow:hidden">
@@ -164,7 +156,6 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
       </div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682;padding:24px 20px 8px">MEMBERSHIP</div>
       <div style="margin:0 16px;border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;overflow:hidden">
-        <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-credit-card" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">Billing</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E7682">Nov 1</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
         <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-activity" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">Server status</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F2C14E">Degraded</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
         <div style="min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px"><i class="icon-key-square" style="font-size:18px;color:#A6ADB8"></i><span style="flex:1;font-size:15px">API keys</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E7682">2 active</span><i class="icon-chevron-right" style="font-size:16px;color:#6E7682"></i></div>
       </div>
@@ -179,15 +170,15 @@ a{color:#6FA8FF;text-decoration:none}a:hover{color:#EDEFF2}
     <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px">
       <div style="padding:14px 16px;border-radius:14px;background:rgba(242,193,78,0.06);border:1px solid rgba(242,193,78,0.35);display:flex;gap:12px">
         <i class="icon-triangle-alert" style="font-size:18px;color:#F2C14E;margin-top:1px"></i>
-        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:500">Llama 70B slowed</span><span style="font-size:13px;line-height:19px;color:#A6ADB8">eGPU A hit its thermal limit. Deep replies are slower but completing. Updated 13:10.</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:500">Llama 70B slowed</span><span style="font-size:13px;line-height:19px;color:#A6ADB8">Boost A hit its thermal limit. Deep replies are slower but completing. Updated 13:10.</span></div>
       </div>
       <div style="border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;overflow:hidden">
         <div style="min-height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #1E232A"><i class="icon-zap" style="font-size:18px;color:#A6ADB8"></i><div style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px">Nemotron 3.5</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">Quick · 47.8 tok/s</span></div><span style="display:flex;align-items:center;gap:6px;font-size:13px;color:#3DDC97"><span style="width:7px;height:7px;border-radius:999px;background:#3DDC97"></span>Up</span></div>
         <div style="min-height:56px;display:flex;align-items:center;gap:12px;padding:0 16px"><i class="icon-brain" style="font-size:18px;color:#A6ADB8"></i><div style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px">Llama 70B</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E7682">Deep · 9.1 tok/s</span></div><span style="display:flex;align-items:center;gap:6px;font-size:13px;color:#F2C14E"><span style="width:7px;height:7px;border-radius:999px;background:#F2C14E"></span>Slow</span></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1E232A;border-radius:16px;overflow:hidden;border:1px solid #1E232A">
-        <div style="background:#000;padding:14px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">YOUR QUEUE</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;margin-top:4px">0.1<span style="font-size:12px;color:#6E7682"> s</span></div><div style="font-size:11px;color:#E6C27A;margin-top:2px">Founders priority</div></div>
-        <div style="background:#000;padding:14px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">GPU MEMORY</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;margin-top:4px">82<span style="font-size:12px;color:#6E7682">%</span></div><div style="font-size:11px;color:#6E7682;margin-top:2px">16 GB reserved for you</div></div>
+        <div style="background:#000;padding:14px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">YOUR QUEUE</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;margin-top:4px">0.1<span style="font-size:12px;color:#6E7682"> s</span></div><div style="font-size:11px;color:#6E7682;margin-top:2px">Quick model</div></div>
+        <div style="background:#000;padding:14px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#6E7682">GPU MEMORY</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;margin-top:4px">82<span style="font-size:12px;color:#6E7682">%</span></div><div style="font-size:11px;color:#6E7682;margin-top:2px">All engines</div></div>
       </div>
       <sc-for list="{{ statusNodes }}" as="n" hint-placeholder-count="2">
         <div style="border-radius:16px;background:#0A0C0F;border:1px solid #1E232A;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
@@ -241,7 +232,7 @@ class Component extends DCLogic {
       titleSize: ios ? '32px' : '26px',
       titleText: ios ? 'center' : 'left',
       titlePad: ios ? '48px' : '0px',
-      statusNodes: [['Node 01 · iGPU', 'icon-server', 1, 48, 22, '58°C', false], ['eGPU A', 'icon-microchip', 2.4, 78, 14, '83°C', true]].map(([name, icon, seed, base, amp, temp, hot]) => {
+      statusNodes: [['Node 01 · Onboard', 'icon-server', 1, 48, 22, '58°C', false], ['Boost A', 'icon-microchip', 2.4, 78, 14, '83°C', true]].map(([name, icon, seed, base, amp, temp, hot]) => {
         const pts = Array.from({ length: 48 }, (_, i) => { const v = Math.max(3, Math.min(97, base + amp * Math.sin(i / 4 + seed) + amp * 0.5 * Math.sin(i / 1.7 + seed * 3))); return (i * 240 / 47).toFixed(1) + ',' + (38 - v * 0.36).toFixed(1); });
         return { name, icon, temp, load: base + '%', color: hot ? '#F2C14E' : '#EDEFF2', points: pts.join(' ') };
       }),

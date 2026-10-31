@@ -1,0 +1,11 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+# Credentials go in the environment (TAILSCALE_API_KEY or an OAuth client), not here.
+
+admin_logins = ["<admin@example.com>"]
+
+# If this tailnet already has a policy, copy its groups, tagOwners and acls into
+# the extra_* variables first, then set overwrite_policy = true.
+# overwrite_policy = true
+# extra_acls = [
+#   { action = "accept", src = ["autogroup:member"], dst = ["autogroup:self:*"] },
+# ]

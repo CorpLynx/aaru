@@ -1,0 +1,32 @@
+# LiteLLM Proxy Configuration
+# See: https://docs.litellm.ai/docs/proxy/configs
+#
+# Model aliases are stable names exposed to clients (`fast`, later `reasoning`).
+# Each member's allowed aliases and quotas live on their LiteLLM virtual key.
+#
+# Which model backs each alias depends on the host, so the model list lives in
+# models.yaml next to this file. It is gitignored; copy models.yaml.example.
+include:
+  - models.yaml
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  # The web app forwards the signed-in member (ENABLE_FORWARD_USER_INFO_HEADERS).
+  # Recording the email as the end user lines web usage up with the member's own
+  # API key, whose user_id is the same address (infra/scripts/member.sh).
+  # Only the address is stored, in spend logs; prompts are not.
+  user_header_name: X-OpenWebUI-User-Email
+  # Usage records (spend logs) never hold prompt or response text, and are
+  # deleted after 90 days, as the Privacy Notice states (legal/privacy.html).
+  store_prompts_in_spend_logs: false
+  maximum_spend_logs_retention_period: "90d"
+
+litellm_settings:
+  # Drop unsupported parameters for local models
+  drop_params: true
+  # Do not log prompts or completions
+  set_verbose: false
+
+router_settings:
+  routing_strategy: simple-shuffle

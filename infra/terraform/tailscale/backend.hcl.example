@@ -1,0 +1,8 @@
+# Copy to backend.hcl and fill in. backend.hcl is gitignored.
+# Values come from the bootstrap stack's `backend_config` output.
+
+bucket       = "<state_bucket_prefix>-<aws-account-id>"
+key          = "aaru/tailscale/terraform.tfstate"
+region       = "us-east-1"
+encrypt      = true
+use_lockfile = true

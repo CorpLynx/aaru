@@ -9,7 +9,6 @@ module.exports = {
         fg: { 1: 'var(--aaru-fg-1)', 2: 'var(--aaru-fg-2)', 3: 'var(--aaru-fg-3)', 4: 'var(--aaru-fg-4)' },
         ember: 'var(--aaru-ember)', cipher: 'var(--aaru-cipher)', signal: 'var(--aaru-signal)',
         caution: 'var(--aaru-caution)', fault: 'var(--aaru-fault)',
-        tier: { casual: 'var(--aaru-tier-casual)', chat: 'var(--aaru-tier-chat)', dev: 'var(--aaru-tier-dev)', sponsor: 'var(--aaru-tier-sponsor)' },
       },
       fontFamily: { sans: ['Geist', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
       spacing: { 0.5: '4px', 1: '8px', 1.5: '12px', 2: '16px', 3: '24px', 4: '32px', 5: '40px', 6: '48px', 8: '64px', 10: '80px', 12: '96px' },

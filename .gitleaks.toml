@@ -1,0 +1,38 @@
+# Secret scanning for this repository: CI (.github/workflows/ci.yml) scans the
+# whole history and the tree; the git hooks (.githooks/) scan staged changes
+# before a commit and outgoing commits before a push.
+#
+# gitleaks's built-in rules cover cloud, Git host and many vendor credentials.
+# The rules below add credentials specific to this deployment.
+
+title = "Aaru"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "tailscale-key"
+description = "Tailscale auth, OAuth client or API key"
+regex = '''\btskey-(?:auth|client|api)-[A-Za-z0-9]{6,}-[A-Za-z0-9]{10,}'''
+keywords = ["tskey-"]
+
+[[rules]]
+id = "openai-style-key"
+description = "LiteLLM master or virtual key, llama-swap key, or another sk- style API key"
+regex = '''\bsk-[A-Za-z0-9_\-]{24,}'''
+entropy = 3.5
+keywords = ["sk-"]
+
+[[rules]]
+id = "age-secret-key"
+description = "age identity (backup encryption private key)"
+regex = '''AGE-SECRET-KEY-1[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{58}'''
+keywords = ["AGE-SECRET-KEY-1"]
+
+# Placeholders in documentation and setup output, never real values.
+[[allowlists]]
+description = "Documented placeholders"
+regexes = [
+  '''sk-OPENWEBUI_VIRTUAL_KEY''',
+  '''YOUR_CLOUDFLARE_TUNNEL_TOKEN''',
+]

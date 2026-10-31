@@ -7,7 +7,7 @@ function SealSheet({ onClose }) {
         <SealPopover style={{ width: "100%", background: "transparent", boxShadow: "none", padding: 0 }} />
         <div style={{ height: 1, background: "var(--border-subtle)" }} />
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.08em", color: "var(--text-muted)" }}>THIS REPLY</div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}><MetricChip kind="speed" value="44.1 tok/s" /><MetricChip kind="engine" value="eGPU · RTX" /><MetricChip kind="context" percent={22} /></div>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}><MetricChip kind="speed" value="44.1 tok/s" /><MetricChip kind="engine" value="Boost" /><MetricChip kind="context" percent={22} /></div>
       </div>
     </div>
   );

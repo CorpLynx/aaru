@@ -27,7 +27,9 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 WEB_DIR="${AARU_WEB_DIR:-${REPO_ROOT}/web}"
 WEB_REPO="${AARU_WEB_REPO:-CorpLynx/aaru-web}"
 WORKFLOW="aaru-image.yaml"
-QUADLET="${REPO_ROOT}/infra/quadlet/openwebui.container"
+# What the pin step rewrites: the KEY= line in PIN_FILE (build-anubis-image.sh overrides both).
+PIN_FILE="${AARU_IMAGE_PIN_FILE:-${REPO_ROOT}/infra/quadlet/openwebui.container}"
+PIN_KEY="${AARU_IMAGE_PIN_KEY:-Image}"
 PIN=true
 
 for arg in "$@"; do
@@ -44,13 +46,13 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "=== Aaru Web App Image Build ==="
+echo "=== Aaru Image Build (${WEB_REPO}) ==="
 
 # --- Preflight checks ---
 command -v gh >/dev/null 2>&1 || { echo "ERROR: gh CLI not found"; exit 1; }
 command -v git >/dev/null 2>&1 || { echo "ERROR: git not found"; exit 1; }
 gh auth status >/dev/null 2>&1 || { echo "ERROR: gh is not authenticated (run: gh auth login)"; exit 1; }
-[ -d "${WEB_DIR}/.git" ] || [ -f "${WEB_DIR}/.git" ] || { echo "ERROR: ${WEB_DIR} is not a checked-out submodule"; exit 1; }
+[ -d "${WEB_DIR}/.git" ] || [ -f "${WEB_DIR}/.git" ] || { echo "ERROR: ${WEB_DIR} is not a git clone"; exit 1; }
 
 SHA="$(git -C "${WEB_DIR}" rev-parse HEAD)"
 SHORT="${SHA:0:12}"
@@ -124,11 +126,11 @@ echo "  Image: ${IMAGE_REF}"
 
 # --- Step 4: Pin the Quadlet unit ---
 if [ "${PIN}" = true ]; then
-    echo "[4/4] Pinning ${QUADLET#"${REPO_ROOT}"/}..."
-    grep -q '^Image=' "${QUADLET}" || { echo "ERROR: no Image= line in ${QUADLET}"; exit 1; }
-    sed -i.bak "s|^Image=.*|Image=${IMAGE_REF}|" "${QUADLET}" && rm -f "${QUADLET}.bak"
+    echo "[4/4] Pinning ${PIN_FILE#"${REPO_ROOT}"/}..."
+    grep -q "^${PIN_KEY}=" "${PIN_FILE}" || { echo "ERROR: no ${PIN_KEY}= line in ${PIN_FILE}"; exit 1; }
+    sed -i.bak "s|^${PIN_KEY}=.*|${PIN_KEY}=${IMAGE_REF}|" "${PIN_FILE}" && rm -f "${PIN_FILE}.bak"
     echo "  Pinned. Review and commit:"
-    echo "    git -C ${REPO_ROOT} diff infra/quadlet/openwebui.container"
+    echo "    git -C ${REPO_ROOT} diff ${PIN_FILE#"${REPO_ROOT}"/}"
 else
     echo "[4/4] Skipping Quadlet pin (--no-pin)"
 fi

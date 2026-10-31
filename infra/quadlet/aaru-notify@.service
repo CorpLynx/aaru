@@ -1,0 +1,7 @@
+# Alerts the operator when a unit fails. Attach with OnFailure=aaru-notify@%n.service.
+[Unit]
+Description=Aaru failure alert for %i
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash %h/aaru/infra/scripts/notify.sh urgent "%i failed" "%i failed; see journalctl --user -u %i"

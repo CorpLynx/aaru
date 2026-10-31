@@ -1,0 +1,13 @@
+# Copy to local.conf (gitignored) and size it for this host. setup.sh installs
+# it next to the unit as llamacpp.container.d/local.conf.
+#
+# The placeholder is not a valid value on purpose: an unedited copy fails when
+# Quadlet generates the unit instead of starting with a wrong size.
+#
+# Which models exist, their context sizes and idle timeouts live in
+# infra/config/llama-swap/config.yaml, not here.
+
+[Container]
+# The cap for every model llama-swap has loaded at once, plus KV cache. Leave
+# headroom for the host, PostgreSQL and the other containers.
+Memory=<memory limit, e.g. 48g>

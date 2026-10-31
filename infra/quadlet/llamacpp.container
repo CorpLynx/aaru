@@ -1,24 +1,49 @@
 [Unit]
-Description=llama.cpp Inference Server (Vulkan)
+Description=llama.cpp Inference Server (Vulkan) behind llama-swap
 After=network-online.target aaru-internal-network.service
 Wants=network-online.target
 
 [Container]
-Image=ghcr.io/ggml-org/llama.cpp:server
+# llama-swap in front of llama-server: a model loads on its first request, a
+# request for a different model swaps it in, and idle models unload after their
+# ttl. Only models already under /models can load; nothing is downloaded, and
+# this network has no egress anyway. Models and their settings live in
+# infra/config/llama-swap/config.yaml (gitignored; see config.yaml.example).
+#
+# Pinned by digest to v266-vulkan-b11804-non-root: llama-swap v266 bundled with
+# llama.cpp server-vulkan-b11804, running as UID 10001. Never use a floating tag
+# (see litellm.container).
+Image=ghcr.io/mostlygeek/llama-swap@sha256:df08926303bc78c032cf732a2404d58f7381febb97f80951779fb8e695eda2c0
 ContainerName=llamacpp
 Network=aaru-internal.network:ip=10.231.0.20
-# No host port published — internal only
+# No host port published — internal only. llama-swap's own endpoints (/ui,
+# /unload, /upstream) are reachable on this network too; LiteLLM forwards
+# only the /v1 routes clients use.
 AddDevice=/dev/dri
+# The image runs as UID 10001. Map the aaru user to it, so the models and config
+# aaru owns are readable without loosening their permissions, and keep aaru's
+# render/video groups for the GPU device nodes (harden-host.sh adds them).
+UserNS=keep-id:uid=10001,gid=10001
+GroupAdd=keep-groups
 SecurityLabelType=container_t
 NoNewPrivileges=true
+DropCapability=ALL
 ReadOnly=true
 Tmpfs=/tmp:size=200m
-Memory=100g
-Environment=LLAMA_ARG_MODEL=/models/model.gguf
-Environment=LLAMA_ARG_HOST=0.0.0.0
-Environment=LLAMA_ARG_PORT=8080
+# Required by apiKeys in config.yaml; LiteLLM gets the same secret.
+Secret=llama-swap-api-key,type=env,target=LLAMA_SWAP_API_KEY
+# The memory limit depends on the host and lives in llamacpp.container.d/local.conf
+# (gitignored; see local.conf.example). It caps every loaded model together.
 Volume=%h/aaru/models:/models:ro,z
-Volume=%h/aaru/infra/config:/config:ro,z
+# The directory rather than the file, so -watch-config sees edits made by
+# replacing the file; config changes apply without a restart.
+Volume=%h/aaru/infra/config/llama-swap:/app/config:ro,z
+Entrypoint=/app/llama-swap
+Exec=-config /app/config/config.yaml -watch-config -listen 0.0.0.0:8080
+HealthCmd=curl --silent --fail http://localhost:8080/health
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=60s
 
 [Service]
 Restart=on-failure

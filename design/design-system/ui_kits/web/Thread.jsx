@@ -23,7 +23,7 @@ function Thread({ chat, model, setModel, onSend, onStop, generating, vaultOpen, 
             ? <MessageBubble key={i} time={m.time}>{m.text}</MessageBubble>
             : <div key={i} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <MessageBubble role="assistant"><span style={{ whiteSpace: "pre-wrap" }}>{renderText(m.text)}</span></MessageBubble>
-                {m.live ? <AmbientStatus speed={model === "moe" ? 48 : 12} engine={model === "moe" ? "egpu" : "igpu"} />
+                {m.live ? <AmbientStatus speed={model === "moe" ? 48 : 12} engine={model === "moe" ? "boost" : "onboard"} />
                   : <div style={{ display: "flex", gap: 2, alignItems: "center" }}><IconButton icon="copy" label="Copy" size="sm" /><IconButton icon="refresh-cw" label="Regenerate" size="sm" /><IconButton icon="git-branch" label="Branch" size="sm" /><span style={{ marginLeft: 6 }}><MetricChip kind="speed" value={m.tps + " tok/s"} /></span></div>}
               </div>)}
         </div>

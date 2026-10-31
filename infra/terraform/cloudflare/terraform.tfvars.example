@@ -1,0 +1,63 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+#
+# The API token is not set here. Export it instead, so it stays out of this
+# file and out of the state:
+#   export CLOUDFLARE_API_TOKEN='...'
+
+cloudflare_account_id = "<32-hex-character account ID>"
+
+zone_name       = "example.com"
+access_hostname = "aaru.example.com"
+
+# Set to false to adopt a tunnel that already exists in the dashboard and
+# keep its connector token out of Terraform state.
+create_tunnel = true
+tunnel_id     = ""
+
+# Hostnames in the zone that point at the tunnel. Proxied records route
+# through the Cloudflare edge, which is what lets the tunnel pick them up.
+records = {
+  "aaru.example.com" = { ttl = 1, proxied = true }
+  # "api.example.com"  = { ttl = 1, proxied = true }
+  # "chat.example.com" = { ttl = 1, proxied = true }
+}
+
+# What each hostname reaches. These are Podman container names on
+# aaru-ingress.network: LiteLLM on 4000, the web app on 8080.
+ingress = {
+  "aaru.example.com" = { service = "http://litellm:4000" }
+  # "api.example.com"  = { service = "http://litellm:4000" }
+  # "chat.example.com" = { service = "http://openwebui:8080" }
+}
+
+# If the domain already has records, the existing_records variable holds the records that have
+# to exist in Cloudflare before the delegation moves.
+
+# Access — the identity layer in front of the tunnel.
+#
+# A tunnel is a path, not a gate. Access decides who gets through, at
+# Cloudflare's edge, before a request reaches the host.
+#
+# The member list is the allowlist: each address authenticates with a
+# one-time PIN sent to that address, so the address is the identity.
+access_member_emails = [
+  # "you@example.com",
+]
+
+# How long an Access session lasts before the user must authenticate again.
+access_session_duration = "24h"
+
+# Machine clients cannot do a browser login. This shared credential gets them
+# past Access; they still need a LiteLLM key for the application itself.
+# Treat it like a password — it bypasses the member list.
+access_service_token_name     = "aaru-api"
+access_service_token_duration = "8760h"
+
+# Used to brand the Access login page and the custom denial page.
+access_logo_url = "https://raw.githubusercontent.com/CorpLynx/aaru/main/design/design-system/assets/aaru-mark-white.svg"
+
+# Origin-side token validation ("Protect with Access"). Off by default
+# because a wrong team name makes the application look unreachable.
+# enable_origin_access_validation = true
+# cloudflare_team_name           = "your-team-name"
+

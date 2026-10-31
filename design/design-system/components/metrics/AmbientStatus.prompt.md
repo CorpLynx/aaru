@@ -1,5 +1,5 @@
-L0 metric disclosure: words, not numbers. Default for Casual and Chat tiers.
+L0 metric disclosure: words, not numbers. Default for chat.
 
 ```jsx
-<AmbientStatus speed={48} engine="egpu" />   // ● Writing · Instant · Boost engine
+<AmbientStatus speed={48} engine="boost" />   // ● Writing · Instant · Boost engine
 ```

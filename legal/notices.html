@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Third-party notices · Aaru</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+{{NAV}}
+{{DRAFT_NOTICE}}
+<h1>Third-party notices</h1>
+<p class="meta">Version {{TERMS_VERSION}}</p>
+
+<p>Aaru is built on open-source software and open-weight models from third parties. They remain under their own licenses; nothing here changes those terms. Their authors do not endorse or operate Aaru.</p>
+
+<h2>Web app</h2>
+<p>Aaru's web app is based on <a href="https://github.com/open-webui/open-webui">Open WebUI</a>, copyright © Timothy Jaeryang Baek and the Open WebUI contributors, and is used under the <a href="https://github.com/CorpLynx/aaru-web/blob/main/LICENSE">Open WebUI License</a>. Aaru's changes are listed in <a href="https://github.com/CorpLynx/aaru-web/blob/main/AARU.md">AARU.md</a>. Open WebUI is used under the license's provision for deployments with at most 50 end users in any rolling 30-day period.</p>
+
+<h2>Models</h2>
+<table>
+  <tr><th>Model</th><th>Developer</th><th>License</th></tr>
+  <tr><td>Qwen3.6-35B-A3B, Qwen3.8-27B</td><td>Qwen team, Alibaba Cloud</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></td></tr>
+  <tr><td>gpt-oss-120b</td><td>OpenAI</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>, plus the <a href="https://huggingface.co/openai/gpt-oss-120b/blob/main/USAGE_POLICY">gpt-oss usage policy</a></td></tr>
+  <tr><td>Qwen3-Embedding-8B, Qwen3-Embedding-0.6B</td><td>Qwen team, Alibaba Cloud</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></td></tr>
+</table>
+<p>Model files are the GGUF conversions published by the model developer or by the llama.cpp project (ggml-org) from the developer's weights.</p>
+
+<h2>Server software</h2>
+<table>
+  <tr><th>Component</th><th>License</th></tr>
+  <tr><td><a href="https://github.com/ggml-org/llama.cpp">llama.cpp</a></td><td>MIT</td></tr>
+  <tr><td><a href="https://github.com/mostlygeek/llama-swap">llama-swap</a></td><td>MIT</td></tr>
+  <tr><td><a href="https://github.com/BerriAI/litellm">LiteLLM</a></td><td>MIT (open-source edition)</td></tr>
+  <tr><td><a href="https://www.postgresql.org/">PostgreSQL</a></td><td>PostgreSQL License</td></tr>
+  <tr><td><a href="https://github.com/containers/podman">Podman</a></td><td>Apache License 2.0</td></tr>
+  <tr><td><a href="https://github.com/tailscale/tailscale">Tailscale client</a></td><td>BSD 3-Clause</td></tr>
+  <tr><td><a href="https://github.com/cloudflare/cloudflared">cloudflared</a></td><td>Apache License 2.0</td></tr>
+</table>
+
+<h2>Fonts</h2>
+<p>Geist (Vercel) and JetBrains Mono (JetBrains) are used under the <a href="https://openfontlicense.org/">SIL Open Font License 1.1</a>.</p>
+
+<footer>Aaru · Third-party notices</footer>
+</main>
+</body>
+</html>

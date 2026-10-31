@@ -1,0 +1,27 @@
+# Aaru model catalog: what infra/scripts/fetch-models.sh downloads, each pinned
+# to a commit and passed through the Anubis gate in fetch-model.sh.
+#
+# Official sources only: the model author's own GGUFs where they publish them
+# (Qwen for the embeddings), otherwise ggml-org, the llama.cpp project, which
+# converts from the authors' weights. No community requantizations.
+#
+# Format: <model-dir> <hf-repo> <commit> <file>[,<file>...]
+# <model-dir> becomes /models/<model-dir> in the llamacpp container; the files
+# are referenced from infra/config/llama-swap/config.yaml.
+
+# Chat, sparse MoE (3B active): the fast default. Q8_0 plus the vision projector.
+qwen3.6-35b-a3b       ggml-org/Qwen3.6-35B-A3B-GGUF   7878dc9a905c7c9379e5e8d6a1aa9affdd6839c5  Qwen3.6-35B-A3B-Q8_0.gguf,mmproj-Qwen3.6-35B-A3B-Q8_0.gguf
+
+# Chat, dense: slower per token, steadier on long work. Q8_0 plus the vision
+# projector; the repo also has Q4_K_M if memory bandwidth matters more.
+qwen3.8-27b           ggml-org/Qwen3.8-27B-GGUF       a316ea527fde32c12487be7574e2db5ac2ad2a7e  Qwen3.8-27B-Q8_0.gguf,mmproj-Qwen3.8-27B-Q8_0.gguf
+
+# Reasoning: OpenAI's own MXFP4 weights, converted without requantization.
+gpt-oss-120b          ggml-org/gpt-oss-120b-GGUF      7200b74bea78b0a2964ef9f3897eefa401e890ff  gpt-oss-120b-MXFP4.gguf
+
+# Embeddings, published by Qwen: a light one and a better one.
+qwen3-embedding-0.6b  Qwen/Qwen3-Embedding-0.6B-GGUF  370f27d7550e0def9b39c1f16d3fbaa13aa67728  Qwen3-Embedding-0.6B-Q8_0.gguf
+qwen3-embedding-8b    Qwen/Qwen3-Embedding-8B-GGUF    69d0e58a13e463cd99a9b83e3f5fee7c10265fab  Qwen3-Embedding-8B-Q8_0.gguf
+
+# Deferred: Qwen-Image-2512. Qwen publishes it only in diffusers format, which
+# stable-diffusion.cpp cannot load, and the available GGUFs are community builds.

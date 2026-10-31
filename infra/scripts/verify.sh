@@ -49,6 +49,7 @@ TEST_KEYS=""
 cleanup() {
     if [ -n "${TEST_KEYS}" ] && [ -n "${MASTER_KEY:-}" ]; then
         local keys_json
+        # shellcheck disable=SC2086  # deliberate: splits a whitespace-separated list
         keys_json="$(printf '%s\n' ${TEST_KEYS} | python3 -c 'import json,sys; print(json.dumps({"keys": sys.stdin.read().split()}))')"
         printf 'Authorization: Bearer %s\n' "${MASTER_KEY}" > "${WORK_DIR}/master.hdr"
         curl -s -o /dev/null --max-time 10 -X POST "${GATEWAY}/key/delete" \
@@ -73,6 +74,8 @@ http() {
 }
 
 snippet() { head -c 200 "${WORK_DIR}/$1.body" 2>/dev/null | tr '\n' ' '; }
+
+expect_unit_file() { [ -f "${HOME}/.config/containers/systemd/$1" ]; }
 
 # ============================================================================
 # Outside mode: run from a machine that is not the host
@@ -140,6 +143,33 @@ if command -v firewall-cmd >/dev/null 2>&1 && [ "$(firewall-cmd --state 2>/dev/n
         drop|block) pass "firewalld running, default zone ${zone}" ;;
         *) fail "firewalld default zone is ${zone}; spec §4a wants drop or block" ;;
     esac
+    # The default zone only covers unbound interfaces; check what every active zone opens.
+    active="$(firewall-cmd --get-active-zones 2>/dev/null | grep -v '^[[:space:]]')"
+    if [ -z "${active}" ]; then
+        skip "active zones unreadable without privileges (run with sudo for the full firewall check)"
+    fi
+    for z in ${active}; do
+        services="$(firewall-cmd --zone="${z}" --list-services 2>/dev/null | xargs)"
+        ports="$(firewall-cmd --zone="${z}" --list-ports 2>/dev/null | xargs)"
+        fwd="$(firewall-cmd --zone="${z}" --list-forward-ports 2>/dev/null | xargs)"
+        case "${z}" in
+            drop|block)
+                [ -z "${services}${ports}${fwd}" ] && pass "zone ${z}: nothing open" \
+                    || fail "zone ${z} opens services='${services}' ports='${ports}' forwards='${fwd}'" ;;
+            aaru-admin)
+                [ "${services}" = ssh ] && [ -z "${ports}${fwd}" ] && pass "zone aaru-admin: ssh only" \
+                    || fail "zone aaru-admin opens services='${services}' ports='${ports}' forwards='${fwd}'"
+                [ "$(firewall-cmd --permanent --zone=aaru-admin --get-target 2>/dev/null)" = DROP ] \
+                    && pass "zone aaru-admin target DROP" || warn "zone aaru-admin target is not DROP" ;;
+            *)
+                fail "zone ${z} is active ($(firewall-cmd --get-active-zones 2>/dev/null | grep -A2 -x "${z}" | tail -n +2 | xargs)); interfaces belong in drop (harden-host.sh)" ;;
+        esac
+    done
+    if systemctl is-active cockpit.socket >/dev/null 2>&1; then
+        fail "Cockpit web console is listening (systemctl disable --now cockpit.socket)"
+    else
+        pass "Cockpit web console off"
+    fi
 else
     fail "firewalld not running"
 fi
@@ -147,9 +177,46 @@ fi
 [ "$(podman info --format '{{.Host.Security.Rootless}}' 2>/dev/null)" = "true" ] \
     && pass "Podman is rootless" || fail "Podman is not rootless"
 
+# Weekly Lynis audit (harden-host.sh); the banner is root:wheel, but its age is visible.
+if systemctl is-enabled aaru-lynis-audit.timer >/dev/null 2>&1; then
+    pass "weekly Lynis audit timer enabled"
+    if [ -e /etc/motd.d/aaru-lynis ] && [ $(( $(date +%s) - $(stat -c %Y /etc/motd.d/aaru-lynis) )) -lt $(( 8 * 86400 )) ]; then
+        pass "Lynis login banner updated within 8 days"
+    else
+        warn "Lynis login banner missing or older than 8 days (sudo systemctl start aaru-lynis-audit.service)"
+    fi
+else
+    warn "aaru-lynis-audit.timer not enabled (run infra/scripts/harden-host.sh)"
+fi
+
+# Without lingering the user's services stop at logout and do not start at boot.
+[ "$(loginctl show-user "$(id -un)" --property=Linger --value 2>/dev/null)" = "yes" ] \
+    && pass "lingering enabled for $(id -un)" || fail "lingering off for $(id -un) (sudo loginctl enable-linger $(id -un))"
+
+# Host-specific settings are gitignored; an inference unit without them has no model.
+for unit in llamacpp vllm; do
+    if expect_unit_file "${unit}.container"; then
+        [ -f "${HOME}/.config/containers/systemd/${unit}.container.d/local.conf" ] \
+            && pass "${unit}: host drop-in installed" || warn "${unit}: no ${unit}.container.d/local.conf installed"
+    fi
+done
+if expect_unit_file llamacpp.container; then
+    [ -f "${HOME}/aaru/infra/config/llama-swap/config.yaml" ] \
+        && pass "llama-swap config.yaml present" || fail "infra/config/llama-swap/config.yaml missing (copy config.yaml.example)"
+fi
+[ -f "${HOME}/aaru/infra/config/litellm/models.yaml" ] \
+    && pass "LiteLLM models.yaml present" || fail "infra/config/litellm/models.yaml missing (copy models.yaml.example)"
+
 # --- Host listeners ---
 section "Host listeners"
 listeners="$(ss -Htln 2>/dev/null | awk '{print $4}')"
+# Anything listening beyond loopback besides SSH is reachable wherever a zone lets it through.
+# Local address is column 4 for both; the UDP ports filtered below are DHCPv6, mDNS and chrony.
+exposed="$( (ss -Htln; ss -Huln) 2>/dev/null | awk '{print $4}' \
+    | grep -Ev '^(127\.[0-9.]+|\[::1\]|\[::ffff:127\.[0-9.]+\]):' \
+    | grep -Ev ':(22|546|5353|323)$' | sort -u | xargs)"
+[ -z "${exposed}" ] && pass "nothing but SSH listens beyond loopback" \
+    || warn "listening beyond loopback: ${exposed} (dropped by the firewall, but check each is needed)"
 for port in 5432 8080 8000 11434; do
     if printf '%s\n' "${listeners}" | grep -Eq "[:.]${port}\$"; then
         fail "port ${port} is listening on the host (database/inference must stay unpublished)"
@@ -162,6 +229,7 @@ for port in 4000 3000 8088; do
     if [ -z "${addrs}" ]; then
         skip "port ${port} not listening"
     elif printf '%s\n' "${addrs}" | grep -Evq "^(127\.0\.0\.1|\[::1\]):${port}\$"; then
+        # shellcheck disable=SC2086  # deliberate: splits a whitespace-separated list
         fail "port ${port} listens beyond loopback: $(printf '%s ' ${addrs})"
     else
         pass "port ${port} bound to loopback only"
@@ -174,9 +242,15 @@ running="$(podman ps --format '{{.Names}}')"
 expect_running() {
     printf '%s\n' "${running}" | grep -qx "$1"
 }
-for c in postgres litellm openwebui cloudflared; do
+for c in postgres litellm openwebui; do
     expect_running "${c}" && pass "${c} running" || fail "${c} not running"
 done
+# Member ingress: Cloudflare, or Tailscale in the interim (spec §9).
+if expect_running cloudflared || expect_running tailscale; then
+    pass "member ingress running ($(printf '%s\n' "${running}" | grep -Ex 'cloudflared|tailscale' | tr '\n' ' '))"
+else
+    fail "no member ingress (cloudflared or tailscale) running"
+fi
 if expect_running llamacpp || expect_running vllm; then
     pass "an inference server is running ($(printf '%s\n' "${running}" | grep -Ex 'llamacpp|vllm' | tr '\n' ' '))"
 else
@@ -218,6 +292,7 @@ check_nets() {
     [ "${got}" = "${want}" ] && pass "${c}: networks = ${want}" || fail "${c}: networks = ${got:-none}, expected ${want}"
 }
 check_nets cloudflared "aaru-ingress"
+check_nets tailscale "aaru-ingress"
 check_nets postgres "aaru-internal"
 check_nets llamacpp "aaru-internal"
 check_nets vllm "aaru-internal"
@@ -264,6 +339,69 @@ else
     skip "egress and isolation probes (postgres container not found)"
 fi
 
+# llama-swap requires its API key; a peer on aaru-internal without it gets 401.
+if expect_running llamacpp && expect_running litellm; then
+    code="$(podman exec litellm python3 -c "import urllib.request,urllib.error
+try: print(urllib.request.urlopen('http://llamacpp:8080/v1/models', timeout=5).status)
+except urllib.error.HTTPError as e: print(e.code)
+except Exception: print('000')" 2>/dev/null)"
+    [ "${code}" = "401" ] && pass "llama-swap rejects requests without its API key (401)" \
+        || fail "llama-swap answered ${code:-nothing} without an API key (set apiKeys in config.yaml)"
+fi
+
+# --- Web app settings ---
+section "Web app settings"
+if expect_running openwebui; then
+    owui_env="$(podman inspect --format '{{range .Config.Env}}{{println .}}{{end}}' openwebui 2>/dev/null)"
+    for want in ENABLE_PERSISTENT_CONFIG=false ENABLE_COMMUNITY_SHARING=false ENABLE_ADMIN_CHAT_ACCESS=false \
+                ENABLE_SIGNUP=false WEBUI_SESSION_COOKIE_SECURE=true WEBUI_AUTH_COOKIE_SECURE=true; do
+        printf '%s\n' "${owui_env}" | grep -qx "${want}" && pass "web app ${want}" || fail "web app is not running with ${want}"
+    done
+    cors="$(printf '%s\n' "${owui_env}" | sed -n 's/^CORS_ALLOW_ORIGIN=//p')"
+    case "${cors}" in
+        ""|"*") fail "web app CORS allows any origin (set WEBUI_URL and CORS_ALLOW_ORIGIN in openwebui.container.d/local.conf)" ;;
+        *) pass "web app CORS limited to ${cors}" ;;
+    esac
+
+    WEBAPP="${AARU_WEBAPP:-http://127.0.0.1:3000}"
+    curl -s -D "${WORK_DIR}/web.hdr" -o /dev/null --max-time 10 "${WEBAPP}/" 2>/dev/null || true
+    for h in 'Strict-Transport-Security: max-age=' 'X-Frame-Options: DENY' 'X-Content-Type-Options: nosniff' \
+             "Content-Security-Policy: frame-ancestors 'none'" 'Referrer-Policy: strict-origin-when-cross-origin'; do
+        grep -qiF "${h}" "${WORK_DIR}/web.hdr" && pass "header ${h%%:*}" || fail "web app response lacks ${h}"
+    done
+
+    # Legal pages: served without sign-in, fully rendered, and marked draft until reviewed.
+    for page in terms acceptable-use privacy notices security; do
+        code="$(http "legal-${page}" GET "${WEBAPP}/legal/${page}.html")"
+        if [ "${code}" = "200" ] && grep -q '<h1>' "${WORK_DIR}/legal-${page}.body" && ! grep -q '{{' "${WORK_DIR}/legal-${page}.body"; then
+            pass "legal page /legal/${page}.html served"
+        else
+            fail "legal page /legal/${page}.html not served (${code}); run infra/scripts/render-legal.sh"
+        fi
+    done
+    grep -q 'class="draft"' "${WORK_DIR}/legal-terms.body" 2>/dev/null \
+        && warn "legal pages are still drafts (set REVIEWED=\"yes\" in legal/legal.conf after counsel review)"
+    code="$(http securitytxt GET "${WEBAPP}/.well-known/security.txt")"
+    expires="$(sed -n 's/^Expires: *//p' "${WORK_DIR}/securitytxt.body" 2>/dev/null | tr -d '\r')"
+    if [ "${code}" != "200" ] || [ -z "${expires}" ]; then
+        fail "/.well-known/security.txt not served (${code})"
+    else
+        left=$(( ( $(date -d "${expires}" +%s 2>/dev/null || echo 0) - $(date +%s) ) / 86400 ))
+        if [ "${left}" -lt 0 ]; then fail "security.txt expired ${expires}; re-run render-legal.sh"
+        elif [ "${left}" -lt 30 ]; then warn "security.txt expires in ${left} days; re-run render-legal.sh"
+        else pass "security.txt served, expires ${expires}"; fi
+    fi
+
+    # Error handling: unknown API routes are real 404s, and no API schema is published.
+    code="$(http api404 GET "${WEBAPP}/api/v1/aaru-verify-no-such-route")"
+    [ "${code}" = "404" ] && pass "unknown API route returns 404" || fail "unknown API route returned ${code}"
+    http openapi GET "${WEBAPP}/openapi.json" >/dev/null
+    grep -q '"openapi"' "${WORK_DIR}/openapi.body" 2>/dev/null \
+        && fail "web app publishes its OpenAPI schema (ENV is not prod)" || pass "no OpenAPI schema published"
+else
+    skip "openwebui not running"
+fi
+
 # --- Database roles ---
 section "Database roles"
 if expect_running postgres; then
@@ -273,6 +411,28 @@ if expect_running postgres; then
     public_connect="$(podman exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tA -c "select datname from pg_database where datname in ('"'litellm','openwebui'"') and has_database_privilege('"'public'"', datname, '"'CONNECT'"')"' 2>/dev/null | xargs)"
     [ -z "${public_connect}" ] && pass "PUBLIC cannot connect to service databases" \
         || fail "PUBLIC can connect to: ${public_connect}"
+    # Open WebUI License 4(i): the rebrand holds only at 50 or fewer end users in
+    # any rolling 30-day period (last_active_at is epoch seconds).
+    active="$(podman exec postgres sh -c 'psql -U "$POSTGRES_USER" -d openwebui -tA -c "select count(*) from \"user\" where last_active_at > extract(epoch from now() - interval '"'30 days'"')"' 2>/dev/null | tr -dc '0-9')"
+    if [ -z "${active}" ]; then
+        skip "active-user count unavailable"
+    elif [ "${active}" -gt 50 ]; then
+        fail "${active} active web app users in 30 days: over the Open WebUI License's 50-user rebrand limit"
+    elif [ "${active}" -gt 40 ]; then
+        warn "${active} active web app users in 30 days (license limit for the rebrand: 50)"
+    else
+        pass "${active} active web app users in 30 days (license limit 50)"
+    fi
+    # The first account created becomes admin even with sign-up off, so an admin
+    # must exist before members can reach the app.
+    admins="$(podman exec postgres sh -c 'psql -U "$POSTGRES_USER" -d openwebui -tA -c "select count(*) from \"user\" where role = '"'admin'"'"' 2>/dev/null | tr -dc '0-9')"
+    if [ "${admins:-0}" -gt 0 ]; then
+        pass "web app has an admin account (${admins})"
+    elif expect_running tailscale || expect_running cloudflared; then
+        fail "web app has no admin yet while member ingress is up: the first visitor would become admin"
+    else
+        warn "web app has no admin yet; create it over an SSH tunnel before starting member ingress"
+    fi
 else
     skip "postgres not running"
 fi
@@ -358,7 +518,7 @@ fi
 # --- Logs ---
 section "Logs (no prompt text or keys)"
 if [ -n "${KEY_OK}" ]; then
-    for c in litellm llamacpp vllm openwebui cloudflared; do
+    for c in litellm llamacpp vllm openwebui cloudflared tailscale; do
         expect_running "${c}" || continue
         log="$(podman logs --since 15m "${c}" 2>&1)"
         if printf '%s' "${log}" | grep -qF "${CANARY}"; then
@@ -380,6 +540,13 @@ fi
 section "Operations"
 systemctl --user is-enabled aaru-backup.timer >/dev/null 2>&1 \
     && pass "backup timer enabled" || warn "aaru-backup.timer not enabled"
+podman secret exists aaru-backup-aws 2>/dev/null && [ -f "${HOME}/.config/aaru/backup.env" ] \
+    && pass "backup credentials installed" || warn "backup credentials missing (infra/scripts/set-backup-credentials.sh)"
+case "$(systemctl --user show aaru-backup.service --property=Result --value 2>/dev/null)" in
+    success) pass "last backup run succeeded" ;;
+    "") skip "backup has not run yet" ;;
+    *) fail "last backup run failed (journalctl --user -u aaru-backup.service)" ;;
+esac
 
 printf '\nResult: %d passed, %d failed, %d warnings, %d skipped\n' "${PASS}" "${FAIL}" "${WARN}" "${SKIP}"
 echo "Also run from another machine: infra/scripts/verify.sh --outside <public-ip> --api-url https://api.<domain>"

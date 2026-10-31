@@ -1,0 +1,11 @@
+# Copy to backend.hcl and fill in. backend.hcl is gitignored.
+# Values come from the bootstrap stack's `backend_config` output.
+#
+# The key differs per stack, so the Cloudflare state and the bootstrap state
+# do not collide in the same bucket.
+
+bucket       = "<state_bucket_prefix>-<aws-account-id>"
+key          = "aaru/cloudflare/terraform.tfstate"
+region       = "us-east-1"
+encrypt      = true
+use_lockfile = true

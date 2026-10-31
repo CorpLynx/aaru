@@ -1,10 +1,10 @@
 // Resolves the Aaru component namespace: compiled bundle first, source fallback (for local preview before compile).
 (function () {
-  var FILES = ["core/Button","core/IconButton","core/Badge","core/Card","core/Kbd","core/Logo","forms/Input","forms/Select","forms/Checkbox","forms/Switch","forms/SegmentedControl","navigation/Tabs","navigation/HistoryItem","feedback/Tooltip","feedback/Dialog","feedback/Toast","security/SealBadge","security/SealPopover","security/VaultFileRow","metrics/GeneratingPulse","metrics/MetricChip","metrics/ContextBar","metrics/AmbientStatus","tier/TierBadge","tier/TierCard","chat/MessageBubble","chat/Citation","chat/Composer","chat/ModelToggle"];
+  var FILES = ["core/Button","core/IconButton","core/Badge","core/Card","core/Kbd","core/Logo","forms/Input","forms/Select","forms/Checkbox","forms/Switch","forms/SegmentedControl","navigation/Tabs","navigation/HistoryItem","feedback/Tooltip","feedback/Dialog","feedback/Toast","security/SealBadge","security/SealPopover","security/VaultFileRow","metrics/GeneratingPulse","metrics/MetricChip","metrics/ContextBar","metrics/AmbientStatus","chat/MessageBubble","chat/Citation","chat/Composer","chat/ModelToggle"];
   function find() {
     var keys = Object.keys(window);
     for (var i = 0; i < keys.length; i++) {
-      try { var v = window[keys[i]]; if (v && typeof v === "object" && v.TierBadge && v.Composer) return v; } catch (e) {}
+      try { var v = window[keys[i]]; if (v && typeof v === "object" && v.SealBadge && v.Composer) return v; } catch (e) {}
     }
     return null;
   }

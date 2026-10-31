@@ -11,8 +11,6 @@
 <script type="text/babel" src="Sidebar.jsx"></script>
 <script type="text/babel" src="Thread.jsx"></script>
 <script type="text/babel" src="VaultPanel.jsx"></script>
-<script type="text/babel" src="PlansScreen.jsx"></script>
-<script type="text/babel" src="BillingScreen.jsx"></script>
 </head><body><div id="root"></div>
 <script type="text/babel">
 
@@ -35,8 +33,6 @@ const DOCS = [
 function App() {
   const { Toast } = window.DS;
   const [unlocked, setUnlocked] = React.useState(true);
-  const [view, setView] = React.useState("chat");
-  const [tier, setTier] = React.useState("dev");
   const [chats, setChats] = React.useState(SEED);
   const [active, setActive] = React.useState(1);
   const [model, setModelRaw] = React.useState("moe");
@@ -62,17 +58,17 @@ function App() {
     setDocs(d => [{ name, kind: "doc", status: "encrypting", progress: 0 }, ...d]);
     let p = 0; const t = setInterval(() => { p += 0.12; if (p >= 1) { clearInterval(t); setDocs(d => d.map(x => x.name === name ? { ...x, status: "sealed", progress: 1 } : x)); setToast(1); setTimeout(() => setToast(null), 3500); } else setDocs(d => d.map(x => x.name === name ? { ...x, progress: p } : x)); }, 220);
   };
-  const newChat = () => { const id = Date.now(); setChats(cs => [{ id, title: "New chat", time: "now", group: "today", messages: [] }, ...cs]); setActive(id); setView("chat"); };
+  const newChat = () => { const id = Date.now(); setChats(cs => [{ id, title: "New chat", time: "now", group: "today", messages: [] }, ...cs]); setActive(id); };
   if (!unlocked) return <UnlockScreen onUnlock={() => setUnlocked(true)} />;
   const inCtx = docs.filter(d => d.inContext).length;
   const chatK = chat ? Math.min(40, chat.messages.reduce((a, m) => a + (m.text || "").length, 0) / 400 + 1.2) : 0;
   return (
     <div style={{ height: "100%", display: "flex", position: "relative" }}>
-      <Sidebar chats={chats} activeId={view === "chat" ? active : null} onSelect={id => { setActive(id); setView("chat"); }} onNew={newChat} onPlans={() => setView("billing")} onLock={() => setUnlocked(false)} tier={tier} />
-      {view === "billing" ? <BillingScreen tier={tier} onChangePlan={() => setView("plans")} onBack={() => setView("chat")} /> : view === "plans" ? <PlansScreen tier={tier} setTier={t => { setTier(t); setView("billing"); }} onBack={() => setView("billing")} /> : <>
+      <Sidebar chats={chats} activeId={active} onSelect={setActive} onNew={newChat} onLock={() => setUnlocked(false)} />
+      <>
         <Thread chat={chat} model={model} setModel={setModel} onSend={send} onStop={() => stopRef.current && stopRef.current()} generating={gen} vaultOpen={vault} toggleVault={() => setVault(v => !v)} docsInContext={inCtx} />
         {vault && <VaultPanel docs={docs} toggleDoc={n => setDocs(d => d.map(x => x.name === n ? { ...x, inContext: !x.inContext } : x))} onClose={() => setVault(false)} onUpload={upload} context={{ system: 7.7, documents: inCtx * 7.6, chat: chatK }} />}
-      </>}
+      </>
       {toast && <div style={{ position: "absolute", right: 24, bottom: 24 }}><Toast tone="secure" title="board-minutes-sept.pdf sealed" body="Stored as ciphertext. 204 chunks indexed." /></div>}
     </div>
   );

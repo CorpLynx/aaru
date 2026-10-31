@@ -3,8 +3,8 @@ export interface AmbientStatusProps {
   generating?: boolean;
   /** tok/s → Steady (<15), Fast (15–40), Instant (>40). */
   speed?: number;
-  /** igpu → "Onboard engine", egpu → "Boost engine". @default "egpu" */
-  engine?: "igpu" | "egpu" | null;
+  /** onboard → "Onboard engine", boost → "Boost engine". @default "boost" */
+  engine?: "onboard" | "boost" | null;
   /** @default "Writing" */
   verb?: string;
   /** Show the raw number instead of the word. */
