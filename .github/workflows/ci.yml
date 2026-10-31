@@ -126,7 +126,8 @@ jobs:
     name: Quadlet units (Fedora's generator)
     runs-on: ubuntu-24.04
     container:
-      image: quay.io/fedora/fedora:43@sha256:6466bd845895a7e29dc62eb92d0e483a6a1f1a28f380f7330f6ce51258926d58
+      # Docker Hub keeps superseded official-image digests; quay.io prunes them.
+      image: docker.io/library/fedora:43@sha256:a651ddf48ea28a06ed4e1e6519f51c9f47e7a5a138722ade87369b8fbb7e5b42
     steps:
       - name: Install podman
         run: dnf -y -q install --setopt=install_weak_deps=False podman
