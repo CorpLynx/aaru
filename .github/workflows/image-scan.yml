@@ -1,0 +1,97 @@
+# Scans every pinned image (infra/scripts/list-images.sh) for fixable CRITICAL
+# and HIGH vulnerabilities. New advisories appear after an image is pinned, so
+# this runs weekly, on any PR that changes a pin, and on demand. The weekly run
+# opens or updates an issue when something needs a digest bump.
+name: Image scan
+
+on:
+  schedule:
+    - cron: "41 6 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - infra/quadlet/*.container
+      - infra/config/anubis.conf
+      - infra/scripts/backup.sh
+      - infra/scripts/list-images.sh
+      - .trivyignore
+      - .github/workflows/image-scan.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Trivy 0.65.0, pinned by digest: it predates the compromised 0.69.4-0.69.6.
+  TRIVY_IMAGE: aquasec/trivy:0.65.0@sha256:a22415a38938a56c379387a8163fcb0ce38b10ace73e593475d3658d578b2436
+
+jobs:
+  list:
+    name: List pinned images
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.list.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - id: list
+        run: echo "matrix=$(bash infra/scripts/list-images.sh --json)" >> "${GITHUB_OUTPUT}"
+
+  scan:
+    name: Scan ${{ matrix.name }}
+    needs: list
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.list.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      # The inference images run to many gigabytes.
+      - name: Free disk space
+        run: sudo rm -rf /opt/hostedtoolcache /usr/local/lib/android /usr/share/dotnet
+      - name: Trivy (fixable CRITICAL and HIGH)
+        env:
+          REF: ${{ matrix.ref }}
+          NAME: ${{ matrix.name }}
+        run: |
+          touch .trivyignore
+          set +e
+          docker run --rm -v "${PWD}/.trivyignore:/.trivyignore:ro" "${TRIVY_IMAGE}" image \
+            --image-src remote --platform linux/amd64 --scanners vuln \
+            --severity CRITICAL,HIGH --ignore-unfixed --ignorefile /.trivyignore \
+            --exit-code 1 --no-progress --format table "${REF}" | tee report.txt
+          status=${PIPESTATUS[0]}
+          set -e
+          total="$(grep -m1 -E '^Total:' report.txt || echo 'Total: 0')"
+          echo "| ${NAME} | \`${REF#*@}\` | ${total} |" >> "${GITHUB_STEP_SUMMARY}"
+          exit "${status}"
+
+  report:
+    name: Open or update the tracking issue
+    needs: scan
+    if: always() && github.event_name == 'schedule' && needs.scan.result == 'failure'
+    runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+    steps:
+      - name: Issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Pinned images have fixable vulnerabilities"
+          body="The weekly image scan found fixable CRITICAL or HIGH vulnerabilities in at least one pinned image: ${RUN_URL}
+
+          For each failing image, pin a newer digest that fixes them (after review, as in architecture.md §10), or record an accepted exception with a reason in .trivyignore."
+          number="$(gh issue list -R "${GITHUB_REPOSITORY}" --state open --search "in:title \"${title}\"" --json number --jq '.[0].number')"
+          if [ -n "${number}" ]; then
+            gh issue comment "${number}" -R "${GITHUB_REPOSITORY}" --body "Still failing: ${RUN_URL}"
+          else
+            gh issue create -R "${GITHUB_REPOSITORY}" --title "${title}" --body "${body}"
+          fi
