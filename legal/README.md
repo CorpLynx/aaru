@@ -4,6 +4,7 @@ Templates for the documents members see, served by the web app without sign-in:
 
 | Page | Path |
 | --- | --- |
+| Member guide (getting in, models, API, data, help) | `/legal/guide.html` |
 | Terms of Service (with the AI-output disclaimer) | `/legal/terms.html` |
 | Acceptable Use Policy | `/legal/acceptable-use.html` |
 | Privacy Notice | `/legal/privacy.html` |
