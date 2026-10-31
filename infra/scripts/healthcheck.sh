@@ -112,6 +112,16 @@ else
     check gateway FAIL "LiteLLM liveliness returned ${code}"
 fi
 
+# --- Open WebUI License 4(i): at most 50 end users in any rolling 30 days ---
+active="$(podman exec postgres sh -c 'psql -U "$POSTGRES_USER" -d openwebui -tA -c "select count(*) from \"user\" where last_active_at > extract(epoch from now() - interval '"'30 days'"')"' 2>/dev/null | tr -dc '0-9')"
+if [ -n "${active}" ]; then
+    if [ "${active}" -gt 45 ]; then
+        check license-users FAIL "${active} active web app users in 30 days; the rebrand license allows 50"
+    else
+        check license-users OK "${active} active web app users in 30 days"
+    fi
+fi
+
 # --- Backup freshness ---
 if systemctl --user is-enabled aaru-backup.timer >/dev/null 2>&1; then
     last="$(systemctl --user show aaru-backup.service --property=ExecMainExitTimestamp --value 2>/dev/null)"

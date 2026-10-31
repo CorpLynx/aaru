@@ -1,0 +1,5 @@
+Contact: mailto:{{SECURITY_EMAIL}}
+Expires: {{SECURITY_TXT_EXPIRES}}
+Preferred-Languages: en
+Policy: {{SERVICE_URL}}/legal/security.html
+Canonical: {{SERVICE_URL}}/.well-known/security.txt

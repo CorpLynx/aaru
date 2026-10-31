@@ -49,6 +49,12 @@ for dropin_dir in "${AARU_DIR}/infra/quadlet/"*.container.d; do
     fi
 done
 
+# The web app mounts the rendered legal pages; the directories must exist for it to start.
+mkdir -p "${AARU_DIR}/legal/site/.well-known"
+if [ ! -f "${AARU_DIR}/legal/site/terms.html" ]; then
+    echo "  NOTE: legal pages not rendered; copy legal/legal.conf.example to legal.conf,"
+    echo "        fill it in and run infra/scripts/render-legal.sh (see legal/README.md)"
+fi
 if [ ! -f "${AARU_DIR}/infra/config/llama-swap/config.yaml" ]; then
     echo "  NOTE: no infra/config/llama-swap/config.yaml; copy config.yaml.example and"
     echo "        list the staged models before starting llamacpp.service"

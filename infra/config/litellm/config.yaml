@@ -17,6 +17,10 @@ general_settings:
   # API key, whose user_id is the same address (infra/scripts/member.sh).
   # Only the address is stored, in spend logs; prompts are not.
   user_header_name: X-OpenWebUI-User-Email
+  # Usage records (spend logs) never hold prompt or response text, and are
+  # deleted after 90 days, as the Privacy Notice states (legal/privacy.html).
+  store_prompts_in_spend_logs: false
+  maximum_spend_logs_retention_period: "90d"
 
 litellm_settings:
   # Drop unsupported parameters for local models

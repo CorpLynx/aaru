@@ -292,6 +292,15 @@ EOF
 run "enable auditd" systemctl enable --now auditd
 run "load audit rules" augenrules --load
 
+# Logs, container output included, are kept 30 days: the Privacy Notice's promise.
+put /etc/systemd/journald.conf.d/90-aaru.conf 0644 <<'EOF'
+# Aaru: technical logs are kept 30 days (legal/privacy.html). Managed by harden-host.sh.
+[Journal]
+MaxRetentionSec=30day
+SystemMaxUse=4G
+EOF
+run "apply journal retention" systemctl restart systemd-journald
+
 # --- Security updates: download, never auto-apply (spec §4a) -----------------
 echo "[8/10] dnf-automatic"
 put /etc/dnf/automatic.conf 0644 <<'EOF'

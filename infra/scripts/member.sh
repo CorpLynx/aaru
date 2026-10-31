@@ -5,12 +5,17 @@
 # narrowed per key when needed. Run on the host as the aaru service user.
 #
 # Usage:
-#   infra/scripts/member.sh add <member> [--models fast,dense,...] [--rpm N] [--tpm N] [--parallel N] [--days N]
+#   infra/scripts/member.sh add <member> --terms-accepted <YYYY-MM-DD> [--models fast,dense,...] [--rpm N] [--tpm N] [--parallel N] [--days N]
 #   infra/scripts/member.sh list
 #   infra/scripts/member.sh rotate <member>     new key with the same settings, old keys deleted
 #   infra/scripts/member.sh revoke <member>     delete every key the member has
 #   infra/scripts/member.sh webapp-key          (re)create the web app's key and store it
 #                                               in the openai-api-key Podman secret
+#
+#   --terms-accepted is the date the member agreed to the Terms, Acceptable Use
+#   Policy and Privacy Notice (keep their written agreement, e.g. the email). It
+#   and the current TERMS_VERSION from legal/legal.conf are stored on the key,
+#   so every key records which version its holder accepted.
 #
 #   <member> is the member's email address; it becomes the LiteLLM user_id
 #   and the key alias "member:<member>". New keys are printed once and never
@@ -34,7 +39,7 @@ TPM="${AARU_MEMBER_TPM:-100000}"
 PARALLEL="${AARU_MEMBER_PARALLEL:-2}"
 DAYS="${AARU_MEMBER_DAYS:-365}"
 
-usage() { sed -n '2,27p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,31p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 
 for cmd in curl python3; do
     command -v "${cmd}" >/dev/null 2>&1 || { echo "ERROR: ${cmd} not found"; exit 1; }
@@ -101,6 +106,7 @@ case "${cmd}" in
         MEMBER="${1:?usage: member.sh add <member> [options]}"; shift
         while [ $# -gt 0 ]; do
             case "$1" in
+                --terms-accepted) ACCEPTED="${2:?}"; shift 2 ;;
                 --models) MODELS="${2:?}"; shift 2 ;;
                 --rpm) RPM="${2:?}"; shift 2 ;;
                 --tpm) TPM="${2:?}"; shift 2 ;;
@@ -109,9 +115,14 @@ case "${cmd}" in
                 *) echo "ERROR: unknown option: $1"; exit 1 ;;
             esac
         done
+        [[ "${ACCEPTED:-}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
+            || { echo "ERROR: --terms-accepted <YYYY-MM-DD> is required: no key without a recorded agreement"; exit 1; }
+        LEGAL_CONF="$(dirname "${BASH_SOURCE[0]}")/../../legal/legal.conf"
+        TERMS_VERSION="$(sed -n 's/^TERMS_VERSION="\{0,1\}\([^"]*\)"\{0,1\}$/\1/p' "${LEGAL_CONF}" 2>/dev/null)"
+        [ -n "${TERMS_VERSION}" ] || { echo "ERROR: no TERMS_VERSION in legal/legal.conf (copy legal.conf.example)"; exit 1; }
         [ -z "$(keys_of "member:${MEMBER}")" ] || { echo "ERROR: ${MEMBER} already has a key; use rotate"; exit 1; }
         KEY="$(generate "member:${MEMBER}" "${MEMBER}" "${MODELS}" "${RPM}" "${TPM}" "${PARALLEL}" "${DAYS}" \
-            "{\"added\": \"$(date -u +%Y-%m-%d)\"}")"
+            "{\"added\": \"$(date -u +%Y-%m-%d)\", \"terms_version\": \"${TERMS_VERSION}\", \"terms_accepted\": \"${ACCEPTED}\"}")"
         echo "Key for ${MEMBER} (models ${MODELS}; ${RPM} rpm, ${TPM} tpm, ${PARALLEL} parallel):"
         echo "  ${KEY}"
         echo "Shown once. Send it over a private channel."

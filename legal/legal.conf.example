@@ -1,0 +1,20 @@
+# Copy to legal.conf (gitignored) and fill in, then run infra/scripts/render-legal.sh.
+# Every {{KEY}} in the templates must have a value here, or rendering stops.
+
+# Who runs Aaru. A person's legal name or an entity name; this is who members contract with.
+OPERATOR_NAME="<operator legal name>"
+# Where members and authorities reach the operator about the terms and privacy.
+CONTACT_EMAIL="<privacy and legal contact email>"
+# Where vulnerability reports go (security.txt). May be the same address.
+SECURITY_EMAIL="<security contact email>"
+# Governing law and courts, e.g. "the State of New York, United States".
+JURISDICTION="<state and country>"
+# The address members use: the Tailscale name now, chat.<domain> once Cloudflare is live.
+SERVICE_URL="https://aaru.<tailnet>.ts.net"
+# Bump TERMS_VERSION whenever the Terms, Acceptable Use or Privacy Notice change;
+# member.sh records which version each member accepted.
+TERMS_VERSION="2026-10-27"
+EFFECTIVE_DATE="27 October 2026"
+# Set to yes only after counsel has reviewed these documents. Until then every
+# page shows a visible DRAFT banner and verify.sh warns.
+REVIEWED="no"

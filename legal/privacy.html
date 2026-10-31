@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Privacy Notice · Aaru</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+{{NAV}}
+{{DRAFT_NOTICE}}
+<h1>Privacy Notice</h1>
+<p class="meta">Version {{TERMS_VERSION}} · Effective {{EFFECTIVE_DATE}}</p>
+
+<p>This notice explains what personal data Aaru handles, why, for how long, who else is involved, and your choices. The controller of your data is <strong>{{OPERATOR_NAME}}</strong>, reachable at <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a>.</p>
+
+<div class="box">
+<p><strong>The short version.</strong> Models run on our own server; your prompts are not sent to any AI company and are not used to train models. Your chats and files are stored on that server so you can come back to them, until you delete them. Aaru is <strong>not end-to-end encrypted</strong>: the software must read your prompts to answer them, and the operator of the server has the technical ability to access stored data. We only do so as described below. We do not sell your data or use it for advertising.</p>
+</div>
+
+<h2>1. What we collect</h2>
+<table>
+  <tr><th>Data</th><th>Examples</th><th>Why</th><th>Kept for</th></tr>
+  <tr><td>Account</td><td>Name, email address, password (stored as a one-way hash), role, settings, last active time</td><td>Sign-in, operating your account</td><td>Until your account is deleted</td></tr>
+  <tr><td>Your content</td><td>Chats (prompts and responses), titles, files you upload, text extracted from them and the search index ("embeddings") built from it, notes, saved memories, ratings you give</td><td>Providing the chat, history and document features you use</td><td>Until you delete it or your account is deleted</td></tr>
+  <tr><td>API usage records</td><td>Time, API key name, model, number of tokens, duration, status, and your email address for web-app usage. <strong>Not</strong> the text of your prompts or responses</td><td>Enforcing usage limits, fairness and capacity planning, troubleshooting, abuse prevention</td><td>90 days</td></tr>
+  <tr><td>Technical logs</td><td>Service and security logs, which can include network addresses, request paths and error details, but not prompt text</td><td>Security, troubleshooting, abuse prevention</td><td>30 days</td></tr>
+  <tr><td>Backups</td><td>Encrypted copies of the database and stored files</td><td>Recovering from failures</td><td>Daily copies 31 days, weekly 12 weeks, monthly 12 months</td></tr>
+  <tr><td>Invitation and correspondence</td><td>Your invitation, your acceptance of these terms (date and version), emails you send us</td><td>Managing membership, records of agreement, answering you</td><td>For as long as you are a member, then up to 3 years, or longer if the law requires</td></tr>
+</table>
+<p>We do not use cookies or similar technology for advertising or analytics. The web app stores a sign-in token (a cookie and browser storage) and your interface preferences, which are strictly necessary for it to work.</p>
+
+<h2>2. How we use it, and on what basis</h2>
+<ul>
+  <li><strong>To provide the Service you asked for</strong>: run your requests through the models, store your history and files, enforce limits. (Where data protection law asks for a legal basis: performance of our agreement with you.)</li>
+  <li><strong>To keep the Service secure and working</strong>: logs, backups, investigating incidents and misuse. (Legitimate interests in operating a secure service.)</li>
+  <li><strong>To meet legal obligations</strong>, such as responding to lawful requests or reporting illegal content. (Legal obligation.)</li>
+</ul>
+<p>We do not use your content to train or fine-tune models, do not sell or rent personal data, do not share it for cross-context behavioural advertising, and do not make automated decisions about you that have legal or similarly significant effects.</p>
+
+<h2>3. Who can access your data</h2>
+<ul>
+  <li><strong>The operator.</strong> The web app is configured so administrators cannot open or export members' chats from within it. The operator still has technical access to the server and database. We access stored content only when you ask us to (for example for support), to investigate a security incident or a serious breach of the <a href="acceptable-use.html">Acceptable Use Policy</a>, or when required by law.</li>
+  <li><strong>Service providers</strong> that help run the Service, under their own terms:
+    <ul>
+      <li><strong>Tailscale Inc.</strong> provides the private network members connect through. It sees connection metadata (devices, network addresses, when they connect), not the content of your traffic, which is encrypted end to end between your device and our server.</li>
+      <li><strong>Cloudflare, Inc.</strong>, once public access moves to it, will route web traffic through its network. Cloudflare terminates the encrypted connection at its edge, so it can technically see traffic passing through it.</li>
+      <li><strong>Amazon Web Services</strong> stores our backups, encrypted with a key we control.</li>
+    </ul>
+  </li>
+  <li><strong>Authorities</strong>, when we are legally required to disclose data, or where necessary to prevent serious harm.</li>
+</ul>
+<p>The models and the software run on our own server. Model developers (for example Qwen or OpenAI) receive no data from Aaru.</p>
+
+<h2>4. Where data is stored</h2>
+<p>On our server and, for encrypted backups, with Amazon Web Services in the United States. If you are outside the country where our server is located, your data is transferred there to provide the Service.</p>
+
+<h2>5. Security</h2>
+<p>We use access controls, encryption in transit, encrypted off-site backups, separate database accounts for each component, regular security audits and software updates. No system is perfectly secure. If a breach affects your personal data, we will notify you and any authority as the law requires.</p>
+
+<h2>6. Your rights and choices</h2>
+<ul>
+  <li><strong>Access and export</strong>: you can export your chats in the web app (Settings → Data Controls). Ask us for a copy of other data we hold about you.</li>
+  <li><strong>Correction</strong>: update your profile in the web app, or ask us.</li>
+  <li><strong>Deletion</strong>: delete individual chats and files yourself, or ask us to delete your account. Deleted data leaves backups as they expire (at most 12 months); if a backup is ever restored, we re-apply deletions.</li>
+  <li><strong>Objection and restriction</strong>, and other rights that the law where you live gives you, including rights under the GDPR and US state privacy laws where they apply.</li>
+</ul>
+<p>Email <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a>. We will answer within 30 days and may need to confirm it is you. You may also complain to your local data protection authority. We will not treat you differently for exercising these rights.</p>
+
+<h2>7. Children</h2>
+<p>The Service is for adults (18 and over). We do not knowingly collect data from children; if we learn we have, we will delete it.</p>
+
+<h2>8. Changes</h2>
+<p>We will tell members about material changes to this notice before they take effect. The version and date are at the top.</p>
+
+<footer>Aaru · Privacy Notice · Version {{TERMS_VERSION}}</footer>
+</main>
+</body>
+</html>

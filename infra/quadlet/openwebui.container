@@ -53,6 +53,27 @@ Environment=WEBUI_AUTH_COOKIE_SECURE=true
 Environment=JWT_EXPIRES_IN=7d
 # WEBUI_URL and CORS_ALLOW_ORIGIN name the public URL, which is per host:
 # openwebui.container.d/local.conf (gitignored; see local.conf.example).
+#
+# Security headers on every response (Open WebUI's header middleware).
+# HSTS: members only ever reach the app over HTTPS. The CSP restricts framing,
+# <base>, plugins and form targets only; a script policy would break the app.
+Environment=HSTS=max-age=31536000
+Environment=XFRAME_OPTIONS=DENY
+Environment=XCONTENT_TYPE=nosniff
+Environment=REFERRER_POLICY=strict-origin-when-cross-origin
+Environment=XPERMITTED_CROSS_DOMAIN_POLICIES=none
+Environment=CROSS_ORIGIN_OPENER_POLICY=same-origin
+# Microphone and clipboard stay available to the app itself (voice input, copy).
+Environment=PERMISSIONS_POLICY=camera=(),geolocation=(),microphone=(self),clipboard-write=(self),payment=(),usb=()
+Environment="CONTENT_SECURITY_POLICY=frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'"
+#
+# Legal pages and security.txt, rendered from legal/ by render-legal.sh and
+# served without sign-in at /legal/ and /.well-known/security.txt.
+Volume=%h/aaru/legal/site:/app/build/legal:ro,z
+Volume=%h/aaru/legal/site/.well-known:/app/build/.well-known:ro,z
+# Shown to every member until dismissed; change the id when the documents get a
+# new TERMS_VERSION (legal/legal.conf) so it shows again.
+Environment='WEBUI_BANNERS=[{"id":"aaru-legal-2026-10-27","type":"info","title":"","content":"Use of Aaru is subject to the [Terms of Service](/legal/terms.html), the [Acceptable Use Policy](/legal/acceptable-use.html) and the [Privacy Notice](/legal/privacy.html). AI output can be wrong: check anything important.","dismissible":true,"timestamp":1793059200}]'
 HealthCmd=curl --silent --fail http://localhost:8080/health
 HealthInterval=30s
 HealthRetries=3
