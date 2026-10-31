@@ -1,0 +1,21 @@
+# Update PRs for the pinned actions and the locked Terraform providers. Each PR
+# runs CI. Container image digests in infra/quadlet are bumped by hand after
+# review (see architecture.md §10); Dependabot cannot read Quadlet files.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: terraform
+    directories:
+      - /infra/terraform/bootstrap
+      - /infra/terraform/cloudflare
+      - /infra/terraform/backup
+      - /infra/terraform/tailscale
+    schedule:
+      interval: weekly

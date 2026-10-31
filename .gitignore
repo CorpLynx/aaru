@@ -1,8 +1,20 @@
-# Secrets and credentials
+# Secrets and credentials (also enforced by infra/scripts/ci-policy.sh and gitleaks)
 *.env
+*.env.*
 *.secret
 secrets/
 credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa*
+id_ed25519*
+id_ecdsa*
+*.kubeconfig
+*credentials*.json
+*.tfplan
 
 # OS files
 .DS_Store
@@ -18,6 +30,10 @@ infra/config/llama-swap/config.yaml
 
 # Backup staging
 backup-staging/
+
+# Legal pages: operator details and the rendered site (see legal/README.md)
+legal/legal.conf
+legal/site/
 
 # Podman volumes and runtime data
 data/

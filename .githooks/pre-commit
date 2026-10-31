@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Blocks a commit that would add a secret or break repository policy.
+# Installed by infra/scripts/install-git-hooks.sh. CI runs the same checks, so
+# bypassing this hook (git commit --no-verify) only moves the failure to CI.
+
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+    echo "pre-commit: gitleaks is not installed (brew install gitleaks); refusing to commit unscanned." >&2
+    exit 1
+fi
+
+# Staged changes only: what this commit adds.
+gitleaks git --pre-commit --staged --redact --no-banner --config .gitleaks.toml . \
+    || { echo "pre-commit: gitleaks found a possible secret in the staged changes (values redacted above)." >&2; exit 1; }
+
+bash infra/scripts/ci-policy.sh --staged

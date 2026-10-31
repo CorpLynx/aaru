@@ -299,6 +299,10 @@ This spec stays authoritative until each row is decided. The handoff was designe
 - A native mobile client must store user credentials/API keys in iOS Keychain or Android Keystore. Direct LiteLLM clients receive individual virtual keys only; never embed a gateway master key or shared service credential in the app.
 - Restrict administrative dashboards and credentials to a private management path; enable MFA for operator accounts. Maintain an incident process for leaked user keys and data deletion requests.
 
+### Legal documents and compliance controls
+
+Members see Terms of Service (with the AI-output disclaimer), an Acceptable Use Policy, a Privacy Notice, third-party notices and a security policy, rendered from `legal/` and served at `/legal/` without sign-in, plus `/.well-known/security.txt`. They are templates pending counsel review and show a DRAFT banner until marked reviewed. The Privacy Notice states retention the deployment enforces (usage records 90 days without prompt text, logs 30 days, backups up to 12 months). Keys require a recorded terms acceptance. Security headers, branded error pages, the Open WebUI license's 50-user cap check and the data-request and incident runbooks are listed in `docs/compliance.md`.
+
 ## 9. Network and edge routing
 
 - Until Cloudflare is live, the interim member path is Tailscale (§4a): node sharing, TLS terminated in the Aaru container with a tailnet certificate, so no third party sees plaintext; Tailscale sees connection metadata. Retiring it is stopping one container.
@@ -311,6 +315,7 @@ This spec stays authoritative until each row is decided. The handoff was designe
 
 ## 10. Operations and lifecycle
 
+- CI (`.github/workflows/ci.yml`) gates every change: secret scanning of the full history, repository policy (`infra/scripts/ci-policy.sh`), shellcheck, Terraform validation against committed lock files, a Trivy misconfiguration scan, Quadlet generation on Fedora, config parsing and actionlint. Local git hooks (`.githooks/`) run the secret scan and policy before commits and pushes.
 - Define a deployment repository containing Quadlet units, pinned configuration, schema/setup steps, and non-secret examples. Pin container images by digest (or an equivalent immutable version) and record model hashes.
 - Build and test the web UI independently. If a native client is later adopted, maintain its source, license inventory, signing credentials, and upstream security-update cadence separately.
 - Scan images/dependencies before production updates, stage updates, and maintain a rollback path. Update Fedora/kernel/firmware deliberately because inference compatibility can change with the GPU stack.

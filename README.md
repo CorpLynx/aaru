@@ -169,6 +169,24 @@ infra/scripts/build-openwebui-image.sh  # builds the web app image on GitHub Act
 database roles, key enforcement, model allowlists, rate limits, streaming, and that no prompt text or
 keys reach the logs.
 
+## Checks and secrets
+
+Every push to `main` and every pull request runs [CI](.github/workflows/ci.yml):
+gitleaks over the full history and tree, repository policy (no state, tfvars,
+host configs or keys tracked; images pinned by digest; actions pinned to SHAs;
+official model sources), shellcheck, Terraform fmt/init/validate against the
+committed lock files, a Trivy misconfiguration scan, the Quadlet units through
+Fedora's generator, config parsing, legal page rendering, and actionlint. All
+tools are pinned by version and checksum.
+
+Locally, run `infra/scripts/install-git-hooks.sh` once per clone: the
+pre-commit hook scans staged changes for secrets and checks policy, and the
+pre-push hook scans outgoing commits. GitHub secret scanning and push
+protection are on for the repository as a third layer.
+
+If a secret is ever committed, treat it as leaked: rotate it first, then
+remove it from history.
+
 ## Hardware
 
 - One host with an AMD GPU, served through llama.cpp on Vulkan
@@ -176,6 +194,8 @@ keys reach the logs.
 - An NVIDIA test machine (vLLM on CUDA) for interim validation
 
 ## Documentation
+
+- [Compliance overview](docs/compliance.md): legal pages, security headers, retention, license cap, and the pre-launch checklist; [legal/](legal/README.md) holds the Terms, Acceptable Use, Privacy and security templates (drafts until counsel review)
 
 - [Build specification](architecture.md): architecture, security model, delivery phases, open decisions
 - [Design handoff](design/README.md): brand, tokens, components and surface specs; §7a of the spec lists where it differs from v1 scope

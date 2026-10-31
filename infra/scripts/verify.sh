@@ -49,6 +49,7 @@ TEST_KEYS=""
 cleanup() {
     if [ -n "${TEST_KEYS}" ] && [ -n "${MASTER_KEY:-}" ]; then
         local keys_json
+        # shellcheck disable=SC2086  # deliberate: splits a whitespace-separated list
         keys_json="$(printf '%s\n' ${TEST_KEYS} | python3 -c 'import json,sys; print(json.dumps({"keys": sys.stdin.read().split()}))')"
         printf 'Authorization: Bearer %s\n' "${MASTER_KEY}" > "${WORK_DIR}/master.hdr"
         curl -s -o /dev/null --max-time 10 -X POST "${GATEWAY}/key/delete" \
@@ -228,6 +229,7 @@ for port in 4000 3000 8088; do
     if [ -z "${addrs}" ]; then
         skip "port ${port} not listening"
     elif printf '%s\n' "${addrs}" | grep -Evq "^(127\.0\.0\.1|\[::1\]):${port}\$"; then
+        # shellcheck disable=SC2086  # deliberate: splits a whitespace-separated list
         fail "port ${port} listens beyond loopback: $(printf '%s ' ${addrs})"
     else
         pass "port ${port} bound to loopback only"
@@ -360,6 +362,42 @@ if expect_running openwebui; then
         ""|"*") fail "web app CORS allows any origin (set WEBUI_URL and CORS_ALLOW_ORIGIN in openwebui.container.d/local.conf)" ;;
         *) pass "web app CORS limited to ${cors}" ;;
     esac
+
+    WEBAPP="${AARU_WEBAPP:-http://127.0.0.1:3000}"
+    curl -s -D "${WORK_DIR}/web.hdr" -o /dev/null --max-time 10 "${WEBAPP}/" 2>/dev/null || true
+    for h in 'Strict-Transport-Security: max-age=' 'X-Frame-Options: DENY' 'X-Content-Type-Options: nosniff' \
+             "Content-Security-Policy: frame-ancestors 'none'" 'Referrer-Policy: strict-origin-when-cross-origin'; do
+        grep -qiF "${h}" "${WORK_DIR}/web.hdr" && pass "header ${h%%:*}" || fail "web app response lacks ${h}"
+    done
+
+    # Legal pages: served without sign-in, fully rendered, and marked draft until reviewed.
+    for page in terms acceptable-use privacy notices security; do
+        code="$(http "legal-${page}" GET "${WEBAPP}/legal/${page}.html")"
+        if [ "${code}" = "200" ] && grep -q '<h1>' "${WORK_DIR}/legal-${page}.body" && ! grep -q '{{' "${WORK_DIR}/legal-${page}.body"; then
+            pass "legal page /legal/${page}.html served"
+        else
+            fail "legal page /legal/${page}.html not served (${code}); run infra/scripts/render-legal.sh"
+        fi
+    done
+    grep -q 'class="draft"' "${WORK_DIR}/legal-terms.body" 2>/dev/null \
+        && warn "legal pages are still drafts (set REVIEWED=\"yes\" in legal/legal.conf after counsel review)"
+    code="$(http securitytxt GET "${WEBAPP}/.well-known/security.txt")"
+    expires="$(sed -n 's/^Expires: *//p' "${WORK_DIR}/securitytxt.body" 2>/dev/null | tr -d '\r')"
+    if [ "${code}" != "200" ] || [ -z "${expires}" ]; then
+        fail "/.well-known/security.txt not served (${code})"
+    else
+        left=$(( ( $(date -d "${expires}" +%s 2>/dev/null || echo 0) - $(date +%s) ) / 86400 ))
+        if [ "${left}" -lt 0 ]; then fail "security.txt expired ${expires}; re-run render-legal.sh"
+        elif [ "${left}" -lt 30 ]; then warn "security.txt expires in ${left} days; re-run render-legal.sh"
+        else pass "security.txt served, expires ${expires}"; fi
+    fi
+
+    # Error handling: unknown API routes are real 404s, and no API schema is published.
+    code="$(http api404 GET "${WEBAPP}/api/v1/aaru-verify-no-such-route")"
+    [ "${code}" = "404" ] && pass "unknown API route returns 404" || fail "unknown API route returned ${code}"
+    http openapi GET "${WEBAPP}/openapi.json" >/dev/null
+    grep -q '"openapi"' "${WORK_DIR}/openapi.body" 2>/dev/null \
+        && fail "web app publishes its OpenAPI schema (ENV is not prod)" || pass "no OpenAPI schema published"
 else
     skip "openwebui not running"
 fi
@@ -373,6 +411,18 @@ if expect_running postgres; then
     public_connect="$(podman exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tA -c "select datname from pg_database where datname in ('"'litellm','openwebui'"') and has_database_privilege('"'public'"', datname, '"'CONNECT'"')"' 2>/dev/null | xargs)"
     [ -z "${public_connect}" ] && pass "PUBLIC cannot connect to service databases" \
         || fail "PUBLIC can connect to: ${public_connect}"
+    # Open WebUI License 4(i): the rebrand holds only at 50 or fewer end users in
+    # any rolling 30-day period (last_active_at is epoch seconds).
+    active="$(podman exec postgres sh -c 'psql -U "$POSTGRES_USER" -d openwebui -tA -c "select count(*) from \"user\" where last_active_at > extract(epoch from now() - interval '"'30 days'"')"' 2>/dev/null | tr -dc '0-9')"
+    if [ -z "${active}" ]; then
+        skip "active-user count unavailable"
+    elif [ "${active}" -gt 50 ]; then
+        fail "${active} active web app users in 30 days: over the Open WebUI License's 50-user rebrand limit"
+    elif [ "${active}" -gt 40 ]; then
+        warn "${active} active web app users in 30 days (license limit for the rebrand: 50)"
+    else
+        pass "${active} active web app users in 30 days (license limit 50)"
+    fi
     # The first account created becomes admin even with sign-up off, so an admin
     # must exist before members can reach the app.
     admins="$(podman exec postgres sh -c 'psql -U "$POSTGRES_USER" -d openwebui -tA -c "select count(*) from \"user\" where role = '"'admin'"'"' 2>/dev/null | tr -dc '0-9')"

@@ -1,0 +1,215 @@
+# Checks for every push to main and every pull request, plus a weekly run so
+# new gitleaks rules are applied to old history. Every tool is pinned: actions
+# to commit SHAs, binaries to versions with SHA-256 checks, images to digests.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITLEAKS_VERSION: 8.30.1
+  GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+  SHELLCHECK_VERSION: 0.11.0
+  SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
+  ACTIONLINT_VERSION: 1.7.12
+  ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+  TERRAFORM_VERSION: 1.15.8
+  TERRAFORM_SHA256: d25ce7b6902013ad905db3d2eab0be4cd905887fe88b81a6171b8d5503c31f3d
+  # Trivy 0.65.0, pinned by digest: it predates the compromised 0.69.4-0.69.6.
+  TRIVY_IMAGE: aquasec/trivy:0.65.0@sha256:a22415a38938a56c379387a8163fcb0ce38b10ace73e593475d3658d578b2436
+
+jobs:
+  secrets:
+    name: Secrets (gitleaks, full history)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install gitleaks
+        run: |
+          curl -fsSLo /tmp/gitleaks.tgz "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  /tmp/gitleaks.tgz" | sha256sum -c -
+          tar -xzf /tmp/gitleaks.tgz -C /tmp gitleaks
+          sudo install /tmp/gitleaks /usr/local/bin/gitleaks
+      - name: Scan every commit on every ref
+        run: gitleaks git --log-opts="--all" --redact --no-banner --config .gitleaks.toml .
+      - name: Scan the checked-out tree
+        run: gitleaks dir --redact --no-banner --config .gitleaks.toml .
+
+  policy:
+    name: Repository policy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Forbidden files, image digests, action pins, model sources
+        run: bash infra/scripts/ci-policy.sh
+
+  shell:
+    name: Shell scripts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Install shellcheck
+        run: |
+          curl -fsSLo /tmp/shellcheck.txz "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+          echo "${SHELLCHECK_SHA256}  /tmp/shellcheck.txz" | sha256sum -c -
+          tar -xJf /tmp/shellcheck.txz -C /tmp
+          sudo install "/tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
+      - name: shellcheck (all severities)
+        run: shellcheck -x infra/scripts/*.sh .githooks/*
+      - name: bash -n
+        run: for f in infra/scripts/*.sh .githooks/*; do bash -n "$f"; done
+
+  terraform:
+    name: Terraform (${{ matrix.stack }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        stack: [bootstrap, cloudflare, backup, tailscale]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Install Terraform
+        run: |
+          curl -fsSLo /tmp/terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+          echo "${TERRAFORM_SHA256}  /tmp/terraform.zip" | sha256sum -c -
+          unzip -q /tmp/terraform.zip -d /tmp/terraform
+          sudo install /tmp/terraform/terraform /usr/local/bin/terraform
+      - name: fmt
+        run: terraform -chdir="infra/terraform/${{ matrix.stack }}" fmt -check -diff
+      # -lockfile=readonly: providers must match the committed lock file exactly.
+      - name: init (no backend)
+        run: terraform -chdir="infra/terraform/${{ matrix.stack }}" init -backend=false -input=false -lockfile=readonly
+      - name: validate
+        run: terraform -chdir="infra/terraform/${{ matrix.stack }}" validate -no-color
+
+  iac-scan:
+    name: Misconfiguration scan (Trivy)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      # CRITICAL findings fail the build. HIGH findings are reported for review;
+      # accepted ones go in .trivyignore with a reason.
+      - name: Terraform and container config (CRITICAL blocks)
+        run: |
+          touch .trivyignore
+          docker run --rm -v "${PWD}:/src:ro" "${TRIVY_IMAGE}" config \
+            --severity CRITICAL --exit-code 1 --ignorefile /src/.trivyignore /src/infra
+      - name: Terraform and container config (HIGH, report only)
+        run: |
+          docker run --rm -v "${PWD}:/src:ro" "${TRIVY_IMAGE}" config \
+            --severity HIGH --exit-code 0 --ignorefile /src/.trivyignore /src/infra
+
+  quadlet:
+    name: Quadlet units (Fedora's generator)
+    runs-on: ubuntu-24.04
+    container:
+      image: quay.io/fedora/fedora:43@sha256:6466bd845895a7e29dc62eb92d0e483a6a1f1a28f380f7330f6ce51258926d58
+    steps:
+      - name: Install podman
+        run: dnf -y -q install --setopt=install_weak_deps=False podman
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Generate every unit, with example drop-ins filled in
+        run: |
+          set -euo pipefail
+          dir=/tmp/quadlet
+          mkdir -p "$dir"
+          cp infra/quadlet/*.container infra/quadlet/*.network infra/quadlet/*.volume "$dir"/
+          # Drop-in examples carry <placeholders> on purpose; give them dummy values.
+          for d in infra/quadlet/*.container.d; do
+            mkdir -p "$dir/$(basename "$d")"
+            sed -E 's/<[^>]*memory[^>]*>/1g/; s/<[^>]*>/x/g' "$d/local.conf.example" > "$dir/$(basename "$d")/local.conf"
+          done
+          QUADLET_UNIT_DIRS="$dir" /usr/libexec/podman/quadlet -dryrun -user > /tmp/units.txt 2> /tmp/quadlet.err || { cat /tmp/quadlet.err; exit 1; }
+          cat /tmp/quadlet.err
+          if grep -qiE 'unsupported|error|invalid|failed' /tmp/quadlet.err; then exit 1; fi
+          want=$(find "$dir" -maxdepth 1 -type f | wc -l)
+          got=$(grep -cE '^---.+---$' /tmp/units.txt)
+          echo "generated ${got} of ${want} units"
+          [ "${got}" -eq "${want}" ]
+
+  configs:
+    name: Config files and legal pages
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Install PyYAML (pinned by hash)
+        run: |
+          python3 -m venv /tmp/venv
+          echo "pyyaml==6.0.2 --hash=sha256:80bab7bfc629882493af4aa31a4cfa43a4c57c83813253626916b8c7ada83476" > /tmp/req.txt
+          /tmp/venv/bin/pip install -q --only-binary=:all: --require-hashes -r /tmp/req.txt
+      - name: YAML, JSON and TOML parse
+        run: |
+          git ls-files '*.yml' '*.yaml' '*.yaml.example' '*.json' '*.toml' | /tmp/venv/bin/python -c '
+          import json, sys, tomllib, yaml
+          bad = 0
+          for path in sys.stdin.read().split():
+              try:
+                  with open(path, "rb") as fh:
+                      data = fh.read()
+                  if path.endswith(".json"):
+                      json.loads(data)
+                  elif path.endswith(".toml"):
+                      tomllib.loads(data.decode())
+                  else:
+                      yaml.safe_load(data)
+              except Exception as exc:
+                  bad += 1
+                  print(f"FAIL {path}: {exc}")
+          sys.exit(1 if bad else 0)'
+      - name: Render the legal pages with sample values
+        run: |
+          sed -e 's/<operator legal name>/CI Example Operator/' \
+              -e 's/<privacy and legal contact email>/privacy@example.com/' \
+              -e 's/<security contact email>/security@example.com/' \
+              -e 's/<state and country>/Example State, Example Country/' \
+              -e 's|https://aaru.<tailnet>.ts.net|https://aaru.example.ts.net|' \
+              legal/legal.conf.example > legal/legal.conf
+          bash infra/scripts/render-legal.sh
+          ! grep -rn '{{' legal/site/
+
+  workflows:
+    name: Workflow lint (actionlint)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Install actionlint and shellcheck
+        run: |
+          curl -fsSLo /tmp/actionlint.tgz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  /tmp/actionlint.tgz" | sha256sum -c -
+          tar -xzf /tmp/actionlint.tgz -C /tmp actionlint
+          sudo install /tmp/actionlint /usr/local/bin/actionlint
+          curl -fsSLo /tmp/shellcheck.txz "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+          echo "${SHELLCHECK_SHA256}  /tmp/shellcheck.txz" | sha256sum -c -
+          tar -xJf /tmp/shellcheck.txz -C /tmp
+          sudo install "/tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
+      - name: actionlint (runs shellcheck on every run step)
+        run: actionlint -color
