@@ -6,7 +6,7 @@ Wants=network-online.target
 [Container]
 # Built from CorpLynx/aaru-web by infra/scripts/build-openwebui-image.sh, which
 # rewrites this line. Never use a floating tag (see litellm.container).
-Image=ghcr.io/corplynx/aaru-web@sha256:726a02d27b71df586324442ece7b3ee58951d1bb52ab5e7beee4d778e7007bfd
+Image=ghcr.io/corplynx/aaru-web@sha256:708029a4c4408075bad29287c26abcd8f35f5814ec83d5e1693f70d28a7cf3a8
 ContainerName=openwebui
 Network=aaru-ingress.network
 Network=aaru-internal.network:ip=10.231.0.40
