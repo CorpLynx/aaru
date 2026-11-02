@@ -105,12 +105,13 @@ no route into it. `aaru-admin` holds Dozzle alone.
 
 | Area | State |
 | --- | --- |
-| Quadlet units, network segmentation, per-service database roles | Written and hardened (capabilities dropped, read-only roots); test-box run pending |
-| Encrypted S3 backups | Script, units and Terraform stack written; first run and restore drill pending |
-| Web app theme and branding | Done in [`aaru-web`](https://github.com/CorpLynx/aaru-web) |
-| Image pipeline (GitHub Actions, Trivy-gated, digest-pinned) | First build blocked by the Trivy gate; dependency fixes in aaru-web #36 |
-| Host hardening, member keys, model fetch, health alerts | Scripts written; not yet run on a host |
-| Restore drill, Tailscale admin access | Next |
+| Quadlet units, network segmentation, hardening | Written; generated cleanly by Fedora 43's Quadlet in CI; not yet deployed |
+| Images | aaru-web and Anubis built on GitHub Actions, Trivy-clean, pinned by digest; every pinned image rescanned weekly |
+| Web app theme, branding, error page, AI disclaimer | Done in [`aaru-web`](https://github.com/CorpLynx/aaru-web) |
+| Legal pages, member guide, compliance controls | Written; legal pages are drafts until counsel review |
+| CI and secret scanning | 11 required checks on `main`, plus pre-commit and pre-push hooks |
+| Encrypted S3 backups and restore drill | Scripts, units and Terraform written; first backup and drill pending |
+| Host hardening, member keys, model fetch with Anubis, health alerts | Scripts written; not yet run on a host |
 | Encrypted storage from the design handoff | Waiting on open decisions 10, 13 and 14 in the spec |
 
 ## Repository layout
@@ -146,6 +147,7 @@ infra/scripts/setup.sh                  # installs units and host drop-ins, prin
 infra/scripts/member.sh add <email>     # one LiteLLM key per invited member; also list, rotate, revoke
 infra/scripts/member.sh webapp-key      # the web app's own key, stored as a Podman secret
 infra/scripts/healthcheck.sh --print    # what the 5-minute health timer sees
+infra/scripts/restore-drill.sh          # restore the newest backup into throwaway containers (quarterly)
 infra/scripts/verify.sh                 # checks the Phase 1 acceptance criteria
 ```
 

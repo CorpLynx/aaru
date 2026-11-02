@@ -1,0 +1,145 @@
+# Builds a patched copy of an upstream image (infra/images/<name>/Containerfile)
+# when a fix is not yet in an upstream release. Triggered by an
+# image-<name>-<sha> tag, which infra/scripts/build-patched-image.sh pushes.
+# Verifies the base's signature where the image has a cosign.pub, scans with
+# Trivy and smoke-tests before pushing; only a passing image reaches the
+# registry, as ghcr.io/corplynx/aaru-<name>.
+name: Patched image
+
+on:
+  push:
+    tags:
+      - image-*
+
+permissions:
+  contents: read
+
+concurrency:
+  group: patched-image-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  # Trivy 0.65.0, pinned by digest: it predates the compromised 0.69.4-0.69.6.
+  TRIVY_IMAGE: aquasec/trivy:0.65.0@sha256:a22415a38938a56c379387a8163fcb0ce38b10ace73e593475d3658d578b2436
+  # cosign v3.1.4, pinned by digest (signed by Sigstore's release identity).
+  COSIGN_IMAGE: ghcr.io/sigstore/cosign/cosign:v3.1.4@sha256:0f06154836d2de34f887a5c273506d52ca43edaa1d9e53e6510fa78a48f69c2d
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Prepare environment
+        run: |
+          name="${GITHUB_REF_NAME#image-}"
+          name="${name%-*}"
+          dir="infra/images/${name}"
+          [ -f "${dir}/Containerfile" ] || { echo "::error::no ${dir}/Containerfile for tag ${GITHUB_REF_NAME}"; exit 1; }
+          base="$(sed -n 's/^ARG BASE_IMAGE=//p' "${dir}/Containerfile")"
+          [ -n "${base}" ] || { echo "::error::${dir}/Containerfile has no ARG BASE_IMAGE"; exit 1; }
+          {
+            echo "NAME=${name}"
+            echo "DIR=${dir}"
+            echo "BASE_IMAGE=${base}"
+            echo "FULL_IMAGE_NAME=${REGISTRY}/${GITHUB_REPOSITORY_OWNER,,}/aaru-${name}"
+            echo "LOCAL_IMAGE=aaru-${name}:${GITHUB_SHA}"
+          } >> "${GITHUB_ENV}"
+
+      # vLLM's image runs to tens of gigabytes unpacked.
+      - name: Free disk space
+        run: |
+          sudo rm -rf /opt/hostedtoolcache /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/share/boost
+          docker system prune -af >/dev/null
+          df -h /
+
+      - name: Verify the base image signature
+        if: hashFiles(format('{0}/cosign.pub', env.DIR)) != ''
+        run: |
+          docker run --rm -v "${PWD}/${DIR}/cosign.pub:/cosign.pub:ro" "${COSIGN_IMAGE}" \
+            verify --key /cosign.pub "${BASE_IMAGE}" >/dev/null
+          echo "Verified ${BASE_IMAGE} against ${DIR}/cosign.pub"
+
+      - name: Build image
+        run: |
+          docker build --pull --platform linux/amd64 \
+            --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.base.name=${BASE_IMAGE}" \
+            -t "${LOCAL_IMAGE}" -f "${DIR}/Containerfile" "${DIR}"
+
+      # Block critical or high vulnerabilities that have a fix. Trivy runs
+      # inside the built image against its root filesystem, which avoids
+      # exporting a multi-gigabyte image to disk. Accepted exceptions go in
+      # .trivyignore.yaml with a reason and an expiry.
+      - name: Scan image with Trivy
+        run: |
+          touch .trivyignore.yaml
+          cid="$(docker create "${TRIVY_IMAGE}")"
+          docker cp "${cid}:/usr/local/bin/trivy" "${RUNNER_TEMP}/trivy"
+          docker rm "${cid}" >/dev/null
+          mkdir -p "${RUNNER_TEMP}/scan-out"
+          chmod 777 "${RUNNER_TEMP}/scan-out"
+          scan() {
+            docker run --rm --user 0 \
+              -v "${RUNNER_TEMP}/trivy:/opt/aaru-scan/trivy:ro" \
+              -v "${PWD}/.trivyignore.yaml:/opt/aaru-scan/trivyignore.yaml:ro" \
+              -v "${RUNNER_TEMP}/scan-out:/opt/aaru-scan/out" \
+              --entrypoint /opt/aaru-scan/trivy "${LOCAL_IMAGE}" \
+              rootfs --cache-dir /tmp/trivy-cache --scanners vuln \
+              --severity CRITICAL,HIGH --ignore-unfixed \
+              --ignorefile /opt/aaru-scan/trivyignore.yaml \
+              --skip-dirs /proc,/sys,/dev,/opt/aaru-scan \
+              --no-progress "$@" /
+          }
+          status=0
+          scan --exit-code 1 || status=$?
+          if [ "${status}" -ne 0 ]; then
+            # Where each finding is, for fixing it or scoping an exception.
+            scan --exit-code 0 --quiet --list-all-pkgs --format json --output /opt/aaru-scan/out/report.json
+            jq -r '.Results[]? | .Target as $t | (.Packages // []) as $p | .Vulnerabilities[]?
+              | . as $v
+              | ([$p[] | select(.Name == $v.PkgName and .Version == $v.InstalledVersion) | .FilePath // empty] | join(", ")) as $f
+              | "\($v.VulnerabilityID)\t\($v.PkgName) \($v.InstalledVersion) -> \($v.FixedVersion)\t\($v.PkgPath // (if $f == "" then $t else $f end))"' \
+              "${RUNNER_TEMP}/scan-out/report.json" | sort -u
+          fi
+          exit "${status}"
+
+      - name: Smoke test
+        run: bash "${DIR}/smoke.sh" "${LOCAL_IMAGE}"
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image
+        run: |
+          docker tag "${LOCAL_IMAGE}" "${FULL_IMAGE_NAME}:${GITHUB_REF_NAME}"
+          docker push "${FULL_IMAGE_NAME}:${GITHUB_REF_NAME}"
+          ref=$(docker inspect --format '{{index .RepoDigests 0}}' "${FULL_IMAGE_NAME}:${GITHUB_REF_NAME}")
+          mkdir -p "${RUNNER_TEMP}/aaru-image"
+          echo "${ref}" > "${RUNNER_TEMP}/aaru-image/image-ref.txt"
+          {
+            echo "### Patched ${NAME} image"
+            echo
+            echo "- Base: \`${BASE_IMAGE}\`"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Pinned reference: \`${ref}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload image reference
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: aaru-image
+          path: ${{ runner.temp }}/aaru-image/image-ref.txt
+          retention-days: 90

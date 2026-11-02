@@ -140,6 +140,25 @@ if systemctl --user is-enabled aaru-backup.timer >/dev/null 2>&1; then
     fi
 fi
 
+# --- Restore drill (spec §10: quarterly) ---
+if systemctl --user is-enabled aaru-backup.timer >/dev/null 2>&1; then
+    drill="${XDG_STATE_HOME:-${HOME}/.local/state}/aaru/restore-drill"
+    if [ ! -f "${drill}" ]; then
+        check restore-drill FAIL "no restore drill has run (infra/scripts/restore-drill.sh)"
+    else
+        drill_date="$(sed -n 's/^date=//p' "${drill}")"
+        drill_result="$(sed -n 's/^result=//p' "${drill}")"
+        drill_age=$(( ( $(date +%s) - $(date -d "${drill_date}" +%s 2>/dev/null || echo 0) ) / 86400 ))
+        if [ "${drill_result}" != "passed" ]; then
+            check restore-drill FAIL "last restore drill ${drill_result:-unknown} (${drill_date})"
+        elif [ "${drill_age}" -gt 100 ]; then
+            check restore-drill FAIL "last successful restore drill ${drill_age} days ago (quarterly)"
+        else
+            check restore-drill OK "restore drill passed ${drill_age} days ago"
+        fi
+    fi
+fi
+
 # --- Report changes and save state ---
 changes=0
 for name in "${!NOW_STATE[@]}"; do

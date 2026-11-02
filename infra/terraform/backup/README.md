@@ -54,6 +54,21 @@ to `COMPLIANCE` after the first restore drill, as the spec asks. Under
 `COMPLIANCE` nobody, the root user included, can delete a locked version
 early, and the bucket cannot be destroyed until every lock has run out.
 
+## Restore drill
+
+`infra/scripts/restore-drill.sh` proves a backup restores without touching live
+data: it downloads the newest daily backup (or a key you name), checks its
+SHA-256 against the value recorded at upload, loads the dump into a throwaway
+PostgreSQL container with no network, imports the web app volume into a
+throwaway volume, and compares row counts with the live databases. Run it
+before onboarding members and then quarterly; `healthcheck.sh` alerts when
+the last passing drill is more than 100 days old.
+
+```sh
+infra/scripts/restore-drill.sh
+infra/scripts/restore-drill.sh monthly/aaru-backup-<timestamp>.tar.gz
+```
+
 ## Restore
 
 The backup user can read as well as write, so a restore uses the same

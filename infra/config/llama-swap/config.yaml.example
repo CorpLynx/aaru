@@ -1,7 +1,7 @@
 # llama-swap configuration for the llamacpp container.
 # Copy to config.yaml (gitignored) and add one entry per model staged with
 # infra/scripts/fetch-model.sh. Edits apply without a restart (-watch-config).
-# Reference: https://github.com/mostlygeek/llama-swap/blob/v266/docs/config.example.yaml
+# Reference: https://github.com/mostlygeek/llama-swap/blob/v269/docs/config.example.yaml
 #
 # How it behaves (the lmstudio-router features, minus downloads):
 #   - a model loads on its first request

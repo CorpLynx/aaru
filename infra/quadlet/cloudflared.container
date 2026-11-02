@@ -4,8 +4,8 @@ After=network-online.target openwebui.service litellm.service
 Wants=network-online.target
 
 [Container]
-# Pinned by digest to 2026.10.3; never use a floating tag (see litellm.container).
-Image=docker.io/cloudflare/cloudflared@sha256:faa8e0a1475f137c910be6025f43c8e4092fdd35461b31e19fd1390657a1ff39
+# Pinned by digest to 2026.10.7; never use a floating tag (see litellm.container).
+Image=docker.io/cloudflare/cloudflared@sha256:4955524aeaa379e154023d5a027c250f7b35041a2e7e950cf13f144bc9b9c5ba
 ContainerName=cloudflared
 # Ingress only: no route to PostgreSQL or inference (spec §9).
 Network=aaru-ingress.network

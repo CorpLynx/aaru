@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Member guide · Aaru</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+{{NAV}}
+<h1>Member guide</h1>
+<p class="meta">How to get in, use the models and use the API</p>
+
+<p>Aaru runs open-weight AI models on a private server. Your use is covered by the <a href="terms.html">Terms</a>, the <a href="acceptable-use.html">Acceptable Use Policy</a> and the <a href="privacy.html">Privacy Notice</a>; the short version is that models run locally, nothing is used for training, and chats are stored on the server (not end-to-end encrypted) until you delete them.</p>
+
+<h2>1. Getting in</h2>
+<p>Aaru is reached over a private network (Tailscale) while its public address is being set up.</p>
+<ol>
+  <li>Accept the share invitation you received from the operator. Install <a href="https://tailscale.com/download">Tailscale</a> on each device you will use and sign in with any account of your own. You will see one shared machine, <strong>aaru</strong>; nothing else on the operator's network is visible to you.</li>
+  <li>With Tailscale connected, open <a href="{{SERVICE_URL}}">{{SERVICE_URL}}</a> and sign in with the email address and temporary password the operator gave you. There is no public sign-up.</li>
+  <li>Change your password (Settings → Account).</li>
+</ol>
+
+<h2>2. Installing it as an app</h2>
+<ul>
+  <li><strong>iPhone or iPad:</strong> open the address in Safari, tap Share, then <em>Add to Home Screen</em>.</li>
+  <li><strong>Android:</strong> open it in Chrome, open the menu, then <em>Install app</em>.</li>
+  <li><strong>Desktop:</strong> in Chrome or Edge, use the install icon in the address bar.</li>
+</ul>
+<p>Tailscale has to be connected for the app to reach Aaru.</p>
+
+<h2>3. Choosing a model</h2>
+<table>
+  <tr><th>Model</th><th>Good for</th></tr>
+  <tr><td><strong>fast</strong></td><td>Everyday chat, drafting, quick answers, images in your messages. The default.</td></tr>
+  <tr><td><strong>dense</strong></td><td>Longer or more careful work where steadiness matters more than speed. Also reads images.</td></tr>
+  <tr><td><strong>reasoning</strong></td><td>Multi-step problems, analysis, code. Slower, and thinks before it answers.</td></tr>
+</table>
+<p>Models load when first asked for. If a model has been idle, the first reply can take a minute or two while it loads; replies after that are quick. Only one of the larger models is loaded at a time, so switching between them also means a short wait.</p>
+<p><strong>Documents:</strong> attach a file to a chat, or add files to a knowledge collection in the Workspace to ask questions across them. Answers cite the passages they used.</p>
+<p><strong>Temporary chats</strong> are not saved to your history.</p>
+<p>AI output can be wrong. Check anything important, and do not rely on it for medical, legal, financial or safety decisions.</p>
+
+<h2>4. Using the API</h2>
+<p>Aaru speaks the OpenAI API, so most tools work by changing the base URL. Ask the operator for an API key; it is shown to you once, so store it somewhere safe and never share it.</p>
+<div class="box">
+<p><strong>Base URL:</strong> <code>{{SERVICE_URL}}:8443/v1</code><br>
+<strong>Models:</strong> <code>fast</code>, <code>dense</code>, <code>reasoning</code>, and <code>embed</code> / <code>embed-small</code> for embeddings</p>
+</div>
+<pre class="box" style="overflow-x:auto"><code>curl {{SERVICE_URL}}:8443/v1/chat/completions \
+  -H "Authorization: Bearer $AARU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "fast", "messages": [{"role": "user", "content": "Hello"}]}'</code></pre>
+<pre class="box" style="overflow-x:auto"><code>import os
+from openai import OpenAI
+client = OpenAI(base_url="{{SERVICE_URL}}:8443/v1", api_key=os.environ["AARU_API_KEY"])
+reply = client.chat.completions.create(model="fast", messages=[{"role": "user", "content": "Hello"}])</code></pre>
+<p>Editor assistants that accept an OpenAI-compatible provider (for example Continue) work the same way: set the base URL, the key and a model name.</p>
+<p><strong>Limits:</strong> each key has per-minute request and token limits and a cap on parallel requests (by default 30 requests and 100,000 tokens a minute, 2 at once). Going over returns HTTP 429; wait and retry. Ask the operator if your use needs more.</p>
+
+<h2>5. Your data</h2>
+<ul>
+  <li>Export your chats in Settings → Data Controls. Delete chats and files yourself at any time.</li>
+  <li>To delete your account, or for a copy of other data we hold, email <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a>.</li>
+  <li>Details are in the <a href="privacy.html">Privacy Notice</a>.</li>
+</ul>
+
+<h2>6. Help and outages</h2>
+<ul>
+  <li>Aaru runs on one server, so it is sometimes down for maintenance or outages, without a guaranteed level of service.</li>
+  <li>Questions, problems or a key you think has leaked: <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a>. A leaked key is revoked and replaced straight away.</li>
+  <li>Security issues: see the <a href="security.html">Security policy</a>.</li>
+</ul>
+
+<footer>Aaru · Member guide</footer>
+</main>
+</body>
+</html>

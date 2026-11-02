@@ -111,16 +111,16 @@ jobs:
         with:
           persist-credentials: false
       # CRITICAL findings fail the build. HIGH findings are reported for review;
-      # accepted ones go in .trivyignore with a reason.
+      # accepted ones go in .trivyignore.yaml with a reason.
       - name: Terraform and container config (CRITICAL blocks)
         run: |
-          touch .trivyignore
+          touch .trivyignore.yaml
           docker run --rm -v "${PWD}:/src:ro" "${TRIVY_IMAGE}" config \
-            --severity CRITICAL --exit-code 1 --ignorefile /src/.trivyignore /src/infra
+            --severity CRITICAL --exit-code 1 --ignorefile /src/.trivyignore.yaml /src/infra
       - name: Terraform and container config (HIGH, report only)
         run: |
           docker run --rm -v "${PWD}:/src:ro" "${TRIVY_IMAGE}" config \
-            --severity HIGH --exit-code 0 --ignorefile /src/.trivyignore /src/infra
+            --severity HIGH --exit-code 0 --ignorefile /src/.trivyignore.yaml /src/infra
 
   quadlet:
     name: Quadlet units (Fedora's generator)

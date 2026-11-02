@@ -71,7 +71,8 @@ anyone else can reach the app. `verify.sh` fails if the ingress is up without on
    (`/legal/…`) and get their agreement in writing. Then create their web app
    account (sign-up is off) and their API key, recording that agreement:
    `infra/scripts/member.sh add <email> --terms-accepted <YYYY-MM-DD>`.
-4. They open `https://aaru.<tailnet>.ts.net`. API clients use
+4. Point them at the member guide, `https://aaru.<tailnet>.ts.net/legal/guide.html`
+   (readable once their share is accepted). They open `https://aaru.<tailnet>.ts.net`. API clients use
    `https://aaru.<tailnet>.ts.net:8443/v1` with their key.
 
 Removing a member: revoke the share (Machines → `aaru` → Share), then
