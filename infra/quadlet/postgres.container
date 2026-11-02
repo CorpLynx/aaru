@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Container]
-# Pinned by digest to 16.15-alpine (the 2026-10-26 rebuild); never use a floating tag (see litellm.container).
+# Pinned by digest to aaru-postgres: 16.15-alpine with gosu rebuilt (infra/images/postgres); never use a floating tag (see litellm.container).
 Image=ghcr.io/corplynx/aaru-postgres@sha256:c5f08ba72420afa1e9f1cb6fd29a4d74897fe95a87df8232686e3583d9547635
 ContainerName=postgres
 Network=aaru-internal.network:ip=10.231.0.10
