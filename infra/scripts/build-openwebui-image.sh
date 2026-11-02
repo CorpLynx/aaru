@@ -26,7 +26,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 WEB_DIR="${AARU_WEB_DIR:-${REPO_ROOT}/web}"
 WEB_REPO="${AARU_WEB_REPO:-CorpLynx/aaru-web}"
-WORKFLOW="aaru-image.yaml"
+WORKFLOW="${AARU_IMAGE_WORKFLOW:-aaru-image.yaml}"
 # What the pin step rewrites: the KEY= line in PIN_FILE (build-anubis-image.sh overrides both).
 PIN_FILE="${AARU_IMAGE_PIN_FILE:-${REPO_ROOT}/infra/quadlet/openwebui.container}"
 PIN_KEY="${AARU_IMAGE_PIN_KEY:-Image}"
@@ -56,7 +56,8 @@ gh auth status >/dev/null 2>&1 || { echo "ERROR: gh is not authenticated (run: g
 
 SHA="$(git -C "${WEB_DIR}" rev-parse HEAD)"
 SHORT="${SHA:0:12}"
-TAG="aaru-${SHORT}"
+# build-patched-image.sh overrides the workflow and the tag prefix.
+TAG="${AARU_IMAGE_TAG_PREFIX:-aaru-}${SHORT}"
 echo "Repo:      ${WEB_REPO}"
 echo "Commit:    ${SHA}"
 echo "Tag:       ${TAG}"
@@ -111,7 +112,7 @@ echo "  Run: https://github.com/${WEB_REPO}/actions/runs/${RUN_ID}"
 echo "[3/4] Building on GitHub Actions (typically 20-40 minutes)..."
 if ! gh run watch "${RUN_ID}" -R "${WEB_REPO}" --exit-status --interval 30 >/dev/null; then
     echo "ERROR: build failed. A Trivy failure means a fixable CRITICAL/HIGH finding;"
-    echo "  fix it or record an exception in aaru-web's .trivyignore."
+    echo "  fix it or record an exception in ${WEB_REPO}'s Trivy ignore file."
     echo "  Logs: gh run view ${RUN_ID} -R ${WEB_REPO} --log-failed"
     exit 1
 fi

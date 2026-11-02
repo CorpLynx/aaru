@@ -1,0 +1,18 @@
+# vLLM v0.33.0 (interim NVIDIA test host only) with Ubuntu's OpenSSL and
+# dirmngr security updates and fixed msgpack, urllib3 and setuptools, which
+# have fixable HIGH CVEs and no newer vLLM release yet.
+# Drop this image once a vLLM release ships these fixes.
+
+ARG BASE_IMAGE=docker.io/vllm/vllm-openai@sha256:d825baf9ce4b1b6bfc5ecc7b79880c7e6748c65a72d697ce3d47607aafa84c6e
+
+# uv 0.13.6, mounted for the install only; it does not end up in the image.
+FROM ghcr.io/astral-sh/uv@sha256:af22a52f5eafef3d78e551599d405c02df61919d18028f0cea8eda93bc9986d0 AS uv
+
+FROM ${BASE_IMAGE}
+RUN --mount=from=uv,source=/uv,target=/usr/local/bin/uv \
+    set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends --only-upgrade openssl libssl3t64 dirmngr; \
+    rm -rf /var/lib/apt/lists/*; \
+    uv pip install --system --break-system-packages --no-cache \
+        'msgpack==1.2.3' 'urllib3==2.8.0' 'setuptools==78.1.1'

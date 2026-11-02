@@ -1,0 +1,25 @@
+# Accepted Trivy findings, for the image scans (image-scan.yml,
+# patched-image.yml) and the misconfiguration scan (ci.yml). Each entry needs a
+# statement and an expiry; Trivy reports the finding again once the date
+# passes. Scope an entry to the file it is in with "paths" wherever possible,
+# so the same ID still fails in any other image.
+
+vulnerabilities:
+  - id: CVE-2026-112940
+    statement: >-
+      filelock in the aaru-web image. Fixed only in filelock 4.2.1, but every
+      unstructured release requires filelock<4. Exploiting it needs local write
+      access to the lock directory; the container runs read-only with no other
+      users. Same exception as CorpLynx/aaru-web's .trivyignore.
+    expired_at: 2027-01-31
+
+  - id: CVE-2026-78669
+    paths:
+      - app/llama-swap
+    statement: >-
+      golang.org/x/net v0.59.0 in the llama-swap binary (v269, the latest
+      release): denial of service via HTTP/2 SETTINGS frames. llama-swap serves
+      plain HTTP on the internal network only, and Go's server speaks HTTP/2
+      only over TLS, so the HTTP/2 code is unreachable. Bump llama-swap when a
+      release picks up x/net 0.60.0.
+    expired_at: 2026-12-15

@@ -1,0 +1,19 @@
+# LiteLLM v1.106.6 with fixed versions of bundled packages that have fixable
+# HIGH CVEs and no newer stable LiteLLM release yet: ddtrace, dnspython, pyasn1
+# and pypdf in /app/.venv (all inside LiteLLM's own version ranges), and the
+# OS pip wheel. The base is verified against cosign.pub (LiteLLM's rotated
+# signing key, see litellm.container) before it is built on.
+# Drop this image once a stable LiteLLM release ships these fixes.
+
+ARG BASE_IMAGE=ghcr.io/berriai/litellm@sha256:37e2dafb088a7723beb998590682957386dfc83ffea1848486f8e0e5cfac0b06
+
+# uv 0.13.6, mounted for the install only; it does not end up in the image.
+FROM ghcr.io/astral-sh/uv@sha256:af22a52f5eafef3d78e551599d405c02df61919d18028f0cea8eda93bc9986d0 AS uv
+
+FROM ${BASE_IMAGE}
+RUN --mount=from=uv,source=/uv,target=/usr/local/bin/uv \
+    set -eux; \
+    apk upgrade --no-cache py3-pip-wheel; \
+    uv pip install --python /app/.venv/bin/python --no-cache \
+        'ddtrace==4.15.6' 'dnspython==2.9.0' 'pyasn1==0.6.5' 'pypdf==6.21.4'; \
+    uv pip check --python /app/.venv/bin/python
