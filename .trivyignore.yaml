@@ -23,3 +23,24 @@ vulnerabilities:
       only over TLS, so the HTTP/2 code is unreachable. Bump llama-swap when a
       release picks up x/net 0.60.0.
     expired_at: 2026-12-15
+
+  # Copies bundled inside setuptools 78.1.1 in the patched vLLM image. vLLM
+  # requires setuptools<81 (Triton uses it at runtime), and only setuptools
+  # 84 bundles fixed versions. Both bugs need setuptools to unpack an untrusted
+  # archive or wheel, which vLLM never asks it to do; this image runs only on
+  # the interim NVIDIA test host. Drop when vLLM allows setuptools>=84.
+  - id: CVE-2026-23949
+    paths:
+      - usr/local/lib/python3.12/dist-packages/setuptools/_vendor/jaraco.context-5.3.0.dist-info/METADATA
+    statement: >-
+      jaraco.context 5.3.0 bundled in setuptools: path traversal when
+      extracting a malicious tar archive; setuptools never extracts untrusted
+      archives in the vLLM runtime.
+    expired_at: 2027-01-31
+  - id: CVE-2026-24049
+    paths:
+      - usr/local/lib/python3.12/dist-packages/setuptools/_vendor/wheel-0.45.1.dist-info/METADATA
+    statement: >-
+      wheel 0.45.1 bundled in setuptools: code execution via a malicious wheel
+      file; setuptools never handles untrusted wheels in the vLLM runtime.
+    expired_at: 2027-01-31

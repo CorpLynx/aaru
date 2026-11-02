@@ -103,9 +103,11 @@ jobs:
           scan --exit-code 1 || status=$?
           if [ "${status}" -ne 0 ]; then
             # Where each finding is, for fixing it or scoping an exception.
-            scan --exit-code 0 --quiet --format json --output /opt/aaru-scan/out/report.json
-            jq -r '.Results[]? | .Target as $t | .Vulnerabilities[]?
-              | "\(.VulnerabilityID)\t\(.PkgName) \(.InstalledVersion) -> \(.FixedVersion)\t\(.PkgPath // $t)"' \
+            scan --exit-code 0 --quiet --list-all-pkgs --format json --output /opt/aaru-scan/out/report.json
+            jq -r '.Results[]? | .Target as $t | (.Packages // []) as $p | .Vulnerabilities[]?
+              | . as $v
+              | ([$p[] | select(.Name == $v.PkgName and .Version == $v.InstalledVersion) | .FilePath // empty] | join(", ")) as $f
+              | "\($v.VulnerabilityID)\t\($v.PkgName) \($v.InstalledVersion) -> \($v.FixedVersion)\t\($v.PkgPath // (if $f == "" then $t else $f end))"' \
               "${RUNNER_TEMP}/scan-out/report.json" | sort -u
           fi
           exit "${status}"
