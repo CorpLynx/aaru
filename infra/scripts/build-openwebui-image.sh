@@ -96,8 +96,10 @@ fi
 echo "[2/4] Waiting for the workflow run to start..."
 RUN_ID=""
 for _ in $(seq 1 30); do
-    RUN_ID="$(gh run list -R "${WEB_REPO}" --workflow "${WORKFLOW}" --branch "${TAG}" \
-        --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+    # By the run's workflow path: gh's --workflow filter only finds workflows
+    # that are already on the default branch.
+    RUN_ID="$(gh api "repos/${WEB_REPO}/actions/runs?branch=${TAG}&event=push&per_page=10" \
+        --jq "[.workflow_runs[] | select(.path == \".github/workflows/${WORKFLOW}\")][0].id // empty")"
     [ -n "${RUN_ID}" ] && break
     sleep 5
 done

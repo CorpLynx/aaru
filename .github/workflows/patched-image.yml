@@ -85,15 +85,30 @@ jobs:
           cid="$(docker create "${TRIVY_IMAGE}")"
           docker cp "${cid}:/usr/local/bin/trivy" "${RUNNER_TEMP}/trivy"
           docker rm "${cid}" >/dev/null
-          docker run --rm --user 0 \
-            -v "${RUNNER_TEMP}/trivy:/opt/aaru-scan/trivy:ro" \
-            -v "${PWD}/.trivyignore.yaml:/opt/aaru-scan/trivyignore.yaml:ro" \
-            --entrypoint /opt/aaru-scan/trivy "${LOCAL_IMAGE}" \
-            rootfs --cache-dir /tmp/trivy-cache --scanners vuln \
-            --severity CRITICAL,HIGH --ignore-unfixed \
-            --ignorefile /opt/aaru-scan/trivyignore.yaml \
-            --skip-dirs /proc,/sys,/dev,/opt/aaru-scan \
-            --exit-code 1 --no-progress /
+          mkdir -p "${RUNNER_TEMP}/scan-out"
+          chmod 777 "${RUNNER_TEMP}/scan-out"
+          scan() {
+            docker run --rm --user 0 \
+              -v "${RUNNER_TEMP}/trivy:/opt/aaru-scan/trivy:ro" \
+              -v "${PWD}/.trivyignore.yaml:/opt/aaru-scan/trivyignore.yaml:ro" \
+              -v "${RUNNER_TEMP}/scan-out:/opt/aaru-scan/out" \
+              --entrypoint /opt/aaru-scan/trivy "${LOCAL_IMAGE}" \
+              rootfs --cache-dir /tmp/trivy-cache --scanners vuln \
+              --severity CRITICAL,HIGH --ignore-unfixed \
+              --ignorefile /opt/aaru-scan/trivyignore.yaml \
+              --skip-dirs /proc,/sys,/dev,/opt/aaru-scan \
+              --no-progress "$@" /
+          }
+          status=0
+          scan --exit-code 1 || status=$?
+          if [ "${status}" -ne 0 ]; then
+            # Where each finding is, for fixing it or scoping an exception.
+            scan --exit-code 0 --quiet --format json --output /opt/aaru-scan/out/report.json
+            jq -r '.Results[]? | .Target as $t | .Vulnerabilities[]?
+              | "\(.VulnerabilityID)\t\(.PkgName) \(.InstalledVersion) -> \(.FixedVersion)\t\(.PkgPath // $t)"' \
+              "${RUNNER_TEMP}/scan-out/report.json" | sort -u
+          fi
+          exit "${status}"
 
       - name: Smoke test
         run: bash "${DIR}/smoke.sh" "${LOCAL_IMAGE}"
