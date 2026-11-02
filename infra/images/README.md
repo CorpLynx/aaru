@@ -1,13 +1,16 @@
-# Patched images
+# Patched and mirrored images
 
 When a pinned upstream image has a fixable CRITICAL or HIGH vulnerability
 (`image-scan.yml`) and no upstream release fixes it yet, the fix goes here as a
-thin layer on the upstream image instead of an exception:
+thin layer on the upstream image instead of an exception. An upstream whose
+digests do not stay pullable is mirrored here unchanged, so the pin points at
+a copy we keep.
 
 | Image | Base | What the layer fixes |
 | --- | --- | --- |
 | `postgres` | postgres 16.15-alpine | Rebuilds gosu 1.20 from source with the current Go; the shipped binary was built with Go 1.24.6 |
 | `litellm` | LiteLLM v1.106.6 (base signature verified against `cosign.pub`) | ddtrace, dnspython, pyasn1 and pypdf in `/app/.venv`; the OS pip wheel |
+| `llamacpp` | llama-swap v269 with llama.cpp b12033 | Nothing: an unchanged mirror. Upstream deletes old digests every six hours, so pins must point at a copy we keep |
 | `vllm` | vLLM v0.33.0 (interim NVIDIA test host only) | Ubuntu OpenSSL and dirmngr updates; msgpack, urllib3 and setuptools; removes pip, whose bundled copies are outdated even in its latest release |
 
 Each directory has a `Containerfile`, whose `ARG BASE_IMAGE` pins the upstream

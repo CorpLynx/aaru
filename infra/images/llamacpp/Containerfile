@@ -1,0 +1,15 @@
+# llama-swap bundled with llama.cpp server-vulkan-b12033, running as UID 10001,
+# mirrored unchanged. llama-swap rebuilds its images every six hours from its
+# main branch, re-pushes the release-named tags and deletes the old digests,
+# so a digest pinned straight from upstream disappears within hours and the
+# host can no longer pull it. This copy lives in our registry and stays put.
+#
+# Upstream tag v269-vulkan-b12033-non-root as rebuilt 2026-11-02T18:04Z from
+# llama-swap main f0a34e7 (v269 plus a log memory fix and a UI change).
+# To bump: pick the newest -vulkan-*-non-root tag, read its digest and labels,
+# update BASE_IMAGE and this note, and rebuild promptly, before the next
+# upstream rebuild deletes that digest.
+
+ARG BASE_IMAGE=ghcr.io/mostlygeek/llama-swap@sha256:317216accfe4bd0f213fddaf3dd6e0a703bb429f0e9dc291de378a227f24f027
+
+FROM ${BASE_IMAGE}
