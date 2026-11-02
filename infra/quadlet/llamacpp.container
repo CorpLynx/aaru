@@ -14,7 +14,7 @@ Wants=network-online.target
 # llama.cpp server-vulkan-b12033, running as UID 10001 (infra/images/llamacpp:
 # upstream deletes old digests every six hours). Never use a floating tag
 # (see litellm.container).
-Image=ghcr.io/mostlygeek/llama-swap@sha256:eef6a7ea4d7f77e01119b27d7e2debc4175ed99bff69ca79814921af5eec2105
+Image=ghcr.io/corplynx/aaru-llamacpp@sha256:daab18ab266488148222bb4927bfdf40ff1e65b78100c67247ff3376c243c2d9
 ContainerName=llamacpp
 Network=aaru-internal.network:ip=10.231.0.20
 # No host port published — internal only. llama-swap's own endpoints (/ui,
