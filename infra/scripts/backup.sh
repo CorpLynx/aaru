@@ -32,8 +32,8 @@ STAGING_PARENT="${AARU_BACKUP_DIR:-${HOME}/aaru/backup-staging}"
 PG_CONTAINER="${POSTGRES_CONTAINER:-postgres}"
 PG_USER="${POSTGRES_USER:-aaru}"
 AWS_SECRET="${AARU_BACKUP_AWS_SECRET:-aaru-backup-aws}"
-# Pinned by digest to 2.37.13; never use a floating tag (see litellm.container).
-AWS_CLI_IMAGE="docker.io/amazon/aws-cli@sha256:d32864c20087d486f5988c3e70817d67a73f584a47535cada9ad97e0ea1e5196"
+# Pinned by digest to 2.39.3; never use a floating tag (see litellm.container).
+AWS_CLI_IMAGE="docker.io/amazon/aws-cli@sha256:d557b3524475d70dd3104cf44d96568ee3188897b73a6ece2b37aa50e1af362f"
 TIMESTAMP=$(date -u +"%Y%m%dT%H%M%SZ")
 BACKUP_NAME="aaru-backup-${TIMESTAMP}"
 STARTED=$(date +%s)

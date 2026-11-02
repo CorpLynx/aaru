@@ -10,10 +10,10 @@ Wants=network-online.target
 # this network has no egress anyway. Models and their settings live in
 # infra/config/llama-swap/config.yaml (gitignored; see config.yaml.example).
 #
-# Pinned by digest to v266-vulkan-b11804-non-root: llama-swap v266 bundled with
-# llama.cpp server-vulkan-b11804, running as UID 10001. Never use a floating tag
+# Pinned by digest to v269-vulkan-b12033-non-root: llama-swap v269 bundled with
+# llama.cpp server-vulkan-b12033, running as UID 10001. Never use a floating tag
 # (see litellm.container).
-Image=ghcr.io/mostlygeek/llama-swap@sha256:df08926303bc78c032cf732a2404d58f7381febb97f80951779fb8e695eda2c0
+Image=ghcr.io/mostlygeek/llama-swap@sha256:eef6a7ea4d7f77e01119b27d7e2debc4175ed99bff69ca79814921af5eec2105
 ContainerName=llamacpp
 Network=aaru-internal.network:ip=10.231.0.20
 # No host port published — internal only. llama-swap's own endpoints (/ui,

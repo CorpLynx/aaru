@@ -4,16 +4,22 @@ After=network-online.target postgres.service
 Wants=network-online.target
 
 [Container]
-# Pinned by digest to v1.106.2 (the current stable release).
+# Pinned by digest to v1.106.6 (the current stable release).
 # Never use a floating tag here. LiteLLM's release pipeline was compromised in
 # October 2026 via stolen GitHub CLI OAuth tokens; version 1.107.0 shipped a
 # credential stealer and a backdoor, and the malicious images were published
 # under the ordinary release tags. A floating tag pulls whatever was pushed
 # last, with no review step.
+# The old signing key (commit 0112e53) was probably exposed in that incident and
+# was rotated on 2026-10-23 (BerriAI/litellm #48103, #48215). Images from
+# v1.106.3 on verify only against the new key; do not trust the old one for
+# anything newer. The new key's cosign.pub has SHA-256
+# e3fe3e08c44b16407fe0b37c43b4f8b603b3a0f4ee74c29e647bc022d762c2c0, as also
+# published in LiteLLM's incident post.
 # Verify before pulling, then update the digest when bumping:
-#   cosign verify --key https://raw.githubusercontent.com/BerriAI/litellm/0112e53046018d726492c814b3644b7d376029d0/cosign.pub \
-#     ghcr.io/berriai/litellm@sha256:7294b90f868c5c38c99b83021c7ba46f9b439e95f8e32964c925c7d2563a03f7
-Image=ghcr.io/berriai/litellm@sha256:7294b90f868c5c38c99b83021c7ba46f9b439e95f8e32964c925c7d2563a03f7
+#   cosign verify --key https://raw.githubusercontent.com/BerriAI/litellm/e82a3c646908ba0a6ee0beddc4310d7a6cac4065/cosign.pub \
+#     ghcr.io/berriai/litellm@sha256:37e2dafb088a7723beb998590682957386dfc83ffea1848486f8e0e5cfac0b06
+Image=ghcr.io/berriai/litellm@sha256:37e2dafb088a7723beb998590682957386dfc83ffea1848486f8e0e5cfac0b06
 ContainerName=litellm
 Network=aaru-ingress.network
 Network=aaru-internal.network:ip=10.231.0.30

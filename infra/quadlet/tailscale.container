@@ -12,8 +12,8 @@ Wants=network-online.target
 # Members reach it through node sharing; ACLs in infra/terraform/tailscale.
 # Retire it with: systemctl --user stop tailscale.service && rm the unit.
 #
-# Pinned by digest to v1.102.5; never use a floating tag (see litellm.container).
-Image=docker.io/tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065
+# Pinned by digest to v1.104.4; never use a floating tag (see litellm.container).
+Image=docker.io/tailscale/tailscale@sha256:ed6480b33c6eb67c9cbd203ed42b9fb57e361986725b6856def71b7a3d9e276c
 ContainerName=tailscale
 # Ingress only, like cloudflared: no route to PostgreSQL or inference (spec §9).
 Network=aaru-ingress.network

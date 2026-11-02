@@ -4,9 +4,9 @@ After=network-online.target aaru-internal-network.service
 Wants=network-online.target
 
 [Container]
-# Pinned by digest to v0.32.0; never use a floating tag (see litellm.container).
+# Pinned by digest to v0.33.0 (CUDA 13 only: needs an NVIDIA driver that supports CUDA 13.0); never use a floating tag (see litellm.container).
 # Must stay at 0.31.0 or later: CVE-2026-114053 (critical RCE via mm_processor_kwargs).
-Image=docker.io/vllm/vllm-openai@sha256:befccf0e7e4089aa23926bb6f887a85c0d46c2a99e6de5c5ffdf5cb7957c5b34
+Image=docker.io/vllm/vllm-openai@sha256:d825baf9ce4b1b6bfc5ecc7b79880c7e6748c65a72d697ce3d47607aafa84c6e
 ContainerName=vllm
 Network=aaru-internal.network:ip=10.231.0.21
 # No host port published — internal only
