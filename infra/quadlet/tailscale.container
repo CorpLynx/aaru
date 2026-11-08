@@ -10,7 +10,8 @@ Wants=network-online.target
 #   https://aaru.<tailnet>.ts.net/          the web app
 #   https://aaru.<tailnet>.ts.net:8443/v1/  the LiteLLM API (/v1 only; no admin UI or key routes)
 # Members reach it through node sharing; ACLs in infra/terraform/tailscale.
-# Retire it with: systemctl --user stop tailscale.service && rm the unit.
+# Installed by setup.sh --ingress tailscale (the default) or both. Retire it with:
+#   systemctl --user stop tailscale.service && infra/scripts/setup.sh --ingress cloudflare
 #
 # Pinned by digest to v1.104.4; never use a floating tag (see litellm.container).
 Image=docker.io/tailscale/tailscale@sha256:ed6480b33c6eb67c9cbd203ed42b9fb57e361986725b6856def71b7a3d9e276c

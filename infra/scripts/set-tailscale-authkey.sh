@@ -5,7 +5,7 @@
 # so it never touches a file, an argument list or the shell history:
 #
 #   terraform -chdir=infra/terraform/tailscale output -raw app_auth_key \
-#     | ssh aaru@<host> aaru/infra/scripts/set-tailscale-authkey.sh
+#     | ssh <admin>@<host> sudo as-aaru aaru/infra/scripts/set-tailscale-authkey.sh
 #
 # The key only logs the node in once; afterwards the node key lives in the
 # tailscale-state volume. Re-run only to re-authenticate a wiped node.

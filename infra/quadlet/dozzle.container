@@ -1,7 +1,7 @@
 [Unit]
 Description=Dozzle Container Log Viewer
-After=network-online.target
-Wants=network-online.target
+After=network-online.target podman.socket
+Wants=network-online.target podman.socket
 
 [Container]
 # Pinned by digest to v11.3.4; never use a floating tag (see litellm.container).
@@ -9,6 +9,9 @@ Image=docker.io/amir20/dozzle@sha256:8796ae7e1ecbe011482319cb7040e69aae91a0632b8
 ContainerName=dozzle
 Network=aaru-admin.network
 PublishPort=127.0.0.1:8088:8080
+# Dozzle sends an anonymous usage beacon by default, and aaru-admin has egress.
+Environment=DOZZLE_NO_ANALYTICS=true
+# The rootless Podman API socket; setup.sh enables podman.socket so it exists.
 Volume=/run/user/%U/podman/podman.sock:/var/run/docker.sock:ro,z
 NoNewPrivileges=true
 DropCapability=ALL

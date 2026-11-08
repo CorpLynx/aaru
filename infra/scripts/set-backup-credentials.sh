@@ -8,7 +8,7 @@
 # From the machine with admin AWS credentials:
 #
 #   aws iam create-access-key --user-name <backup_user_name> --output json \
-#     | ssh aaru@<host> aaru/infra/scripts/set-backup-credentials.sh \
+#     | ssh <admin>@<host> sudo as-aaru aaru/infra/scripts/set-backup-credentials.sh \
 #         --bucket <bucket_name> --kms-key-arn <kms_key_arn> --region <region>
 #
 # The three values are outputs of infra/terraform/backup. Rotate the key
