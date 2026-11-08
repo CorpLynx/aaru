@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aaru · Sign in</title>
+<link rel="icon" href="../design-system/assets/aaru-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.454.0/font/lucide.css">
+<style>
+  :root {
+    --aaru-void: #000000;
+    --aaru-ink-950: #050607;
+    --aaru-ink-900: #0A0C0F;
+    --aaru-ink-850: #101318;
+    --aaru-ink-800: #161A20;
+    --aaru-ink-700: #1F242C;
+    --aaru-line-1: #1E232A;
+    --aaru-line-2: #2A3039;
+    --aaru-line-3: #3A414C;
+    --aaru-fg-1: #EDEFF2;
+    --aaru-fg-2: #A6ADB8;
+    --aaru-fg-3: #6E7682;
+    --aaru-fg-4: #474E59;
+    --aaru-cipher: #3DDC97;
+    --aaru-signal: #6FA8FF;
+    --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--aaru-ink-950);
+    color: var(--aaru-fg-1);
+    font: 400 15px/24px var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ---------- Scene ---------- */
+  #scene {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+  }
+  /* Shown only if WebGL2 is unavailable. */
+  .fallback {
+    position: fixed; inset: 0;
+    display: none;
+    align-items: flex-start; justify-content: center;
+    padding-top: 14vh;
+    background: linear-gradient(#0b1016 0%, #26303a 46%, #0a1a20 46.2%, #02080b 100%);
+  }
+  .fallback span {
+    font: 800 clamp(64px, 16vw, 200px)/1 var(--font-sans);
+    letter-spacing: 0.04em;
+    color: #8f8a82;
+    text-shadow: 0 2px 0 #5b5852, 0 8px 24px rgba(0,0,0,.5);
+  }
+  body.no-webgl .fallback { display: flex; }
+  body.no-webgl #scene { display: none; }
+
+  /* ---------- Login card ---------- */
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 16px 16px max(5vh, 16px);
+    pointer-events: none;
+  }
+  .login {
+    pointer-events: auto;
+    width: 100%; max-width: 380px;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid var(--aaru-line-1);
+    background: rgba(10, 12, 15, 0.78);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 24px 64px rgba(0,0,0,.45);
+    display: flex; flex-direction: column; gap: 16px;
+    opacity: 0; transform: translateY(12px);
+    transition: opacity 900ms var(--ease), transform 900ms var(--ease);
+  }
+  body.revealed .login { opacity: 1; transform: none; }
+
+  .overline {
+    margin: 0;
+    font: 500 11px/16px var(--font-mono);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--aaru-fg-3);
+  }
+  .login h1 {
+    margin: 4px 0 0;
+    font: 600 24px/32px var(--font-sans);
+    letter-spacing: -0.015em;
+  }
+  .lede { margin: 4px 0 0; font: 400 13px/20px var(--font-sans); color: var(--aaru-fg-2); }
+
+  form { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label { font: 500 13px/16px var(--font-sans); color: var(--aaru-fg-2); }
+  .field input {
+    height: 40px; padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--aaru-line-2);
+    background: var(--aaru-ink-800);
+    color: var(--aaru-fg-1);
+    font: 400 15px/24px var(--font-sans);
+    outline: none;
+    transition: border-color 120ms var(--ease), box-shadow 120ms var(--ease);
+  }
+  .field input::placeholder { color: var(--aaru-fg-4); }
+  .field input:hover { border-color: var(--aaru-line-3); }
+  .field input:focus { border-color: var(--aaru-line-3); box-shadow: 0 0 0 4px rgba(255,255,255,.06); }
+
+  .primary {
+    margin-top: 4px;
+    height: 40px; border-radius: 8px;
+    border: 1px solid transparent;
+    background: var(--aaru-fg-1); color: var(--aaru-ink-950);
+    font: 500 14px/20px var(--font-sans);
+    cursor: pointer;
+    transition: background 120ms var(--ease), border-color 120ms var(--ease);
+  }
+  .primary:hover { background: #ffffff; }
+  .primary:active { border-color: var(--aaru-line-3); }
+  .primary:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.12); }
+
+  .seal {
+    display: flex; gap: 8px; align-items: flex-start;
+    margin: 0; font: 400 12px/18px var(--font-sans); color: var(--aaru-fg-3);
+  }
+  .seal i { color: var(--aaru-cipher); font-size: 14px; line-height: 18px; }
+
+  .foot {
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    padding-top: 12px; border-top: 1px solid var(--aaru-line-1);
+    font: 400 12px/16px var(--font-sans); color: var(--aaru-fg-3);
+  }
+  .foot a { color: var(--aaru-signal); text-decoration: none; }
+  .foot a:hover { text-decoration: underline; }
+  .note {
+    margin: 0; min-height: 16px;
+    font: 500 11px/16px var(--font-mono); letter-spacing: 0.04em;
+    color: var(--aaru-fg-3);
+  }
+
+  .replay {
+    position: fixed; top: 16px; right: 16px;
+    height: 32px; padding: 0 12px;
+    display: inline-flex; align-items: center; gap: 8px;
+    border-radius: 8px; border: 1px solid var(--aaru-line-2);
+    background: rgba(10,12,15,.6); color: var(--aaru-fg-2);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    font: 500 11px/16px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer; opacity: 0; transition: opacity 600ms var(--ease), color 120ms var(--ease);
+  }
+  body.revealed .replay { opacity: 1; }
+  .replay:hover { color: var(--aaru-fg-1); border-color: var(--aaru-line-3); }
+  body.no-webgl .replay { display: none; }
+
+  @media (min-width: 960px) and (min-aspect-ratio: 5/4) {
+    .stage { align-items: center; justify-content: flex-end; padding: 24px max(6vw, 32px); }
+  }
+  @media (max-height: 760px) {
+    .login { padding: 20px; gap: 12px; }
+    .lede, .seal { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .login, .replay { transition: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" role="img" aria-label="The word Aaru, cut in weathered concrete, rising out of open water"></canvas>
+<div class="fallback" aria-hidden="true"><span>AARU</span></div>
+
+<button class="replay" type="button" id="replay"><i class="icon-rotate-ccw"></i>Replay</button>
+
+<div class="stage">
+  <main class="login" aria-labelledby="login-title">
+    <div>
+      <p class="overline">Members only</p>
+      <h1 id="login-title">Sign in to Aaru</h1>
+      <p class="lede">Open-weight models served from hardware the collective owns.</p>
+    </div>
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="passphrase">Passphrase</label>
+        <input id="passphrase" name="passphrase" type="password" autocomplete="current-password" placeholder="Your vault passphrase">
+      </div>
+      <button class="primary" type="submit">Unlock</button>
+      <p class="note" id="note" aria-live="polite"></p>
+    </form>
+    <p class="seal"><i class="icon-lock" aria-hidden="true"></i><span>Your passphrase derives the key that decrypts your chats on this device. It never leaves your browser.</span></p>
+    <div class="foot">
+      <span>No account? Membership is by invitation.</span>
+      <a href="#" id="forgot">Forgot passphrase</a>
+    </div>
+  </main>
+</div>
+
+<script id="common-glsl" type="x-shader/x-fragment">
+// ---------- Shared: noise + letter geometry ----------
+uniform vec4 uLetter[4];   // x: center x, y: vertical offset, z: tilt (rad), w: wet height
+uniform float uTime;
+
+float hash13(vec3 p) {
+  p = fract(p * 0.1031);
+  p += dot(p, p.zyx + 31.32);
+  return fract((p.x + p.y) * p.z);
+}
+float vnoise(vec3 x) {
+  vec3 i = floor(x), f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(hash13(i), hash13(i + vec3(1,0,0)), f.x),
+                 mix(hash13(i + vec3(0,1,0)), hash13(i + vec3(1,1,0)), f.x), f.y),
+             mix(mix(hash13(i + vec3(0,0,1)), hash13(i + vec3(1,0,1)), f.x),
+                 mix(hash13(i + vec3(0,1,1)), hash13(i + vec3(1,1,1)), f.x), f.y), f.z);
+}
+float fbm(vec3 p) {
+  float a = 0.5, s = 0.0;
+  for (int i = 0; i < 4; i++) { s += a * vnoise(p); p = p * 2.03 + vec3(1.7, 9.2, 3.1); a *= 0.5; }
+  return s / 0.9375;
+}
+
+const float LH = 2.2;     // letter height
+const float DEPTH = 0.42; // half thickness
+
+float sdBox2(vec2 p, vec2 c, vec2 h) {
+  vec2 d = abs(p - c) - h;
+  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+float sdOBox(vec2 p, vec2 a, vec2 b, float th) {
+  float l = length(b - a);
+  vec2 d = (b - a) / l;
+  vec2 q = p - (a + b) * 0.5;
+  q = mat2(d.x, -d.y, d.y, d.x) * q;
+  q = abs(q) - vec2(l, th) * 0.5;
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0);
+}
+// Blocky glyphs. Origin at the bottom centre of each letter.
+float glyphA(vec2 p) {
+  float d = sdBox2(p, vec2(0.0, LH * 0.5), vec2(0.9, LH * 0.5));
+  d = max(d, (abs(p.x) + p.y - (0.9 + LH - 0.55)) * 0.7071);
+  float c = sdBox2(p, vec2(0.0, 1.42), vec2(0.34, 0.22));
+  c = max(c, (abs(p.x) + p.y - (0.34 + 1.64 - 0.16)) * 0.7071);
+  d = max(d, -c);
+  d = max(d, -sdBox2(p, vec2(0.0, 0.3), vec2(0.34, 0.5)));
+  return d;
+}
+float glyphR(vec2 p) {
+  float stem = sdBox2(p, vec2(-0.6, LH * 0.5), vec2(0.275, LH * 0.5));
+  float bowl = sdBox2(p, vec2(0.0, 1.575), vec2(0.875, 0.625));
+  bowl = max(bowl, (p.x + p.y - (0.875 + 2.2 - 0.42)) * 0.7071);
+  bowl = max(bowl, (p.x - p.y - (0.875 - 0.95 - 0.34)) * 0.7071);
+  bowl = max(bowl, -sdBox2(p, vec2(0.025, 1.575), vec2(0.35, 0.2)));
+  float leg = sdOBox(p, vec2(-0.05, 1.05), vec2(0.66, -0.2), 0.56);
+  leg = max(leg, p.x - 0.875);
+  float d = min(stem, min(bowl, leg));
+  return max(d, -p.y);
+}
+float glyphU(vec2 p) {
+  float d = sdBox2(p, vec2(0.0, LH * 0.5), vec2(0.9, LH * 0.5));
+  d = max(d, (abs(p.x) - p.y - (0.9 - 0.34)) * 0.7071);
+  d = max(d, -sdBox2(p, vec2(0.0, 1.55 + 0.0), vec2(0.34, 1.0)));
+  return d;
+}
+
+// Local coordinates of letter i for a world point.
+vec3 letterLocal(int i, vec3 p) {
+  vec4 L = uLetter[i];
+  vec3 q = p - vec3(L.x, L.y, 0.0);
+  float c = cos(L.z), s = sin(L.z);
+  q.xy = mat2(c, -s, s, c) * q.xy;
+  return q;
+}
+float sdLetterLocal(int i, vec3 q) {
+  float d2 = (i == 2) ? glyphR(q.xy) : (i == 3) ? glyphU(q.xy) : glyphA(q.xy);
+  vec2 w = vec2(d2, abs(q.z) - DEPTH);
+  return min(max(w.x, w.y), 0.0) + length(max(w, 0.0)) - 0.03;
+}
+// Raw distance to all letters (no surface detail).
+float sdLettersRaw(vec3 p, out int id) {
+  float d = 1e5; id = 0;
+  for (int i = 0; i < 4; i++) {
+    vec3 q = letterLocal(i, p);
+    // cheap bound
+    float b = length(max(abs(q - vec3(0.0, LH * 0.5, 0.0)) - vec3(0.95, LH * 0.5, DEPTH), 0.0));
+    float di = b > 0.4 ? b : sdLetterLocal(i, q);
+    if (di < d) { d = di; id = i; }
+  }
+  return d;
+}
+</script>
+
+<script id="sim-frag" type="x-shader/x-fragment">
+// ---------- Ripple simulation: 2D wave equation on the water plane ----------
+uniform sampler2D uState;   // r: height now, g: height previous step
+uniform vec2 uTexel;
+uniform vec4 uDomain;       // minX, minZ, sizeX, sizeZ
+uniform float uRise[4];     // letter rise speed (units / s)
+uniform vec4 uDrops[8];     // xz, strength, radius
+uniform float uReset;
+out vec4 outColor;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy * uTexel;
+  if (uReset > 0.5) { outColor = vec4(0.0); return; }
+  vec2 s = texture(uState, uv).rg;
+  float n = texture(uState, uv + vec2(0.0, uTexel.y)).r;
+  float so = texture(uState, uv - vec2(0.0, uTexel.y)).r;
+  float e = texture(uState, uv + vec2(uTexel.x, 0.0)).r;
+  float w = texture(uState, uv - vec2(uTexel.x, 0.0)).r;
+  float lap = n + so + e + w - 4.0 * s.r;
+  float h = s.r + (s.r - s.g) * 0.985 + 0.24 * lap;
+  h *= 0.9992;
+
+  vec2 xz = uDomain.xy + uv * uDomain.zw;
+  vec3 p = vec3(xz.x, 0.0, xz.y);
+
+  // The letters are obstacles; water touching a moving letter is churned.
+  bool inside = false;
+  for (int i = 0; i < 4; i++) {
+    vec3 q = letterLocal(i, p);
+    float b = length(max(abs(q - vec3(0.0, LH * 0.5, 0.0)) - vec3(0.95, LH * 0.5, DEPTH), 0.0));
+    if (b > 0.6) continue;
+    float d = sdLetterLocal(i, q);
+    if (d < 0.0) { inside = true; break; }
+    float band = smoothstep(0.32, 0.0, d);
+    float turb = vnoise(vec3(xz * 5.0, uTime * 2.7)) - 0.5;
+    float lift = smoothstep(0.12, 0.0, d);
+    h += band * uRise[i] * (0.010 * turb) + lift * uRise[i] * 0.0016 * sin(uTime * 7.0 + xz.x * 3.0);
+  }
+  for (int k = 0; k < 8; k++) {
+    vec4 dr = uDrops[k];
+    if (dr.z == 0.0) continue;
+    vec2 dd = xz - dr.xy;
+    h -= dr.z * exp(-dot(dd, dd) / (dr.w * dr.w));
+  }
+
+  // Absorb at the edges so ripples fade into the open sea.
+  vec2 edge = smoothstep(0.0, 0.08, uv) * smoothstep(1.0, 0.92, uv);
+  float k = edge.x * edge.y;
+  h *= mix(0.94, 1.0, k);
+
+  if (inside) { outColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+  outColor = vec4(clamp(h, -0.4, 0.4), s.r, 0.0, 1.0);
+}
+</script>
+
+<script id="scene-frag" type="x-shader/x-fragment">
+// ---------- Scene: raymarched concrete letters + water ----------
+uniform vec2 uRes;
+uniform vec3 uCamPos;
+uniform vec3 uCamTarget;
+uniform float uTanHalf;
+uniform float uShift;
+uniform float uShiftX;
+uniform vec3 uSunDir;
+uniform sampler2D uSim;
+uniform vec4 uDomain;
+uniform float uHasSim;
+uniform float uRiseTime;
+out vec4 outColor;
+
+const vec3 SUN_COL = vec3(1.0, 0.86, 0.70) * 2.6;
+const vec3 HORIZON = vec3(0.24, 0.27, 0.30);
+
+// ----- water -----
+float simHeight(vec2 xz) {
+  if (uHasSim < 0.5) return 0.0;
+  vec2 uv = (xz - uDomain.xy) / uDomain.zw;
+  if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) return 0.0;
+  return textureLod(uSim, uv, 0.0).r;
+}
+vec2 simState(vec2 xz) {
+  if (uHasSim < 0.5) return vec2(0.0);
+  vec2 uv = (xz - uDomain.xy) / uDomain.zw;
+  if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) return vec2(0.0);
+  return textureLod(uSim, uv, 0.0).rg;
+}
+// Sum of sharpened directional waves, each with deep-water dispersion and
+// a little domain drag so crests bunch and troughs widen.
+float waves(vec2 p, int oct) {
+  float amp = 0.10, fr = 0.42, ang = 1.32;
+  float h = 0.0, sum = 0.0;
+  for (int i = 0; i < 10; i++) {
+    if (i >= oct) break;
+    vec2 dir = vec2(cos(ang), sin(ang));
+    float ph = dot(dir, p) * fr - uTime * sqrt(9.8 * fr) * 0.62;
+    float w = exp(sin(ph) - 1.0);
+    float dw = w * cos(ph);
+    p += dir * dw * amp * 0.9;
+    h += w * amp;
+    sum += amp;
+    amp *= 0.6; fr *= 1.62; ang += 2.39996;
+  }
+  return h - sum * 0.47;
+}
+float waterH(vec2 p, int oct) { return waves(p, oct) + simHeight(p); }
+
+float traceWater(vec3 ro, vec3 rd, out vec3 pos) {
+  pos = vec3(0.0);
+  if (rd.y >= -1e-4) return -1.0;
+  float t = max((0.4 - ro.y) / rd.y, 0.0);
+  float tEnd = min((-0.4 - ro.y) / rd.y, 220.0);
+  float tPrev = t;
+  for (int i = 0; i < 110; i++) {
+    vec3 p = ro + rd * t;
+    float d = p.y - waterH(p.xz, 5);
+    if (d < 0.0) {
+      float a = tPrev, b = t;
+      for (int j = 0; j < 7; j++) {
+        float m = 0.5 * (a + b);
+        vec3 pm = ro + rd * m;
+        if (pm.y - waterH(pm.xz, 5) < 0.0) b = m; else a = m;
+      }
+      t = 0.5 * (a + b);
+      pos = ro + rd * t;
+      return t;
+    }
+    tPrev = t;
+    t += max(d * 0.55, 0.012 + t * 0.003);
+    if (t > tEnd) break;
+  }
+  t = -ro.y / rd.y;
+  pos = ro + rd * t;
+  return t;
+}
+vec3 waterNormal(vec2 p, float dist) {
+  float e = 0.012 + dist * 0.0018;
+  int oct = dist > 45.0 ? 6 : 9;
+  float h = waterH(p, oct);
+  vec3 n = normalize(vec3(h - waterH(p + vec2(e, 0.0), oct), e, h - waterH(p + vec2(0.0, e), oct)));
+  return normalize(mix(n, vec3(0.0, 1.0, 0.0), smoothstep(25.0, 180.0, dist) * 0.7));
+}
+
+// ----- letters with surface detail -----
+float mapLetters(vec3 p, out int id, out vec3 lq) {
+  float d = sdLettersRaw(p, id);
+  lq = letterLocal(id, p);
+  if (d < 0.25) {
+    // weathering: large chips on edges and a pitted, eroded surface
+    float chip = smoothstep(0.58, 0.82, vnoise(lq * 1.9 + 4.0));
+    float erosion = vnoise(lq * 5.0) - 0.5;
+    d += chip * 0.07 + erosion * 0.018;
+  }
+  return d;
+}
+float mapL(vec3 p) { int id; vec3 lq; return mapLetters(p, id, lq); }
+
+vec2 boxHit(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax) {
+  vec3 inv = 1.0 / rd;
+  vec3 t0 = (bmin - ro) * inv, t1 = (bmax - ro) * inv;
+  vec3 tn = min(t0, t1), tf = max(t0, t1);
+  return vec2(max(max(tn.x, tn.y), tn.z), min(min(tf.x, tf.y), tf.z));
+}
+float traceLetters(vec3 ro, vec3 rd, float tmax, int steps) {
+  vec2 bb = boxHit(ro, rd, vec3(-4.6, -3.4, -0.75), vec3(4.6, 2.3, 0.75));
+  if (bb.y < 0.0 || bb.x > bb.y) return -1.0;
+  float t = max(bb.x, 0.0);
+  float tEnd = min(bb.y, tmax);
+  for (int i = 0; i < 120; i++) {
+    if (i >= steps) break;
+    float d = mapL(ro + rd * t);
+    if (d < 0.0008 + t * 0.0006) return t;
+    t += d * 0.8;
+    if (t > tEnd) break;
+  }
+  return -1.0;
+}
+vec3 letterNormal(vec3 p) {
+  const vec2 k = vec2(1.0, -1.0);
+  const float e = 0.0025;
+  return normalize(k.xyy * mapL(p + k.xyy * e) + k.yyx * mapL(p + k.yyx * e) +
+                   k.yxy * mapL(p + k.yxy * e) + k.xxx * mapL(p + k.xxx * e));
+}
+float letterShadow(vec3 ro, vec3 rd, float k) {
+  vec2 bb = boxHit(ro, rd, vec3(-4.6, -3.4, -0.75), vec3(4.6, 2.3, 0.75));
+  if (bb.y < 0.0 || bb.x > bb.y) return 1.0;
+  float res = 1.0;
+  float t = max(bb.x, 0.02);
+  for (int i = 0; i < 40; i++) {
+    float h = mapL(ro + rd * t);
+    res = min(res, k * h / t);
+    if (res < 0.01 || t > bb.y) break;
+    t += clamp(h, 0.02, 0.35);
+  }
+  return clamp(res, 0.0, 1.0);
+}
+float letterAO(vec3 p, vec3 n) {
+  float occ = 0.0, sca = 1.0;
+  for (int i = 1; i <= 4; i++) {
+    float h = 0.05 * float(i);
+    occ += (h - mapL(p + n * h)) * sca;
+    sca *= 0.7;
+  }
+  return clamp(1.0 - 2.2 * occ, 0.0, 1.0);
+}
+
+// ----- sky -----
+vec3 sky(vec3 rd) {
+  float y = max(rd.y, 0.0);
+  vec3 zen = vec3(0.025, 0.035, 0.05);
+  vec3 col = mix(HORIZON, zen, pow(y, 0.38));
+  float sd = max(dot(rd, uSunDir), 0.0);
+  col += vec3(1.0, 0.6, 0.35) * 0.25 * pow(sd, 5.0) + vec3(1.0, 0.78, 0.55) * 0.5 * pow(sd, 48.0);
+  col += SUN_COL * 3.0 * smoothstep(0.9993, 0.9997, sd);
+  if (rd.y > 0.0) {
+    vec2 cp = rd.xz / (rd.y + 0.12) * 1.3 + vec2(uTime * 0.012, uTime * 0.004);
+    float c = fbm(vec3(cp, uTime * 0.01));
+    c = smoothstep(0.42, 0.9, c);
+    vec3 cc = mix(vec3(0.11, 0.12, 0.14), vec3(0.42, 0.38, 0.35), pow(sd, 3.0) * 0.6 + 0.15);
+    col = mix(col, cc, c * 0.8 * smoothstep(0.0, 0.2, rd.y));
+  }
+  return col;
+}
+
+// Moving caustic network (sharpened, animated noise ridges).
+float caustic(vec3 p) {
+  vec3 q = vec3(p.x * 2.4, p.z * 2.4 + p.y, uTime * 0.55);
+  float a = 1.0 - abs(vnoise(q) * 2.0 - 1.0);
+  float b = 1.0 - abs(vnoise(q * 1.7 + 3.1) * 2.0 - 1.0);
+  return pow(a, 7.0) + pow(b, 7.0) * 0.6;
+}
+
+// ----- concrete -----
+vec3 concrete(vec3 q, out float pits) {
+  float n1 = fbm(q * 1.2);
+  float n2 = vnoise(q * 7.0);
+  float n3 = vnoise(q * 31.0);
+  vec3 c = mix(vec3(0.30, 0.29, 0.27), vec3(0.55, 0.53, 0.49), n1);
+  c *= 0.86 + 0.28 * n2;
+  pits = smoothstep(0.7, 0.82, n3);
+  c *= 1.0 - 0.45 * pits;
+  // aggregate speckle
+  c *= 0.93 + 0.14 * step(0.86, vnoise(q * 55.0));
+  // rain streaks running down from the top
+  float streak = vnoise(vec3(q.x * 7.0, q.y * 0.45, q.z * 7.0));
+  c *= 1.0 - 0.3 * smoothstep(0.55, 0.9, streak) * smoothstep(0.6, 2.1, q.y);
+  // hairline cracks in some regions
+  float cr = abs(vnoise(q * 1.6 + 7.3) * 2.0 - 1.0);
+  float crMask = smoothstep(0.55, 0.75, vnoise(q * 0.6 + 2.0));
+  c *= mix(1.0, 0.4, (1.0 - smoothstep(0.0, 0.03, cr)) * crMask);
+  // old tide line: algae and mineral staining on the lower half
+  float tide = 0.85 + 0.25 * (n1 - 0.5);
+  float alg = smoothstep(tide + 0.15, tide - 0.45, q.y);
+  c = mix(c, c * vec3(0.42, 0.50, 0.34), alg * 0.85);
+  c = mix(c, vec3(0.62, 0.60, 0.55), smoothstep(0.03, 0.0, abs(q.y - tide)) * 0.3);
+  return c;
+}
+float bump(vec3 q) { return vnoise(q * 9.0) * 0.6 + vnoise(q * 24.0) * 0.4; }
+
+vec3 shadeLetter(vec3 p, vec3 rd, bool hq) {
+  int id; vec3 q;
+  mapLetters(p, id, q);
+  vec3 n = letterNormal(p);
+  // micro relief
+  {
+    float e = 0.01;
+    float b0 = bump(q);
+    vec3 g = vec3(bump(q + vec3(e, 0, 0)) - b0, bump(q + vec3(0, e, 0)) - b0, bump(q + vec3(0, 0, e)) - b0) / e;
+    n = normalize(n - 0.018 * (g - dot(g, n) * n));
+  }
+  float pits;
+  vec3 alb = concrete(q, pits);
+
+  float wl = waterH(p.xz, 4);
+  float above = p.y - wl;
+
+  // Wetness: freshly risen concrete stays dark, drying from the top with drip streaks.
+  float wetH = uLetter[id].w;
+  float drip = vnoise(vec3(q.x * 11.0, q.y * 0.3, q.z * 11.0));
+  float front = wetH * (0.55 + 0.9 * drip);
+  float wet = 1.0 - smoothstep(front - 0.08, front + 0.06, above);
+  float rivulet = step(0.82, vnoise(vec3(q.x * 26.0, q.y * 0.7, q.z * 26.0))) * (1.0 - smoothstep(wetH * 1.4, wetH * 1.4 + 0.3, above));
+  float splash = 1.0 - smoothstep(0.05, 0.28 + 0.12 * drip, above);
+  wet = clamp(max(max(wet, rivulet * 0.8), splash), 0.0, 1.0);
+  alb *= mix(1.0, 0.48, wet);
+
+  float sh = hq ? letterShadow(p + n * 0.01, uSunDir, 10.0) : 1.0;
+  float ao = hq ? letterAO(p, n) : 1.0;
+  float dif = max(dot(n, uSunDir), 0.0);
+  float skyAmb = 0.5 + 0.5 * n.y;
+  float bounce = clamp(-n.y, 0.0, 1.0) * 0.5 + 0.18;
+
+  vec3 col = alb * SUN_COL * dif * sh;
+  col += alb * vec3(0.22, 0.26, 0.31) * skyAmb * ao;
+  col += alb * vec3(0.05, 0.10, 0.11) * bounce * ao;   // light bounced off the water
+
+  // Caustics thrown up onto the concrete by the waves just above the waterline.
+  float caustAbove = exp(-max(above, 0.0) * 2.6) * step(0.0, above);
+  col += alb * vec3(0.55, 0.7, 0.65) * caustic(p) * caustAbove * 0.45 * (0.4 + 0.6 * dif);
+
+  // Specular: rough when dry, glossy and sharp when wet.
+  vec3 h = normalize(uSunDir - rd);
+  float spec = mix(pow(max(dot(n, h), 0.0), 16.0) * 0.04,
+                   pow(max(dot(n, h), 0.0), 120.0) * 0.9, wet);
+  col += SUN_COL * spec * sh * (1.0 - pits * 0.7);
+  float fr = pow(1.0 - max(dot(n, -rd), 0.0), 5.0);
+  col += sky(reflect(rd, n)) * fr * mix(0.05, 0.45, wet) * ao;
+
+  // Parts still below the surface: green-tinted, lit by caustics only.
+  if (above < 0.0) {
+    float depth = -above;
+    vec3 uw = alb * (vec3(0.05, 0.13, 0.13) + vec3(0.35, 0.55, 0.5) * caustic(p) * exp(-depth * 1.2) * dif);
+    col = uw;
+  }
+  return col;
+}
+
+vec3 underwater(vec3 ro, vec3 rd, float depthAtSurface) {
+  vec3 deep = vec3(0.004, 0.022, 0.028);
+  vec3 shallowTint = vec3(0.02, 0.075, 0.08);
+  float t = traceLetters(ro, rd, 7.0, 60);
+  vec3 col = mix(shallowTint, deep, clamp(-rd.y * 1.5, 0.0, 1.0));
+  if (t > 0.0) {
+    vec3 p = ro + rd * t;
+    vec3 lc = shadeLetter(p, rd, false);
+    vec3 absorb = exp(-vec3(1.6, 0.55, 0.45) * (t + max(-p.y, 0.0) * 0.6));
+    col = mix(col, lc, absorb);
+  }
+  return col;
+}
+
+vec3 aces(vec3 x) {
+  return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / uRes.y;   // y in [-1, 1]
+  vec3 ro = uCamPos;
+  vec3 fw = normalize(uCamTarget - ro);
+  vec3 rt = normalize(cross(fw, vec3(0.0, 1.0, 0.0)));
+  vec3 up = cross(rt, fw);
+  vec3 rd = normalize(fw + rt * (uv.x - uShiftX) * uTanHalf + up * (uv.y - uShift) * uTanHalf);
+
+  vec3 wp;
+  float tw = traceWater(ro, rd, wp);
+  float tl = traceLetters(ro, rd, tw > 0.0 ? tw : 200.0, 120);
+
+  vec3 col;
+  float dist;
+  if (tl > 0.0) {
+    vec3 p = ro + rd * tl;
+    col = shadeLetter(p, rd, true);
+    dist = tl;
+  } else if (tw > 0.0) {
+    dist = tw;
+    vec3 n = waterNormal(wp.xz, tw);
+    float cosi = max(dot(n, -rd), 0.0);
+    float fres = 0.02 + 0.98 * pow(1.0 - cosi, 5.0);
+
+    // reflection: letters or sky
+    vec3 rr = reflect(rd, n);
+    rr.y = abs(rr.y);
+    vec3 refl;
+    float trr = traceLetters(wp + n * 0.02, rr, 30.0, 70);
+    if (trr > 0.0) refl = shadeLetter(wp + n * 0.02 + rr * trr, rr, false);
+    else refl = sky(rr);
+
+    // refraction: letters below the surface or the water body
+    vec3 tr = refract(rd, n, 1.0 / 1.333);
+    vec3 refr = underwater(wp - n * 0.02, tr, 0.0);
+
+    // light scattered inside wave crests facing the sun
+    float crest = clamp(wp.y * 6.0 + 0.4, 0.0, 1.0);
+    refr += vec3(0.02, 0.09, 0.085) * crest * (0.4 + 0.6 * max(dot(-rd, uSunDir) * -1.0 + 0.6, 0.0));
+
+    float sh = letterShadow(wp + vec3(0.0, 0.02, 0.0), uSunDir, 8.0);
+    col = mix(refr * mix(0.55, 1.0, sh), refl, fres);
+    col += SUN_COL * pow(max(dot(rr, uSunDir), 0.0), 700.0) * 6.0 * sh;
+
+    // foam: where water meets concrete, and where the ripples churn
+    int id;
+    float dl = sdLettersRaw(vec3(wp.x, 0.0, wp.z), id);
+    float fn = fbm(vec3(wp.xz * 6.0, uTime * 0.8));
+    float contact = 1.0 - smoothstep(0.0, 0.18 + 0.3 * fn, dl);
+    vec2 ss = simState(wp.xz);
+    float churn = smoothstep(0.004, 0.02, abs(ss.r - ss.g)) + smoothstep(0.05, 0.12, ss.r);
+    float foam = clamp(contact * 0.8 + churn * 0.6, 0.0, 1.0) * smoothstep(0.35, 0.75, fn + contact * 0.25);
+    vec3 foamCol = vec3(0.8, 0.84, 0.86) * (SUN_COL * max(dot(n, uSunDir), 0.0) * sh * 0.35 + vec3(0.25, 0.28, 0.32));
+    col = mix(col, foamCol, foam * 0.85);
+  } else {
+    col = sky(rd);
+    dist = 1e4;
+  }
+
+  // atmospheric haze
+  float fog = 1.0 - exp(-max(dist - 6.0, 0.0) * 0.012);
+  col = mix(col, HORIZON * 0.9 + vec3(0.03, 0.02, 0.0), fog * (tw > 0.0 || tl > 0.0 ? 1.0 : 0.0));
+
+  col = aces(col * 1.15);
+  col = pow(col, vec3(1.0 / 2.2));
+  vec2 q = gl_FragCoord.xy / uRes;
+  col *= 0.55 + 0.45 * pow(16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.18);
+  col += (hash13(vec3(gl_FragCoord.xy, uTime)) - 0.5) / 255.0;
+  outColor = vec4(col, 1.0);
+}
+</script>
+
+<script>
+(() => {
+  "use strict";
+  const canvas = document.getElementById("scene");
+  const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, powerPreference: "high-performance" });
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const reveal = () => document.body.classList.add("revealed");
+  ["pointerdown", "keydown"].forEach(ev => window.addEventListener(ev, reveal, { once: true }));
+
+  // Example form: nothing is sent anywhere.
+  document.getElementById("login-form").addEventListener("submit", e => {
+    e.preventDefault();
+    document.getElementById("note").textContent = "EXAMPLE PAGE · NOTHING WAS SENT";
+  });
+  document.getElementById("forgot").addEventListener("click", e => {
+    e.preventDefault();
+    document.getElementById("note").textContent = "ASK THE MEMBER WHO INVITED YOU";
+  });
+
+  if (!gl) { document.body.classList.add("no-webgl"); reveal(); return; }
+
+  // ---------- GL helpers ----------
+  const common = document.getElementById("common-glsl").textContent;
+  const header = "#version 300 es\nprecision highp float;\nprecision highp int;\n";
+  const vsrc = header + "in vec2 aPos; void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }";
+  function shader(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  function program(fragId) {
+    const p = gl.createProgram();
+    gl.attachShader(p, shader(gl.VERTEX_SHADER, vsrc));
+    gl.attachShader(p, shader(gl.FRAGMENT_SHADER, header + common + document.getElementById(fragId).textContent));
+    gl.bindAttribLocation(p, 0, "aPos");
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const u = {};
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) {
+      const name = gl.getActiveUniform(p, i).name.replace(/\[0\]$/, "");
+      u[name] = gl.getUniformLocation(p, name);
+    }
+    return { p, u };
+  }
+
+  let sceneProg, simProg;
+  try {
+    sceneProg = program("scene-frag");
+    simProg = program("sim-frag");
+  } catch (err) {
+    console.error(err);
+    document.body.classList.add("no-webgl"); reveal(); return;
+  }
+
+  const vbo = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+  // ---------- Ripple simulation targets ----------
+  const SIM_W = 384, SIM_H = 256;
+  const DOMAIN = [-7.5, -5.0, 15.0, 10.0];  // minX, minZ, sizeX, sizeZ
+  const hasFloatRT = !!(gl.getExtension("EXT_color_buffer_float") || gl.getExtension("EXT_color_buffer_half_float"));
+  let simTex = [], simFbo = [], simIdx = 0;
+  if (hasFloatRT) {
+    for (let i = 0; i < 2; i++) {
+      const t = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, SIM_W, SIM_H, 0, gl.RGBA, gl.HALF_FLOAT, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      const f = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+      simTex.push(t); simFbo.push(f);
+    }
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) { simTex = []; simFbo = []; }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  }
+  const useSim = simTex.length === 2;
+
+  // ---------- Letters ----------
+  const WIDTHS = [1.8, 1.8, 1.75, 1.8], GAP = 0.32;
+  const total = WIDTHS.reduce((a, b) => a + b, 0) + GAP * 3;
+  const CENTERS = [];
+  { let x = -total / 2; for (const w of WIDTHS) { CENTERS.push(x + w / 2); x += w + GAP; } }
+  const DELAYS = [0.0, 1.1, 0.5, 1.7];
+  const TILTS = [0.07, -0.05, 0.06, -0.075];
+  const DUR = 11.0, START_Y = -2.95, END_Y = -0.34;
+  const RISE_END = Math.max(...DELAYS) + DUR;
+
+  const smoother = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * x * (x * (6 * x - 15) + 10);
+  const offsetAt = (i, t) => START_Y + (END_Y - START_Y) * smoother((t - DELAYS[i]) / DUR);
+  const progressAt = (i, t) => smoother((t - DELAYS[i]) / DUR);
+
+  const letterU = new Float32Array(16);
+  const riseU = new Float32Array(4);
+  function updateLetters(t) {
+    for (let i = 0; i < 4; i++) {
+      const y = offsetAt(i, t);
+      const e = progressAt(i, t);
+      letterU[i * 4 + 0] = CENTERS[i];
+      letterU[i * 4 + 1] = y;
+      letterU[i * 4 + 2] = TILTS[i] * Math.pow(1 - e, 1.6);
+      letterU[i * 4 + 3] = Math.max(0, y - offsetAt(i, t - 5.5)) + 0.06;  // height still wet
+      riseU[i] = (offsetAt(i, t + 0.05) - offsetAt(i, t - 0.05)) / 0.1;
+    }
+  }
+
+  // ---------- Drops shed by the wet concrete ----------
+  const drops = new Float32Array(32);
+  const breached = [false, false, false, false];
+  let rng = 1234567;
+  const rand = () => (rng = (rng * 1664525 + 1013904223) >>> 0) / 4294967296;
+  function makeDrops(t) {
+    drops.fill(0);
+    let k = 0;
+    const push = (x, z, s, r) => { if (k < 8) { drops.set([x, z, s, r], k * 4); k++; } };
+    for (let i = 0; i < 4; i++) {
+      const top = offsetAt(i, t) + 2.2;
+      if (!breached[i] && top > 0.0) {
+        breached[i] = true;     // the top face breaks the surface: a wide, slow swell
+        for (let j = 0; j < 3; j++) push(CENTERS[i] + (j - 1) * 0.6, (rand() - 0.5) * 0.3, -0.035, 0.55);
+      }
+      if (top <= 0.05) continue;
+      const wetness = Math.min(1, letterU[i * 4 + 3] / 1.2) * (0.25 + Math.min(1, Math.abs(riseU[i]) * 2.5));
+      if (rand() < wetness * 0.55) {
+        const side = rand();
+        let x, z;
+        if (side < 0.8) { x = CENTERS[i] + (rand() - 0.5) * WIDTHS[i]; z = (rand() < 0.5 ? -1 : 1) * (DEPTH + 0.06 + rand() * 0.12); }
+        else { x = CENTERS[i] + (rand() < 0.5 ? -1 : 1) * (WIDTHS[i] / 2 + 0.06 + rand() * 0.1); z = (rand() - 0.5) * 0.8; }
+        push(x, z, 0.006 + rand() * 0.012, 0.035 + rand() * 0.03);
+      }
+    }
+  }
+  const DEPTH = 0.42;
+
+  // ---------- Camera framing ----------
+  const FOV = 36 * Math.PI / 180, TAN_HALF = Math.tan(FOV / 2);
+  // Wide screens: the word sits left of centre and the card on the right.
+  // Narrow screens: the word sits in the top third and the card below it.
+  let cam = { pos: [0, 1, 12], target: [0, 0.85, 0], shift: 0.36, shiftX: 0 };
+  function frame(w, h) {
+    const aspect = w / h;
+    const wide = w >= 960 && aspect >= 1.25;
+    const half = total / 2 + 0.35;
+    if (wide) {
+      const share = Math.min(0.56, 1 - 520 / w);         // fraction of width for the word
+      const byWidth = half / (TAN_HALF * aspect * share);
+      const byHeight = 2.2 / (0.66 * TAN_HALF);
+      const dist = Math.max(byWidth, byHeight);
+      const centre = share * 0.5 + 0.03;                   // word centre, fraction of width
+      cam = { pos: [0, 1.0, dist], target: [0, 0.85, 0], shift: 0.16, shiftX: (centre * 2 - 1) * aspect };
+    } else {
+      const byWidth = half / (TAN_HALF * aspect * 0.9);
+      const byHeight = 2.2 / (0.4 * TAN_HALF);
+      const dist = Math.max(byWidth, byHeight);
+      cam = { pos: [0, aspect < 0.9 ? 1.5 : 1.1, dist], target: [0, 0.85, 0], shift: 0.5, shiftX: 0 };
+    }
+  }
+
+  // ---------- Sizing with adaptive resolution ----------
+  const params = new URLSearchParams(location.search);
+  const fixedScale = parseFloat(params.get("scale"));
+  let scale = fixedScale > 0 ? Math.min(fixedScale, 1) : 0.75;
+  const dprCap = Math.min(window.devicePixelRatio || 1, 1.5);
+  function resize() {
+    const w = Math.max(1, Math.floor(innerWidth * dprCap * scale));
+    const h = Math.max(1, Math.floor(innerHeight * dprCap * scale));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    frame(innerWidth, innerHeight);
+  }
+  addEventListener("resize", resize);
+  resize();
+
+  const sunDir = (() => { const v = [-0.78, 0.33, 0.53]; const l = Math.hypot(...v); return v.map(c => c / l); })();
+
+  // ---------- Loop ----------
+  const SIM_DT = 1 / 60;
+  let riseStart = performance.now() / 1000;
+  let last = riseStart, simAcc = 0, simTime = 0;
+  let resetSim = useSim ? 2 : 0;
+  let frameTimes = [], lastAdjust = 0;
+  if (reduceMotion) { riseStart -= RISE_END + 6; reveal(); }
+  let revealed = reduceMotion;
+  let frozenAt = null;
+
+  document.getElementById("replay").addEventListener("click", () => {
+    riseStart = performance.now() / 1000;
+    breached.fill(false);
+    resetSim = 2;
+  });
+
+  function simStep(t) {
+    makeDrops(t);
+    gl.useProgram(simProg.p);
+    const src = simIdx, dst = 1 - simIdx;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, simFbo[dst]);
+    gl.viewport(0, 0, SIM_W, SIM_H);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, simTex[src]);
+    gl.uniform1i(simProg.u.uState, 0);
+    gl.uniform2f(simProg.u.uTexel, 1 / SIM_W, 1 / SIM_H);
+    gl.uniform4fv(simProg.u.uDomain, DOMAIN);
+    gl.uniform4fv(simProg.u.uLetter, letterU);
+    gl.uniform1fv(simProg.u.uRise, riseU);
+    gl.uniform4fv(simProg.u.uDrops, drops);
+    gl.uniform1f(simProg.u.uTime, simTime);
+    gl.uniform1f(simProg.u.uReset, resetSim > 0 ? 1 : 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (resetSim > 0) resetSim--;
+    simIdx = dst;
+  }
+
+  function render(nowMs) {
+    const now = nowMs / 1000;
+    const dt = Math.min(0.1, now - last);
+    last = now;
+    const t = frozenAt !== null ? frozenAt : now - riseStart;
+    const waveTime = reduceMotion ? now * 0.35 : now;
+
+    if (!revealed && t > DELAYS[3] + DUR * 0.55) { revealed = true; reveal(); }
+
+    if (useSim) {
+      simAcc += dt;
+      let steps = 0;
+      while (simAcc >= SIM_DT && steps < 4) {
+        simTime += SIM_DT;
+        updateLetters(t - simAcc);
+        simStep(t - simAcc);
+        simAcc -= SIM_DT; steps++;
+      }
+      if (steps === 4) simAcc = 0;
+    }
+    updateLetters(t);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.useProgram(sceneProg.p);
+    const u = sceneProg.u;
+    gl.uniform2f(u.uRes, canvas.width, canvas.height);
+    gl.uniform1f(u.uTime, waveTime);
+    gl.uniform3fv(u.uCamPos, cam.pos);
+    gl.uniform3fv(u.uCamTarget, cam.target);
+    gl.uniform1f(u.uTanHalf, TAN_HALF);
+    gl.uniform1f(u.uShift, cam.shift);
+    gl.uniform1f(u.uShiftX, cam.shiftX);
+    gl.uniform3fv(u.uSunDir, sunDir);
+    gl.uniform4fv(u.uLetter, letterU);
+    gl.uniform4fv(u.uDomain, DOMAIN);
+    gl.uniform1f(u.uHasSim, useSim ? 1 : 0);
+    gl.activeTexture(gl.TEXTURE0);
+    if (useSim) gl.bindTexture(gl.TEXTURE_2D, simTex[simIdx]);
+    gl.uniform1i(u.uSim, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    // Adapt the render scale to hold a steady frame rate.
+    frameTimes.push(dt);
+    if (!(fixedScale > 0) && frameTimes.length > 30 && now - lastAdjust > 1.5) {
+      const avg = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
+      frameTimes = [];
+      lastAdjust = now;
+      const prev = scale;
+      if (avg > 1 / 40 && scale > 0.4) scale = Math.max(0.4, scale - 0.1);
+      else if (avg < 1 / 58 && scale < 1.0) scale = Math.min(1.0, scale + 0.05);
+      if (scale !== prev) resize();
+    }
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+
+  // Test hook: render a specific moment of the rise.
+  window.__aaruSeek = (s, freeze) => { riseStart = performance.now() / 1000 - s; breached.fill(false); frozenAt = freeze ? s : null; };
+})();
+</script>
+</body>
+</html>
