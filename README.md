@@ -131,6 +131,9 @@ aaru/
 
 ## Operating it
 
+For a first deployment, follow [`docs/operations/first-deploy.md`](docs/operations/first-deploy.md)
+step by step; this section is a summary.
+
 Once, as the admin user (dry run first; `--apply` makes the changes):
 
 ```sh
@@ -139,11 +142,13 @@ sudo infra/scripts/harden-host.sh --admin-user <admin> --ssh-from <cidr|interfac
 
 It also sets up a weekly Lynis audit; its summary appears in the login banner for admins.
 
-On the Fedora host, as the unprivileged `aaru` service user:
+On the Fedora host, as the unprivileged `aaru` service user. SSH admits only the admin account, so
+get there with `sudo as-aaru` (a shell) or `sudo as-aaru <command>`; `harden-host.sh` installs it.
 
 ```sh
 infra/scripts/fetch-models.sh          # the model catalog: pinned, hash-checked, Anubis-scanned
 infra/scripts/setup.sh                  # installs units and host drop-ins, prints the secrets to create
+                                        #   --ingress tailscale|cloudflare|both, --inference llamacpp|vllm
 infra/scripts/member.sh add <email>     # one LiteLLM key per invited member; also list, rotate, revoke
 infra/scripts/member.sh webapp-key      # the web app's own key, stored as a Podman secret
 infra/scripts/healthcheck.sh --print    # what the 5-minute health timer sees
@@ -197,6 +202,7 @@ remove it from history.
 
 ## Documentation
 
+- [First deployment](docs/operations/first-deploy.md): a fresh Fedora host to a running Tailscale pilot, step by step, with a check after each step
 - [Compliance overview](docs/compliance.md): legal pages, security headers, retention, license cap, and the pre-launch checklist; [legal/](legal/README.md) holds the Terms, Acceptable Use, Privacy and security templates (drafts until counsel review)
 
 - [Build specification](architecture.md): architecture, security model, delivery phases, open decisions
