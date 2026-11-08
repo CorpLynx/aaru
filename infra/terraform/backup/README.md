@@ -26,12 +26,14 @@ a machine with admin AWS credentials:
 ```sh
 terraform output -raw install_command   # prints the command below, filled in
 aws iam create-access-key --user-name aaru-backup --output json \
-  | ssh aaru@<host> aaru/infra/scripts/set-backup-credentials.sh \
+  | ssh <admin>@<host> sudo as-aaru aaru/infra/scripts/set-backup-credentials.sh \
       --bucket <bucket_name> --kms-key-arn <kms_key_arn> --region <region>
 ```
 
-The script stores the key in the `aaru-backup-aws` Podman secret and writes
-the bucket, key ARN and region to `~/.config/aaru/backup.env`. Then on the host:
+SSH admits only the admin account; `as-aaru` (installed by `harden-host.sh`)
+runs the script as the `aaru` service user. The script stores the key in the
+`aaru-backup-aws` Podman secret and writes the bucket, key ARN and region to
+`~aaru/.config/aaru/backup.env`. Then on the host, as `aaru` (`sudo as-aaru`):
 
 ```sh
 systemctl --user start aaru-backup.service      # first run, now

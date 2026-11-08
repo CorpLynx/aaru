@@ -20,5 +20,5 @@ output "backup_user_name" {
 
 output "install_command" {
   description = "Run from a machine with admin AWS credentials to give the host its key."
-  value       = "aws iam create-access-key --user-name ${aws_iam_user.backup.name} --output json | ssh aaru@<host> aaru/infra/scripts/set-backup-credentials.sh --bucket ${aws_s3_bucket.backup.id} --kms-key-arn ${aws_kms_key.backup.arn} --region ${var.region}"
+  value       = "aws iam create-access-key --user-name ${aws_iam_user.backup.name} --output json | ssh <admin>@<host> sudo as-aaru aaru/infra/scripts/set-backup-credentials.sh --bucket ${aws_s3_bucket.backup.id} --kms-key-arn ${aws_kms_key.backup.arn} --region ${var.region}"
 }

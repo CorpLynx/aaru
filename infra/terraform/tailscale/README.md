@@ -40,9 +40,11 @@ cp terraform.tfvars.example terraform.tfvars   # admin_logins
 terraform init -backend-config=backend.hcl
 terraform apply
 
-# App node (as the aaru user on the host)
-terraform output -raw app_auth_key | ssh aaru@<host> aaru/infra/scripts/set-tailscale-authkey.sh
-ssh aaru@<host> systemctl --user start tailscale.service
+# App node, as the aaru service user. SSH admits only the admin account;
+# as-aaru (installed by harden-host.sh) runs the command as aaru.
+terraform output -raw app_auth_key \
+  | ssh <admin>@<host> sudo as-aaru aaru/infra/scripts/set-tailscale-authkey.sh
+ssh <admin>@<host> sudo as-aaru systemctl --user start tailscale.service
 
 # Host node, for admin SSH (as root)
 terraform output -raw host_auth_key | ssh <admin>@<host> sudo aaru/infra/scripts/tailscale-host.sh
@@ -59,7 +61,7 @@ state is spent. Re-apply only if a node has to be re-registered.
 
 Before the first share: the web app admin must already exist. The first account
 created becomes admin even with sign-up off, so create yours over an SSH tunnel
-(`ssh -L 3000:127.0.0.1:3000 aaru@<host>`, then `http://localhost:3000`) before
+(`ssh -L 3000:127.0.0.1:3000 <admin>@<host>`, then `http://localhost:3000`) before
 anyone else can reach the app. `verify.sh` fails if the ingress is up without one.
 
 1. Admin console → **Machines** → `aaru` → **Share** → invite the member's
@@ -87,9 +89,12 @@ before installing it: `tailscale lock sign <auth-key>`.
 
 ## When Cloudflare is live
 
+As `aaru` (`sudo as-aaru`), stop the node, then re-run setup with Cloudflare as
+the only ingress, which removes the unit:
+
 ```sh
 systemctl --user stop tailscale.service
-rm ~/.config/containers/systemd/tailscale.container && systemctl --user daemon-reload
+infra/scripts/setup.sh --ingress cloudflare
 ```
 
 Remove the `aaru` node in the admin console and the `autogroup:shared` rule in

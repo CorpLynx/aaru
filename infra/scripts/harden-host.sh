@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Aaru Host Hardening (spec §4a)
 # Applies the host lockdown the spec asks for on a fresh Fedora Server:
-# service account, SSH, firewalld, fail2ban, kernel parameters, auditd,
-# security-update downloads, SELinux booleans, a weekly Lynis audit shown on
-# the admin login banner and, optionally, AIDE.
+# service account (and `sudo as-aaru` to reach it, since SSH admits only the
+# admin), SSH, firewalld, fail2ban, kernel parameters, auditd, security-update
+# downloads, SELinux booleans, a weekly Lynis audit shown on the admin login
+# banner and, optionally, AIDE.
 #
 # Run as root (sudo). Without --apply it prints what it would change and
 # changes nothing. Every step is idempotent, so re-running is safe.
@@ -26,6 +27,7 @@
 set -euo pipefail
 
 SERVICE_USER="aaru"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ADMIN_USER=""
 SSH_FROM=()
 APPLY=false
@@ -121,6 +123,21 @@ umask 027
 EOF
 if [ "${APPLY}" = true ]; then
     chown -R "${SERVICE_USER}:" "${SERVICE_HOME}/.bashrc.d"
+fi
+# SSH admits only the admin (below), who reaches the service user with
+# `sudo as-aaru`. A root-owned copy: sudo must not run a file the service user can edit.
+put /usr/local/sbin/as-aaru 0755 < "${SCRIPT_DIR}/as-aaru.sh"
+# Without a password prompt, so secrets can be piped in over SSH, where sudo has
+# no terminal to ask on. It grants only the service user's privileges; root
+# still needs the admin's password.
+put /etc/sudoers.d/aaru-as 0440 <<EOF
+# Managed by infra/scripts/harden-host.sh: ${ADMIN_USER} may act as ${SERVICE_USER} (as-aaru drops to it).
+${ADMIN_USER} ALL=(root) NOPASSWD: /usr/local/sbin/as-aaru
+EOF
+if [ "${APPLY}" = true ] && ! visudo -cqf /etc/sudoers.d/aaru-as; then
+    rm -f /etc/sudoers.d/aaru-as
+    echo "ERROR: visudo rejected /etc/sudoers.d/aaru-as; removed it"
+    exit 1
 fi
 
 # --- SSH --------------------------------------------------------------------
@@ -327,7 +344,6 @@ fi
 
 # --- Weekly Lynis audit, summarized on the admin login banner -----------------
 echo "[10/10] Lynis"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # A root-owned copy: the root timer must not run a file the service user can edit.
 put /usr/local/sbin/aaru-lynis-audit 0755 < "${SCRIPT_DIR}/lynis-audit.sh"
 put /etc/systemd/system/aaru-lynis-audit.service 0644 <<'EOF'
