@@ -36,7 +36,10 @@
 ## Screens
 
 ### 01 Login (`src/routes/auth/+page.svelte`)
-- **Layout:** a split. Form on the left; a brand panel on the right (Ink 900).
+- **Visual reference:** [`design/login/index.html`](../login/index.html), "Reeds gathering". Reed stems surface from black night water, fall flat and drift together into the word AARU while the sign-in card fades in below. It replaces the split layout and brand panel this section described before.
+  - The scene is one WebGL2 fragment shader plus a small per-frame update of the reed positions. Port both into a Svelte component that mounts a full-bleed `<canvas>` behind the form and stops its animation loop when the component is destroyed.
+  - Without WebGL2, show the flat `#030507` background with the form only. With `prefers-reduced-motion`, start with the word already formed.
+  - The reference's copy is sample text. Where it conflicts with the rules below (for example "Create an account" on an invite-only service), the rules below win.
 - **Form fields:** Email, Password, and a **separate encryption passphrase**.
   - Authentication stays on the server; the passphrase never leaves the browser.
   - The passphrase field has a "Use recovery kit" link.
