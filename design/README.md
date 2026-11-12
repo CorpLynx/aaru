@@ -131,7 +131,7 @@ designs/                      HTML design references (open in a browser)
   Aaru Logo Animation.dc.html animated mark specimen
   Aaru Design System.dc.html  long-form visual spec
   support.js, assets/         runtime and logos used by the designs
-login/index.html              sign-in page: reeds gathering into AARU on night water (the login to build)
+login/index.html              sign-in page: reeds gathering into AARU on night water (as built in aaru-web)
 login-splash/index.html       earlier sign-in concept: concrete letters rising out of the sea
 design-system/
   DESIGN_SYSTEM.md            brand, voice, visual foundations, iconography, logo

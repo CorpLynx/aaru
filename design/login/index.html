@@ -6,136 +6,152 @@
 <title>Aaru · Sign in</title>
 <link rel="icon" href="../design-system/assets/aaru-favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-body{margin:0;background:#030507}
-a{color:#c9d3e2}a:hover{color:#ffffff}
-.aaru-card{animation:aaruIn 1.6s cubic-bezier(.2,.7,.2,1) 2.2s both}
-@keyframes aaruIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){.aaru-card{animation:none}}
-.aaru-input::placeholder{color:rgba(225,231,240,0.5)}
-.aaru-input:focus{outline:2px solid #c9d3e2;outline-offset:1px;border-color:transparent}
-.aaru-btn:hover{background:#e8edf4}
-.aaru-btn:focus-visible,.aaru-ghost:focus-visible{outline:2px solid #c9d3e2;outline-offset:2px}
-.aaru-ghost:hover{background:rgba(255,255,255,0.08)}
+  /* Layout: full-bleed night water, the word in the top half, the sign-in card under it. Dark only, like the app. */
+  :root {
+    --water: #030507;
+    --ink-950: #050607;
+    --ink-800: #161a20;
+    --ink-700: #1f242c;
+    --line-1: #1e232a;
+    --line-2: #2a3039;
+    --line-3: #3a414c;
+    --fg-1: #edeff2;
+    --fg-2: #a6adb8;
+    --fg-3: #6e7682;
+    --fg-4: #474e59;
+    --signal: #6fa8ff;
+    --card: rgba(10, 12, 15, 0.72);
+    --sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+    color-scheme: dark;
+  }
+  html, body { height: 100%; margin: 0; }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--water);
+    color: var(--fg-1);
+    font: 400 15px/24px var(--sans);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: var(--water); }
+
+  .page {
+    position: relative; height: 100%; overflow-y: auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0 32px;
+  }
+  .bar {
+    position: sticky; top: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding-block: 16px;
+  }
+  .mark { font: 500 11px/16px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+  .ghost {
+    height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px;
+    border-radius: 8px; border: 1px solid var(--line-2); background: rgba(10, 12, 15, .6); color: var(--fg-2);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    font: 500 11px/16px var(--mono); letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+    transition: color 120ms var(--ease), border-color 120ms var(--ease);
+  }
+  .ghost:hover { color: var(--fg-1); border-color: var(--line-3); }
+  .ghost:focus-visible { outline: none; box-shadow: 0 0 0 1px var(--line-3), 0 0 0 4px rgba(237, 239, 242, .06); }
+
+  .card {
+    margin: max(calc(54vh - 64px), 236px) auto 0;
+    max-width: 380px; padding: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+    background: var(--card); border: 1px solid var(--line-1); border-radius: 16px;
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .45);
+    animation: card-in 1.6s var(--ease) 2.2s both;
+  }
+  @keyframes card-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  .overline { margin: 0 0 4px; font: 500 11px/16px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+  h1 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -.015em; text-wrap: balance; }
+  .lede { margin: 4px 0 0; font-size: 13px; line-height: 20px; color: var(--fg-2); }
+  form { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  label { font-size: 13px; line-height: 16px; font-weight: 500; color: var(--fg-2); }
+  .input {
+    height: 40px; padding: 0 12px; display: flex; align-items: center; gap: 8px;
+    background: var(--ink-800); border: 1px solid var(--line-2); border-radius: 8px;
+    transition: border-color 120ms var(--ease), box-shadow 120ms var(--ease);
+  }
+  .input:hover { border-color: var(--line-3); }
+  .input:focus-within { border-color: var(--line-3); box-shadow: 0 0 0 1px var(--line-3), 0 0 0 4px rgba(237, 239, 242, .06); }
+  .input input {
+    flex: 1; min-width: 0; height: 100%; border: 0; padding: 0; background: transparent;
+    color: var(--fg-1); font: 400 15px/24px var(--sans); outline: none;
+  }
+  .input input::placeholder { color: var(--fg-4); }
+  .eye { border: 0; background: transparent; color: var(--fg-3); cursor: pointer; padding: 4px; display: inline-flex; border-radius: 4px; }
+  .eye:hover { color: var(--fg-1); }
+  .eye:focus-visible { outline: 1px solid var(--line-3); }
+  .primary {
+    margin-top: 8px; height: 40px; border-radius: 8px; border: 1px solid transparent;
+    background: var(--fg-1); color: var(--ink-950); font: 500 14px/20px var(--sans); cursor: pointer;
+    transition: background 120ms var(--ease), border-color 120ms var(--ease);
+  }
+  .primary:hover { background: #ffffff; }
+  .primary:active { border-color: var(--line-3); }
+  .primary:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(237, 239, 242, .12); }
+  .note { margin: 0; font: 500 11px/16px var(--mono); letter-spacing: .04em; color: var(--fg-3); }
+  .hint { margin: 0; font-size: 12px; line-height: 18px; color: var(--fg-3); }
+  .hint a { color: var(--signal); }
+
+  .nogl { display: none; position: fixed; inset: auto 0 0; padding: 12px; text-align: center; font: 500 11px/16px var(--mono); color: var(--fg-3); }
+  body.no-webgl .nogl { display: block; }
+
+  @media (prefers-reduced-motion: reduce) { .card { animation: none; } }
 </style>
 </head>
 <body>
-<div style="position: relative; width: 100%; min-height: 100vh; overflow: hidden; background: #030507; color: #e7ebf1; font-family: 'Inter', system-ui, sans-serif; display: flex; flex-direction: column">
-<canvas id="reeds" data-aaru-reeds="1" aria-hidden="true" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block"></canvas>
 
-<header style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 20px 28px">
-<div style="font-family: 'Cinzel', serif; font-weight: 600; font-size: 15px; letter-spacing: 0.32em; color: #e7ebf1">AARU</div>
-<nav style="display: flex; align-items: center; gap: 8px">
-<button type="button" class="aaru-ghost" id="replay" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.16); background: rgba(6,9,13,0.4); color: #e7ebf1; font: 500 14px 'Inter', system-ui, sans-serif; cursor: pointer">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
-Replay
-</button>
-<a href="#" style="display: inline-flex; align-items: center; height: 44px; padding: 0 12px; font-size: 14px; text-decoration: none">Help</a>
-</nav>
-</header>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="page">
+  <div class="bar">
+    <span class="mark">Aaru · sign-in reference</span>
+    <button class="ghost" type="button" id="replay">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
+      Replay
+    </button>
+  </div>
+  <main class="card" aria-labelledby="title">
+    <div>
+      <p class="overline">Members only</p>
+      <h1 id="title">Sign in to Aaru</h1>
+      <p class="lede">Membership is by invitation.</p>
+    </div>
+    <form id="form" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <div class="input"><input id="email" type="email" autocomplete="off" placeholder="Enter Your Email"></div>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input">
+          <input id="password" type="password" autocomplete="off" placeholder="Enter Your Password">
+          <button class="eye" type="button" id="eye" aria-pressed="false" aria-label="Show password">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+      </div>
+      <button class="primary" type="submit">Sign in</button>
+      <p class="note" id="note" role="status" aria-live="polite" hidden>Reference only. Nothing was sent.</p>
+    </form>
+    <p class="hint">Move the pointer or tap the water to make ripples. The app version lives in <a href="https://github.com/CorpLynx/aaru-web" target="_blank" rel="noopener">aaru-web</a>.</p>
+  </main>
+</div>
+<p class="nogl">WebGL2 is not available in this browser, so the water scene is hidden. The app shows this same flat background.</p>
 
-<div style="position: relative; height: 50vh; min-height: 300px; flex-shrink: 0"></div>
-
-<main style="position: relative; z-index: 1; display: flex; justify-content: center; padding: 0 20px 32px">
-<form class="aaru-card" id="login-form" style="width: 100%; max-width: 380px; box-sizing: border-box; padding: 28px; border-radius: 14px; background: rgba(5,8,12,0.66); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; flex-direction: column; gap: 6px">
-<h1 style="margin: 0; font-family: 'Cinzel', serif; font-weight: 500; font-size: 24px; letter-spacing: 0.04em; color: #f2f5f9">Welcome back</h1>
-<p style="margin: 0; font-size: 14px; line-height: 1.5; color: rgba(231,235,241,0.76)">Sign in to return to the Field of Reeds.</p>
-</div>
-<div style="display: flex; flex-direction: column; gap: 6px">
-<label for="aaru-email" style="font-size: 13px; font-weight: 500; color: #dfe5ee">Email</label>
-<input id="aaru-email" class="aaru-input" type="email" name="email" autocomplete="email" placeholder="you@example.com" style="height: 44px; box-sizing: border-box; padding: 0 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); color: #f2f5f9; font: 400 15px 'Inter', system-ui, sans-serif">
-</div>
-<div style="display: flex; flex-direction: column; gap: 6px">
-<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
-<label for="aaru-pass" style="font-size: 13px; font-weight: 500; color: #dfe5ee">Password</label>
-<a href="#" style="font-size: 13px">Forgot password?</a>
-</div>
-<input id="aaru-pass" class="aaru-input" type="password" name="password" autocomplete="current-password" placeholder="••••••••" style="height: 44px; box-sizing: border-box; padding: 0 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); color: #f2f5f9; font: 400 15px 'Inter', system-ui, sans-serif">
-</div>
-<label for="aaru-keep" style="display: flex; align-items: center; gap: 10px; min-height: 28px; font-size: 14px; color: rgba(231,235,241,0.82); cursor: pointer">
-<input id="aaru-keep" type="checkbox" name="keep" style="width: 18px; height: 18px; margin: 0; accent-color: #c9d3e2">
-Keep me signed in
-</label>
-<button type="submit" class="aaru-btn" style="height: 46px; border: none; border-radius: 8px; background: #d6dde8; color: #0b1017; font: 600 15px 'Inter', system-ui, sans-serif; letter-spacing: 0.02em; cursor: pointer">Enter Aaru</button>
-<p role="status" id="sent" hidden style="margin: 0; font-size: 13px; line-height: 1.5; color: #c9d3e2">Example screen only — nothing was sent.</p>
-<p style="margin: 0; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 14px; color: rgba(231,235,241,0.76)">New here? <a href="#">Create an account</a></p>
-</form>
-</main>
-
-<footer style="position: relative; z-index: 1; margin-top: auto; display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; padding: 0 20px 20px; font-size: 12px; color: rgba(231,235,241,0.7)">
-<span>© 2026 Aaru</span>
-<a href="#">Privacy</a>
-<a href="#">Terms</a>
-</footer>
-</div>
 <script>
-class ReedsScene {
-  componentWillUnmount() {
-    this._alive = false;
-    this.stopGL();
-  }
-  _attach(el) {
-    if (el && el !== this._canvas) {
-      this.stopGL();
-      this._canvas = el;
-      this.startGL(el);
-    }
-  }
-  stopGL() {
-    if (this._raf) cancelAnimationFrame(this._raf);
-    this._raf = 0;
-    if (this._ro) { this._ro.disconnect(); this._ro = null; }
-  }
-  buildReeds() {
-    var seed = 20261108;
-    var rnd = function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-    var A = [[-0.36, 0.0, -0.05, 1.0], [0.36, 0.0, 0.05, 1.0], [-0.27, 0.36, 0.27, 0.36]];
-    var R = [[-0.28, 0.0, -0.28, 1.0], [-0.40, 0.93, 0.24, 0.93], [0.29, 0.95, 0.29, 0.48], [-0.40, 0.52, 0.30, 0.52], [-0.02, 0.50, 0.38, 0.0]];
-    var U = [[-0.29, 0.10, -0.29, 1.0], [0.29, 0.10, 0.29, 1.0], [-0.40, 0.07, 0.40, 0.07]];
-    var glyphs = [A, A, R, U];
-    var reeds = [];
-    var startPos = function (stray) {
-      for (var k = 0; k < 40; k++) {
-        var x = -2.5 + rnd() * 5.0, z = -1.0 + rnd() * 2.7;
-        var inside = Math.abs(x) < 2.0 && z > -0.65 && z < 0.75;
-        if (!stray || !inside) return [x, z];
-      }
-      return [2.3, 1.2];
-    };
-    for (var li = 0; li < 4; li++) {
-      var cx = -1.47 + 0.98 * li;
-      glyphs[li].forEach(function (s) {
-        var x0 = cx + s[0], z0 = 0.5 - s[1], x1 = cx + s[2], z1 = 0.5 - s[3];
-        var dx = x1 - x0, dz = z1 - z0, len = Math.sqrt(dx * dx + dz * dz);
-        var ux = dx / len, uz = dz / len, px = -uz, pz = ux;
-        for (var k = 0; k < 4; k++) {
-          var o = (k - 1.5) * 0.042 + (rnd() - 0.5) * 0.008;
-          var al = (rnd() - 0.5) * 0.06;
-          var sp = startPos(false);
-          reeds.push({
-            tx: (x0 + x1) / 2 + px * o + ux * al, tz: (z0 + z1) / 2 + pz * o + uz * al,
-            ta: Math.atan2(uz, ux), hl: len / 2 + 0.05 + (rnd() - 0.5) * 0.06,
-            sx: sp[0], sz: sp[1], sa: rnd() * Math.PI, letter: li, stray: false,
-            r1: rnd(), r2: rnd(), r3: rnd(), vx: (rnd() - 0.5) * 0.06, vz: (rnd() - 0.5) * 0.06, w: (rnd() - 0.5) * 0.16, seed: rnd()
-          });
-        }
-      });
-    }
-    for (var j = 0; j < 14; j++) {
-      var sp2 = startPos(true);
-      var ang = Math.atan2(sp2[1] - 0.2, sp2[0]);
-      reeds.push({
-        tx: 0, tz: 0, ta: 0, hl: 0.16 + rnd() * 0.22, sx: sp2[0], sz: sp2[1], sa: rnd() * Math.PI, letter: 0, stray: true,
-        r1: rnd(), r2: rnd(), r3: rnd(), vx: Math.cos(ang) * 0.015, vz: Math.sin(ang) * 0.015, w: (rnd() - 0.5) * 0.1, seed: rnd()
-      });
-    }
-    return reeds;
-  }
-  fragSrc() {
-    return `#version 300 es
+"use strict";var AaruReeds=(()=>{var __defProp=Object.defineProperty;var __getOwnPropDesc=Object.getOwnPropertyDescriptor;var __getOwnPropNames=Object.getOwnPropertyNames;var __hasOwnProp=Object.prototype.hasOwnProperty;var __export=(target,all)=>{for(var name in all)__defProp(target,name,{get:all[name],enumerable:true})};var __copyProps=(to,from,except,desc)=>{if(from&&typeof from==="object"||typeof from==="function"){for(let key of __getOwnPropNames(from))if(!__hasOwnProp.call(to,key)&&key!==except)__defProp(to,key,{get:()=>from[key],enumerable:!(desc=__getOwnPropDesc(from,key))||desc.enumerable})}return to};var __toCommonJS=mod=>__copyProps(__defProp({},"__esModule",{value:true}),mod);var reeds_exports={};__export(reeds_exports,{startReeds:()=>startReeds});var FRAG=`#version 300 es
 precision highp float;
 precision highp sampler2D;
 uniform vec2 uRes;
@@ -143,6 +159,7 @@ uniform float uTime;
 uniform float uCam;
 uniform int uN;
 uniform sampler2D uData;
+uniform vec4 uTouch[8];   // xz, birth time, strength
 out vec4 fragColor;
 
 const vec3 L = vec3(-0.500, 0.740, -0.450);
@@ -184,40 +201,106 @@ float bubbleAge(float age, float seed, float fk){
 }
 
 // A: centre.xz, angle, projected half-length   B: tip depth (neg = above), age since tip broke surface, glide speed, seed
-// C: tan(pitch), age since it fell flat (-1 = not yet), true half-length
-float reedRip(vec2 q, vec2 dir, vec4 A, vec4 B, vec4 C, float rad){
+// C: tan(pitch), age since it fell flat (-1 = not yet), true half-length, age since it docked into its letter (-1 = not yet)
+// D (row 3, passed as vel): smoothed glide velocity.xz
+// Every term below fades in and out smoothly and is ~0 at the cull radius used in main(),
+// so nothing pops or leaves a seam on the water.
+float reedRip(vec2 q, vec2 dir, vec4 A, vec4 B, vec4 C, vec2 vel, float rad){
   float h = 0.0;
   float d = segDist(q, dir, A.w);
   float dt = length(q - dir*A.w);
   float age = B.y, la = C.y;
-  bool isFlat = la >= 0.0;
-  if (age < 0.0 && B.x < 0.08) h += 0.010*(1.0 - max(B.x, 0.0)/0.08)*exp(-dt*30.0);
-  if (isFlat) h += 0.0025*exp(-max(d - rad, 0.0)/0.007);
-  else if (age >= 0.0) h += 0.0035*exp(-max(dt - rad, 0.0)/0.008);
-  if (age >= 0.0 && age < 4.0){
+
+  // the surface swells over the rising tip, then relaxes once it is through
+  float bump = age < 0.0 ? 1.0 - clamp(B.x/0.08, 0.0, 1.0) : exp(-age*9.0);
+  h += 0.010*bump*exp(-dt*30.0);
+
+  // meniscus: around the tip while the stem stands, along the whole stem once it lies flat
+  float flatT = smoothstep(0.0, 0.25, la);
+  h += 0.0035*smoothstep(0.0, 0.2, age)*(1.0 - flatT)*exp(-max(dt - rad, 0.0)/0.008);
+  h += 0.0025*flatT*exp(-max(d - rad, 0.0)/0.007);
+
+  // ring from the tip breaking the surface
+  if (age > 0.0 && age < 4.0){
     float x = dt - age*0.25;
-    h += 0.005*sin(x*75.0)*exp(-x*x*450.0)*exp(-age*0.9);
+    h += 0.005*sin(x*75.0)*exp(-x*x*450.0)*exp(-age*0.9)*smoothstep(0.0, 0.18, age)*smoothstep(4.0, 3.0, age);
   }
-  if (isFlat && la < 4.0){
+  // the slap as it falls flat: a ring off the whole stem and a brief trough under it
+  if (la > 0.0 && la < 4.0){
     float x = d - la*0.3;
-    h += 0.008*sin(x*65.0)*exp(-x*x*350.0)*exp(-la*0.9);
-    h -= 0.006*exp(-la*6.0)*exp(-d*30.0);
+    h += 0.008*sin(x*65.0)*exp(-x*x*350.0)*exp(-la*0.9)*smoothstep(0.0, 0.12, la)*smoothstep(4.0, 3.0, la);
+    h -= 0.006*smoothstep(0.0, 0.08, la)*exp(-la*6.0)*exp(-d*30.0);
   }
-  if (B.z > 0.001) h += min(B.z, 0.3)*0.03*sin(d*55.0 - uTime*9.0)*exp(-d*9.0);
+
+  // Wake of a gliding stem, steady in the stem's own frame: a low bow wave pushed
+  // ahead of it and short ripples trailing behind.
+  float sp = length(vel);
+  if (sp > 0.002){
+    vec2 vh = vel/sp;
+    float s = min(sp, 0.6);
+    float al = dot(q, vh);
+    float ext = abs(dot(dir, vh))*A.w;   // how far the stem reaches along its heading
+    h += s*0.010*smoothstep(-0.03, 0.06, al - ext)*exp(-d*22.0);
+    float back = al + ext;
+    h += s*0.007*sin(back*46.0)*smoothstep(0.02, -0.08, back)*exp(back*3.0)*exp(-d*d*70.0);
+  }
+
+  // a faint ring as the stem nudges into its place in the word
+  if (C.w > 0.0 && C.w < 3.0){
+    float x = d - 0.02 - C.w*0.2;
+    h += 0.0024*sin(x*52.0)*exp(-x*x*300.0)*smoothstep(0.0, 0.35, C.w)*smoothstep(3.0, 1.8, C.w);
+  }
+
   for (int k = 0; k < 3; k++){
     float fk = float(k);
     float ba = bubbleAge(age, B.w, fk);
     if (ba > 0.7 && ba < 2.2){
       float x = length(q - bubblePos(dir, A.w, B.w, fk)) - (ba - 0.7)*0.15;
-      h += 0.0015*sin(x*120.0)*exp(-x*x*3000.0)*exp(-(ba - 0.7)*2.0);
+      h += 0.0015*sin(x*120.0)*exp(-x*x*3000.0)*exp(-(ba - 0.7)*2.0)*smoothstep(0.7, 0.85, ba);
     }
   }
   return h;
 }
 
+// rings left by the pointer
+float touchRip(vec2 p){
+  float h = 0.0;
+  for (int k = 0; k < 8; k++){
+    vec4 T = uTouch[k];
+    float age = uTime - T.z;
+    if (T.w <= 0.0 || age < 0.0 || age > 3.5) continue;
+    float x = length(p - T.xy) - age*0.26;
+    h += T.w*0.006*sin(x*60.0)*exp(-x*x*260.0)*exp(-age*1.4);
+  }
+  return h;
+}
+
+// a sparse field of stars, seen only by reflection
+vec3 stars(vec3 r){
+  vec2 s = r.xz/max(r.y, 0.2)*26.0;
+  vec2 c = floor(s);
+  float hs = hash(vec3(c, 7.0));
+  if (hs < 0.88) return vec3(0.0);
+  vec2 o = (vec2(hash(vec3(c, 1.0)), hash(vec3(c, 2.0))) - 0.5)*0.7;
+  float d = length(fract(s) - 0.5 - o);
+  float mag = pow((hs - 0.88)/0.12, 3.0);
+  float tw = 0.7 + 0.3*sin(uTime*(0.8 + hs*2.5) + hs*40.0);
+  vec3 tint = mix(vec3(0.72, 0.84, 1.0), vec3(1.0, 0.9, 0.78), hash(vec3(c, 3.0)));
+  return tint*mag*tw*smoothstep(0.07, 0.0, d);
+}
+
 vec3 moonRad(vec3 r){
   float d = max(dot(r, L), 0.0);
   return MOON*(pow(d, 3000.0)*140.0 + pow(d, 400.0)*8.0 + pow(d, 60.0)*0.5);
+}
+
+// Moonlight on the water. Graded lobes so a ripple shades from black through
+// silver to white instead of flashing, and the sharpest lobe widens where the
+// surface turns faster than a pixel can resolve (w), which stops the sparkle crawling.
+vec3 moonWater(vec3 r, float w){
+  float d = max(dot(r, L), 0.0);
+  float sharp = mix(3000.0, 450.0, w);
+  return MOON*(pow(d, sharp)*140.0*(sharp/3000.0) + pow(d, 400.0)*8.0 + pow(d, 110.0)*1.6 + pow(d, 60.0)*0.5 + pow(d, 18.0)*0.12);
 }
 
 void main(){
@@ -234,6 +317,9 @@ void main(){
   float h0 = baseWaves(p, t);
   float hx = baseWaves(p + vec2(e, 0.0), t);
   float hz = baseWaves(p + vec2(0.0, e), t);
+  h0 += touchRip(p);
+  hx += touchRip(p + vec2(e, 0.0));
+  hz += touchRip(p + vec2(0.0, e));
   vec3 nb = normalize(vec3(h0 - hx, e, h0 - hz));
 
   float bestTop = -1e3; float bCov = 0.0;
@@ -244,17 +330,20 @@ void main(){
     vec4 A = texelFetch(uData, ivec2(i, 0), 0);
     vec4 B = texelFetch(uData, ivec2(i, 1), 0);
     vec4 C = texelFetch(uData, ivec2(i, 2), 0);
+    vec2 vel = texelFetch(uData, ivec2(i, 3), 0).xy;
     vec2 dc = p - A.xy;
     float r1 = (B.y > -1.0 && B.y < 4.0) ? max(B.y, 0.0)*0.25 + 0.1 : 0.0;
     float r2 = (C.y >= 0.0 && C.y < 4.0) ? C.y*0.3 + 0.1 : 0.0;
-    float cullR = A.w + 0.14 + max(r1, r2) + B.z*2.0;
+    float r3 = (C.w >= 0.0 && C.w < 3.0) ? C.w*0.22 + 0.1 : 0.0;
+    float rw = dot(vel, vel) > 4e-6 ? 0.3 : 0.0;
+    float cullR = A.w + 0.14 + max(max(r1, r2), max(r3, rw));
     if (dot(dc, dc) > cullR*cullR) continue;
     vec2 dir = vec2(cos(A.z), sin(A.z));
     vec2 perp = vec2(-dir.y, dir.x);
     float R = 0.02*(0.85 + 0.3*fract(B.w*13.7));
-    h0 += reedRip(dc, dir, A, B, C, R);
-    hx += reedRip(dc + vec2(e, 0.0), dir, A, B, C, R);
-    hz += reedRip(dc + vec2(0.0, e), dir, A, B, C, R);
+    h0 += reedRip(dc, dir, A, B, C, vel, R);
+    hx += reedRip(dc + vec2(e, 0.0), dir, A, B, C, vel, R);
+    hz += reedRip(dc + vec2(0.0, e), dir, A, B, C, vel, R);
 
     // air escaping the hollow stem just before it surfaces
     for (int k = 0; k < 3; k++){
@@ -283,7 +372,8 @@ void main(){
         float ac = dot(dq, perp);
         if (abs(al) < A.w){
           float tipT = smoothstep(A.w, A.w - 0.05, abs(al));
-          float rad = R*(0.5 + 0.5*tipT);
+          // rounded ends, and a taper from the thick base to the tip
+          float rad = R*(0.5 + 0.5*tipT)*(1.0 - 0.3*(al/A.w*0.5 + 0.5));
           float cov = smoothstep(rad + px*0.5, rad - px*0.5, abs(ac))*smoothstep(A.w, A.w - px, abs(al));
           if (cov > 0.0){
             float top = y + B.w*0.004 + sqrt(max(rad*rad - ac*ac, 0.0));
@@ -300,7 +390,10 @@ void main(){
   // pure black water: only the moon, by reflection
   vec3 n = normalize(vec3(h0 - hx, e, h0 - hz));
   float fres = 0.02 + 0.98*pow(1.0 - max(dot(n, -rd), 0.0), 5.0);
-  vec3 col = moonRad(reflect(rd, n))*fres;
+  float nw = clamp(length(fwidth(n))*14.0, 0.0, 1.0);
+  vec3 col = moonWater(reflect(rd, n), nw)*fres;
+  // stars use a calmer normal so they wobble on the swell instead of breaking into noise
+  col += stars(reflect(rd, normalize(vec3(n.x*0.12, 1.0, n.z*0.12))))*0.42;
 
   if (bCov > 0.0){
     vec2 dir = vec2(cos(bAng), sin(bAng));
@@ -319,12 +412,33 @@ void main(){
     alb *= 1.0 - 0.45*node;
     float endc = smoothstep(bHl - 0.012, bHl, abs(u));
     alb *= 1.0 - 0.5*endc;
+    // green at the base, dried straw toward the tip
+    alb = mix(alb, alb*vec3(1.35, 1.15, 0.72), smoothstep(-bHl, bHl, u)*0.55);
     float wf = exp(-max(bAge, 0.0)/6.0);
+    alb *= 1.0 - 0.3*wf;   // darker while still wet
     float dif = max(dot(nr, L), 0.0);
-    vec3 rc = alb*(MOON*dif*1.15 + vec3(0.003, 0.004, 0.006));
+
+    // Stems lying on top of this one: a moon shadow cast across it, and a dark crease where they touch.
+    float occ = 0.0;
+    vec2 ls = normalize(L.xz)*0.02;
+    for (int j = 0; j < 128; j++){
+      if (j >= uN) break;
+      vec4 B2 = texelFetch(uData, ivec2(j, 1), 0);
+      if (B2.w <= bSeed + 1e-4 || B2.y < 0.0) continue;
+      vec4 A2 = texelFetch(uData, ivec2(j, 0), 0);
+      vec2 dc2 = p - A2.xy;
+      float cr = A2.w + 0.08;
+      if (dot(dc2, dc2) > cr*cr) continue;
+      vec2 d2 = vec2(cos(A2.z), sin(A2.z));
+      float R2 = 0.02*(0.85 + 0.3*fract(B2.w*13.7));
+      occ = max(occ, 0.75*smoothstep(R2*1.6, R2*0.5, segDist(dc2 + ls, d2, A2.w)));
+      occ = max(occ, 0.35*smoothstep(R2*2.4, R2, segDist(dc2, d2, A2.w)));
+    }
+    float lit = 1.0 - occ;
+    vec3 rc = alb*(MOON*dif*1.15*lit + vec3(0.003, 0.004, 0.006));
     vec3 rr = reflect(rd, nr);
     float sd = max(dot(rr, L), 0.0);
-    rc += MOON*(pow(sd, 90.0)*0.18 + pow(sd, 700.0)*1.6*(1.0 + wf))*(1.0 - 0.6*node);
+    rc += MOON*(pow(sd, 90.0)*0.18 + pow(sd, 700.0)*1.6*(1.0 + wf))*(1.0 - 0.6*node)*lit;
     // beads of water on a freshly surfaced stem
     float bead = smoothstep(0.8, 0.9, noise(vec3(u*70.0, s*5.0, bSeed*40.0)))*wf;
     rc += MOON*bead*0.12*(0.3 + pow(sd, 20.0));
@@ -342,171 +456,33 @@ void main(){
   col += (hash(vec3(gl_FragCoord.xy, fract(uTime)*91.0)) - 0.5)*0.006;
   fragColor = vec4(max(col, 0.0), 1.0);
 }
-`;
-  }
-  startGL(canvas) {
-    var gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' });
-    if (!gl) { console.warn('Aaru reeds: WebGL2 not available'); return; }
-    var mk = function (type, src) {
-      var s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn('Aaru reeds shader:', gl.getShaderInfoLog(s)); return null; }
-      return s;
-    };
-    var vs = mk(gl.VERTEX_SHADER, '#version 300 es\nin vec2 aP; void main(){ gl_Position = vec4(aP, 0.0, 1.0); }');
-    var fs = mk(gl.FRAGMENT_SHADER, this.fragSrc());
-    if (!vs || !fs) return;
-    var prog = gl.createProgram();
-    gl.attachShader(prog, vs); gl.attachShader(prog, fs);
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn('Aaru reeds link:', gl.getProgramInfoLog(prog)); return; }
-    gl.useProgram(prog);
-    var buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    var aP = gl.getAttribLocation(prog, 'aP');
-    gl.enableVertexAttribArray(aP);
-    gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
-    var U = {};
-    ['uRes', 'uTime', 'uCam', 'uN', 'uData'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
-
-    var reeds = this.buildReeds();
-    var N = reeds.length;
-    var data = new Float32Array(N * 3 * 4);
-    var tex = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, N, 3, 0, gl.RGBA, gl.FLOAT, data);
-    gl.uniform1i(U.uData, 0);
-    gl.uniform1i(U.uN, N);
-
-    var reduce = false;
-    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var cw0 = Math.max(1, canvas.clientWidth * dpr), ch0 = Math.max(1, canvas.clientHeight * dpr);
-    var scale = Math.max(0.5, Math.min(1, Math.sqrt(2400000 / (cw0 * ch0))));
-    var resize = function () {
-      var w = Math.max(1, Math.round(canvas.clientWidth * dpr * scale));
-      var h = Math.max(1, Math.round(canvas.clientHeight * dpr * scale));
-      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-      gl.viewport(0, 0, w, h);
-    };
-    resize();
-    if (window.ResizeObserver) { this._ro = new ResizeObserver(resize); this._ro.observe(canvas); }
-
-    this._t0 = performance.now();
-    var self = this, last = performance.now(), acc = 0, frames = 0, lastT = -1;
-    var PI = Math.PI;
-    var smooth = function (x) { x = Math.min(1, Math.max(0, x)); return x * x * x * (x * (x * 6 - 15) + 10); };
-    var wrapPi = function (a) { a = (a + PI / 2) % PI; if (a < 0) a += PI; return a - PI / 2; };
-    var loop = function (now) {
-      if (!self._alive && self._alive !== undefined) return;
-      self._raf = requestAnimationFrame(loop);
-      var dt = now - last; last = now;
-      if (dt < 100) { acc += dt; frames++; }
-      if (frames >= 24) {
-        var avg = acc / frames;
-        if (avg > 22 && scale > 0.5) { scale = Math.max(0.5, scale * 0.9); resize(); }
-        else if (avg < 13 && scale < 1) { scale = Math.min(1, scale * 1.05); resize(); }
-        acc = 0; frames = 0;
-      }
-      var t = (now - self._t0) / 1000 + (reduce ? 120 : 0);
-      var fs2 = Number(self.props && self.props.formSeconds);
-      var D = Math.max(6, isFinite(fs2) && fs2 > 0 ? fs2 : 18);
-      var stepDt = (lastT >= 0 && t > lastT && t - lastT < 0.2) ? t - lastT : 0;
-      lastT = t;
-      for (var i = 0; i < N; i++) {
-        var r = reeds[i];
-        var ts = 0.4 + r.r1 * 0.35 * D;
-        var age = t - ts;
-        var th0 = 0.45 + ((r.seed * 3.7) % 1) * 0.5;
-        var Tf = 0.9 + ((r.seed * 5.3) % 1) * 0.5;
-        var th, tipDepth, landAge = -1;
-        if (age < 0) {
-          // rising at a slant, buoyant end first
-          th = th0; tipDepth = -age * 0.22;
-        } else if (age < Tf) {
-          // the end has broken the surface; the stem topples over like a falling pole
-          var f = age / Tf;
-          th = th0 * (1 - f * f);
-          tipDepth = -0.012 * Math.sin(f * PI);
-        } else {
-          landAge = age - Tf;
-          th = 0.035 * Math.exp(-landAge * 4) * Math.abs(Math.sin(landAge * 10));
-          tipDepth = 0;
-        }
-        var td = Math.max(0, age - Tf);
-        var ramp = Math.min(1, td / 3);
-        var fx = r.sx + r.vx * td + Math.sin(t * 0.6 + r.seed * 20) * 0.03 * ramp;
-        var fz = r.sz + r.vz * td + Math.cos(t * 0.5 + r.seed * 11) * 0.03 * ramp;
-        var fa = r.sa + r.w * td;
-        var x = fx, z = fz, a = fa;
-        if (!r.stray) {
-          var tA = Math.max(ts + Tf + 1.2, 0.3 * D + r.r2 * 0.4 * D + r.letter * 0.04 * D);
-          var g = Math.max(2.5, 0.18 * D * (0.8 + 0.4 * r.r3));
-          var s = smooth((t - tA) / g);
-          if (s > 0) {
-            x = fx + (r.tx - fx) * s;
-            z = fz + (r.tz - fz) * s;
-            a = fa + wrapPi(r.ta - fa) * s;
-            if (s >= 1) {
-              x = r.tx - Math.sin(r.ta) * 0.003 * Math.sin(t * 0.7 + r.seed * 10);
-              z = r.tz + Math.cos(r.ta) * 0.003 * Math.sin(t * 0.7 + r.seed * 10);
-              a = r.ta + 0.006 * Math.sin(t * 0.5 + r.seed * 7);
-            }
-          }
-        }
-        var spd = 0;
-        if (stepDt > 0 && r.px !== undefined) {
-          var mx = x - r.px, mz = z - r.pz;
-          spd = Math.sqrt(mx * mx + mz * mz) / stepDt + Math.abs(wrapPi(a - r.pa)) * r.hl / stepDt;
-          spd = Math.max(0, spd - 0.04);
-        }
-        if (stepDt === 0) spd = 0;
-        r.spd = (r.spd || 0) * 0.85 + spd * 0.15;
-        r.px = x; r.pz = z; r.pa = a;
-        // projected shape of a tilted stem: the surfaced end stays put, the far end swings out as it falls
-        var c = Math.cos(th), ca = Math.cos(a), sa = Math.sin(a);
-        var cx = x + ca * r.hl * (1 - c), cz = z + sa * r.hl * (1 - c);
-        var o = i * 4, o2 = (N + i) * 4, o3 = (2 * N + i) * 4;
-        data[o] = cx; data[o + 1] = cz; data[o + 2] = a; data[o + 3] = r.hl * c;
-        data[o2] = tipDepth; data[o2 + 1] = Math.max(age, -5); data[o2 + 2] = r.spd; data[o2 + 3] = r.seed;
-        data[o3] = Math.tan(th); data[o3 + 1] = landAge; data[o3 + 2] = r.hl; data[o3 + 3] = 0;
-      }
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, N, 3, gl.RGBA, gl.FLOAT, data);
-      var aspect = canvas.width / Math.max(1, canvas.height);
-      gl.uniform2f(U.uRes, canvas.width, canvas.height);
-      gl.uniform1f(U.uTime, t);
-      gl.uniform1f(U.uCam, Math.max(4.2, 6.5 / aspect));
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-    this._raf = requestAnimationFrame(loop);
-  }
-}
-
+`;var VERT="#version 300 es\nin vec2 aP; void main(){ gl_Position = vec4(aP, 0.0, 1.0); }";var A=[[-.36,0,-.05,1],[.36,0,.05,1],[-.27,.36,.27,.36]];var R=[[-.28,0,-.28,1],[-.4,.93,.24,.93],[.29,.95,.29,.48],[-.4,.52,.3,.52],[-.02,.5,.38,0]];var U=[[-.29,.1,-.29,1],[.29,.1,.29,1],[-.4,.07,.4,.07]];function buildReeds(){let seed=20261108;const rnd=()=>{seed|=0;seed=seed+1831565813|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};const startPos=stray=>{for(let k=0;k<40;k++){const x=-2.5+rnd()*5;const z=-1+rnd()*2.7;const inside=Math.abs(x)<2&&z>-.65&&z<.75;if(!stray||!inside)return[x,z]}return[2.3,1.2]};const reeds=[];[A,A,R,U].forEach((glyph,li)=>{const cx=-1.47+.98*li;for(const s of glyph){const x0=cx+s[0];const z0=.5-s[1];const x1=cx+s[2];const z1=.5-s[3];const dx=x1-x0;const dz=z1-z0;const len=Math.sqrt(dx*dx+dz*dz);const ux=dx/len;const uz=dz/len;const px=-uz;const pz=ux;for(let k=0;k<4;k++){const o=(k-1.5)*.042+(rnd()-.5)*.008;const al=(rnd()-.5)*.06;const sp=startPos(false);reeds.push({tx:(x0+x1)/2+px*o+ux*al,tz:(z0+z1)/2+pz*o+uz*al,ta:Math.atan2(uz,ux),hl:len/2+.05+(rnd()-.5)*.06,sx:sp[0],sz:sp[1],sa:rnd()*Math.PI,letter:li,stray:false,r1:rnd(),r2:rnd(),r3:rnd(),vx:(rnd()-.5)*.06,vz:(rnd()-.5)*.06,w:(rnd()-.5)*.16,seed:rnd()})}}});for(let j=0;j<14;j++){const sp=startPos(true);const ang=Math.atan2(sp[1]-.2,sp[0]);reeds.push({tx:0,tz:0,ta:0,hl:.16+rnd()*.22,sx:sp[0],sz:sp[1],sa:rnd()*Math.PI,letter:0,stray:true,r1:rnd(),r2:rnd(),r3:rnd(),vx:Math.cos(ang)*.015,vz:Math.sin(ang)*.015,w:(rnd()-.5)*.1,seed:rnd()})}return reeds}var camHeight=aspect=>Math.max(4.2,6.5/aspect);var smooth=x=>{x=Math.min(1,Math.max(0,x));return x*x*x*(x*(x*6-15)+10)};var wrapPi=a=>{a=(a+Math.PI/2)%Math.PI;if(a<0)a+=Math.PI;return a-Math.PI/2};function startReeds(canvas,opts={}){var _a;const gl=canvas.getContext("webgl2",{antialias:false,alpha:false,depth:false,stencil:false,powerPreference:"high-performance"});if(!gl)return null;const compile=(type,src)=>{const s=gl.createShader(type);if(!s)return null;gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.warn("Aaru reeds shader:",gl.getShaderInfoLog(s));return null}return s};const vs=compile(gl.VERTEX_SHADER,VERT);const fs=compile(gl.FRAGMENT_SHADER,FRAG);const prog=gl.createProgram();if(!vs||!fs||!prog)return null;gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){console.warn("Aaru reeds link:",gl.getProgramInfoLog(prog));return null}gl.useProgram(prog);const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const aP=gl.getAttribLocation(prog,"aP");gl.enableVertexAttribArray(aP);gl.vertexAttribPointer(aP,2,gl.FLOAT,false,0,0);const uRes=gl.getUniformLocation(prog,"uRes");const uTime=gl.getUniformLocation(prog,"uTime");const uCam=gl.getUniformLocation(prog,"uCam");const uTouch=gl.getUniformLocation(prog,"uTouch");const reeds=buildReeds();const N=reeds.length;const data=new Float32Array(N*4*4);const tex=gl.createTexture();gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,N,4,0,gl.RGBA,gl.FLOAT,data);gl.uniform1i(gl.getUniformLocation(prog,"uData"),0);gl.uniform1i(gl.getUniformLocation(prog,"uN"),N);const D=Math.min(40,Math.max(6,(_a=opts.formSeconds)!=null?_a:18));const skip=opts.reduceMotion?120:0;const dpr=Math.min(window.devicePixelRatio||1,2);const area0=Math.max(1,canvas.clientWidth*dpr)*Math.max(1,canvas.clientHeight*dpr);let scale=Math.max(.5,Math.min(1,Math.sqrt(24e5/area0)));const resize=()=>{const w=Math.max(1,Math.round(canvas.clientWidth*dpr*scale));const h=Math.max(1,Math.round(canvas.clientHeight*dpr*scale));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}gl.viewport(0,0,w,h)};resize();const ro=new ResizeObserver(resize);ro.observe(canvas);let t0=performance.now();const touches=new Float32Array(8*4);let touchIdx=0;let lastTX=1e9;let lastTZ=1e9;const addTouch=(ev,press)=>{const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;const ux=(ev.clientX-rect.left-rect.width/2)/rect.height;const uy=(rect.height/2-(ev.clientY-rect.top))/rect.height-.2;const k=camHeight(rect.width/rect.height)/1.6;const wx=ux*k;const wz=-uy*k;const dist=Math.sqrt((wx-lastTX)**2+(wz-lastTZ)**2);if(!press&&dist<.09)return;lastTX=wx;lastTZ=wz;touches.set([wx,wz,(performance.now()-t0)/1e3+skip,press?1:Math.min(.8,.3+dist*2)],touchIdx*4);touchIdx=(touchIdx+1)%8};const onMove=ev=>addTouch(ev,false);const onDown=ev=>addTouch(ev,true);if(!opts.reduceMotion){window.addEventListener("pointermove",onMove,{passive:true});window.addEventListener("pointerdown",onDown,{passive:true})}let last=t0;let acc=0;let frames=0;let lastT=-1;let raf=0;let alive=true;const loop=now=>{if(!alive)return;raf=requestAnimationFrame(loop);if(document.hidden)return;const dtMs=now-last;last=now;if(dtMs<100){acc+=dtMs;frames++}if(frames>=24){const avg=acc/frames;if(avg>22&&scale>.5){scale=Math.max(.5,scale*.9);resize()}else if(avg<13&&scale<1){scale=Math.min(1,scale*1.05);resize()}acc=0;frames=0}const t=(now-t0)/1e3+skip;const stepDt=lastT>=0&&t>lastT&&t-lastT<.2?t-lastT:0;lastT=t;for(let i=0;i<N;i++){const r=reeds[i];const ts=.4+r.r1*.35*D;const age=t-ts;const th0=.45+r.seed*3.7%1*.5;const Tf=.9+r.seed*5.3%1*.5;let th;let tipDepth;let landAge=-1;if(age<0){th=th0;tipDepth=-age*.22}else if(age<Tf){const f=age/Tf;th=th0*(1-f*f);tipDepth=-.012*Math.sin(f*Math.PI)}else{landAge=age-Tf;th=.035*Math.exp(-landAge*4)*Math.abs(Math.sin(landAge*10));tipDepth=0}const td=Math.max(0,age-Tf);const ramp=Math.min(1,td/3);const fx=r.sx+r.vx*td+Math.sin(t*.6+r.seed*20)*.03*ramp;const fz=r.sz+r.vz*td+Math.cos(t*.5+r.seed*11)*.03*ramp;const fa=r.sa+r.w*td;let x=fx;let z=fz;let a=fa;let dockAge=-1;if(!r.stray){const tA=Math.max(ts+Tf+1.2,.3*D+r.r2*.4*D+r.letter*.04*D);const g=Math.max(2.5,.18*D*(.8+.4*r.r3));const u=(t-tA)/g;const s=smooth(u);if(s>0){const ddx=r.tx-fx;const ddz=r.tz-fz;const faA=r.sa+r.w*Math.max(0,tA-ts-Tf);const turn=wrapPi(r.ta-faA);if(u<1){const arc=Math.sin(Math.PI*s)*(r.r3-.5)*.3;const s2=smooth(u*1.25-.25);x=fx+ddx*s-ddz*arc;z=fz+ddz*s+ddx*arc;a=faA+(fa-faA)*(1-s2)+turn*s2}else{dockAge=t-(tA+g);const dl=Math.sqrt(ddx*ddx+ddz*ddz)||1;const ease=smooth(dockAge/.4);const settle=.012*ease*Math.exp(-dockAge*2.2)*Math.sin(dockAge*7);x=r.tx+ddx/dl*settle;z=r.tz+ddz/dl*settle;a=faA+turn+.02*ease*Math.exp(-dockAge*2)*Math.sin(dockAge*6)}}}if(stepDt>0&&r.px!==void 0&&r.pz!==void 0){const k=1-Math.exp(-stepDt/.3);r.svx=(r.svx||0)+((x-r.px)/stepDt-(r.svx||0))*k;r.svz=(r.svz||0)+((z-r.pz)/stepDt-(r.svz||0))*k}r.px=x;r.pz=z;const svx=r.svx||0;const svz=r.svz||0;const sp=Math.sqrt(svx*svx+svz*svz);const wake=landAge>=0&&sp>.03?(sp-.03)/sp:0;if(ramp>0){const p1=(.8*x+.6*z)*2.1+t*.9;const p2=(-.6*x+.8*z)*3.3+t*1.3;const p3=(.3*x-.95*z)*5.7+t*1.9;const c1=.014*Math.cos(p1)*ramp;const c2=.0098*Math.cos(p2)*ramp;const c3=.0056*Math.cos(p3)*ramp;x+=.8*c1-.6*c2+.3*c3;z+=.6*c1+.8*c2-.95*c3;a+=(.012*Math.sin(p1+1.3)+.008*Math.sin(p2+.4))*ramp}const c=Math.cos(th);const ccx=x+Math.cos(a)*r.hl*(1-c);const ccz=z+Math.sin(a)*r.hl*(1-c);const o=i*4;const o2=(N+i)*4;const o3=(2*N+i)*4;data[o]=ccx;data[o+1]=ccz;data[o+2]=a;data[o+3]=r.hl*c;data[o2]=tipDepth;data[o2+1]=Math.max(age,-5);data[o2+2]=sp*wake;data[o2+3]=r.seed;data[o3]=Math.tan(th);data[o3+1]=landAge;data[o3+2]=r.hl;data[o3+3]=dockAge;const o4=(3*N+i)*4;data[o4]=svx*wake;data[o4+1]=svz*wake}gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,4,gl.RGBA,gl.FLOAT,data);const aspect=canvas.width/Math.max(1,canvas.height);gl.uniform2f(uRes,canvas.width,canvas.height);gl.uniform1f(uTime,t);gl.uniform1f(uCam,camHeight(aspect));gl.uniform4fv(uTouch,touches);gl.drawArrays(gl.TRIANGLES,0,3)};raf=requestAnimationFrame(loop);return{replay:()=>{t0=performance.now();touches.fill(0);lastT=-1;for(const r of reeds)r.px=r.pz=r.svx=r.svz=void 0},destroy:()=>{var _a2;alive=false;cancelAnimationFrame(raf);ro.disconnect();window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerdown",onDown);gl.deleteTexture(tex);gl.deleteBuffer(buf);gl.deleteProgram(prog);gl.deleteShader(vs);gl.deleteShader(fs);(_a2=gl.getExtension("WEBGL_lose_context"))==null?void 0:_a2.loseContext()}}}return __toCommonJS(reeds_exports);})();
+</script>
+<script>
 (function () {
-  var params = new URLSearchParams(location.search);
-  var scene = new ReedsScene();
-  // Seconds for the reeds to gather into the word, 8-40. Override with ?form=.
-  scene.props = { formSeconds: Math.min(40, Math.max(8, Number(params.get('form')) || 18)) };
-  scene._alive = true;
-  scene._attach(document.getElementById('reeds'));
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var scene = AaruReeds.startReeds(document.getElementById('scene'), { formSeconds: 18, reduceMotion: reduce });
+  if (!scene) document.body.classList.add('no-webgl');
 
+  var card = document.querySelector('.card');
   document.getElementById('replay').addEventListener('click', function () {
-    scene._t0 = performance.now();
+    if (scene) scene.replay();
+    card.style.animation = 'none';
+    void card.offsetWidth;
+    card.style.animation = '';
+    document.getElementById('note').hidden = true;
   });
-  // Example form: nothing is sent anywhere.
-  document.getElementById('login-form').addEventListener('submit', function (e) {
+  document.getElementById('form').addEventListener('submit', function (e) {
     e.preventDefault();
-    document.getElementById('sent').hidden = false;
+    document.getElementById('note').hidden = false;
   });
-  Array.prototype.forEach.call(document.querySelectorAll('a[href="#"]'), function (a) {
-    a.addEventListener('click', function (e) { e.preventDefault(); });
+  var eye = document.getElementById('eye'), pw = document.getElementById('password');
+  eye.addEventListener('click', function () {
+    var show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    eye.setAttribute('aria-pressed', String(show));
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
   });
 })();
 </script>

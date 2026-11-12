@@ -1,12 +1,18 @@
 # Login: reeds gathering
 
-`index.html` is the sign-in page to build in `aaru-web` (`src/routes/auth/+page.svelte`). Reed stems surface from black night water lit only by the moon, topple flat with a ripple, then drift together and line up into the word AARU. The sign-in card fades in below.
+`index.html` is the sign-in page as built in `aaru-web` (`src/routes/auth/+page.svelte`). Reed stems surface from black night water lit only by the moon, topple flat with a ripple, then glide together and line up into the word AARU. The sign-in card fades in below.
 
-It is a standalone port of the "Reeds gathering" board from the Aaru Login Splash design canvas, with the same shader, timing and markup. It is reference only, like the rest of `design/`; the form sends nothing.
+The water scene is the app's own code (`aaru-web` → `src/lib/aaru/reeds.ts`), compiled into the page, so it matches the app exactly. The card around it is a hand-built copy in the design tokens. It is reference only, like the rest of `design/`; the form sends nothing.
 
-- **Timing:** the reeds take about 18 seconds to form the word. Add `?form=8` (8–40) to change it.
-- **Replay** restarts the gathering.
-- **Performance:** the render scale adapts between 0.5 and 1.0 to hold the frame rate.
-- **Reduced motion:** the scene starts with the word already formed.
+It started from the "Reeds gathering" board of the Aaru Login Splash design canvas. The app version adds:
+
+- tapered stems shaded from green base to straw tip, darker while wet, with contact shadows where they cross;
+- glides on shallow arcs with a fixed turn, a bow wave and trailing wake, and a soft settle and ring on docking;
+- stems that ride the visible swell once the word is formed;
+- graded moon glints, a faint field of reflected stars, and ripples under the pointer.
+
+**Replay** restarts the gathering. With `prefers-reduced-motion` the word starts already formed and pointer ripples are off. Without WebGL2 the page keeps its flat background.
+
+When `reeds.ts` changes, rebuild the inline script here with `npx esbuild src/lib/aaru/reeds.ts --bundle --format=iife --global-name=AaruReeds --target=es2019 --minify-whitespace` from `aaru-web`.
 
 The build notes for the web app are in `../specs/openwebui.md`, under "01 Login".
